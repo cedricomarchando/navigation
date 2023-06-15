@@ -181,7 +181,6 @@ amer4 = Amer(100.0, 100.0, 0, "Amer4")
 
 boat = Boat(400.0, 200.0)
 
-
 amer1.angle  = compute_angle(boat,amer1,sigma)
 amer2.angle  = compute_angle(boat,amer2,sigma)
 amer3.angle  = compute_angle(boat,amer3,sigma)
@@ -194,9 +193,9 @@ angle_table = np.zeros((amer_table_size ,amer_table_size ))
 cost_table= np.zeros((amer_table_size ,amer_table_size ))
 cost_table2= np.zeros((amer_table_size ,amer_table_size ))
 
-for i in range(amer_table_size):
-    for j in range(amer_table_size):
-        angle_table[i][j] = (amer_table[j].angle - amer_table[i].angle)
+for i , amer_i in enumerate(amer_table):
+    for j, amer_j in enumerate(amer_table):
+        angle_table[i][j] = (amer_j.angle - amer_i.angle)
 
 cost_table = angle_table % (2*np.pi)
 cost_table2 = - angle_table % (2*np.pi)
@@ -204,24 +203,18 @@ cost_table = np.minimum(cost_table,cost_table2)
 cost_table = cost_table - (2*np.pi/3)
 cost_table = abs(cost_table)
 
-# print(cost_table)
-
 comb = list(combinations(range(amer_table_size),3))
 
 min_cost = 1000.0
 index_min = 0
-for i in range(len(comb)):
-    # print(comb[i])
+for comb_i in comb:
     cost=0
-    for j in range(len(comb[i])):
-        cost += cost_table[comb[i][j]][comb[i][(j+1)%3]]
-        # print(f"i={i}, j={j}, cost={cost}")
+    for j in range(3):
+        cost += cost_table[comb_i[j]][comb_i[(j+1)%3]]
     if cost < min_cost:
         min_cost = cost
         index_min = i
 
-
-# print(f" index_min={index_min}, min_cost={min_cost}")
 amer_index = comb[index_min]
 print(amer_index)
 
