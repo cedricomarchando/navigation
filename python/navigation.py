@@ -2,6 +2,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import random
+from itertools import combinations
 
 #position fixing
 # Line Of Position (LOP)
@@ -168,15 +169,18 @@ for i in range(100,600,50):
 legend_unique()
 plt.title("2 LOP position fix")
 plt.show()
+
+
 # %%
-sigma = math.pi/90 # 2 degree
+sigma = np.pi/90 # 2 degree
 
 amer1 = Amer(100.0, 500.0, 0, "Amer1")
 amer2 = Amer(500.0, 500.0, 0, "Amer2")
 amer3 = Amer(500.0, 100.0, 0, "Amer3")
 amer4 = Amer(100.0, 100.0, 0, "Amer4")
 
-boat = Boat(300.0, 300.0)
+boat = Boat(400.0, 200.0)
+
 
 amer1.angle  = compute_angle(boat,amer1,sigma)
 amer2.angle  = compute_angle(boat,amer2,sigma)
@@ -184,17 +188,54 @@ amer3.angle  = compute_angle(boat,amer3,sigma)
 amer4.angle  = compute_angle(boat,amer4,sigma)
 
 amer_table=[amer1, amer2, amer3, amer4]
+amer_table_size = 4
 
-amer_detected = 4
-angle_table = np.zeros((amer_detected ,amer_detected ))
+angle_table = np.zeros((amer_table_size ,amer_table_size ))
+cost_table= np.zeros((amer_table_size ,amer_table_size ))
+cost_table2= np.zeros((amer_table_size ,amer_table_size ))
 
-for i in range(amer_detected):
-    for j in range(amer_detected):
+for i in range(amer_table_size):
+    for j in range(amer_table_size):
         angle_table[i][j] = (amer_table[j].angle - amer_table[i].angle)
-        print(f"i={i}, j={j}, angle i=  {amer_table[i].angle}, angle j=  {amer_table[j].angle} ")
-        
-print(angle_table)
-        
+
+cost_table = angle_table % (2*np.pi)
+cost_table2 = - angle_table % (2*np.pi)
+cost_table = np.minimum(cost_table,cost_table2)
+cost_table = cost_table - (2*np.pi/3)
+cost_table = abs(cost_table)
+
+# print(cost_table)
+
+comb = list(combinations(range(amer_table_size),3))
+
+min_cost = 1000.0
+index_min = 0
+for i in range(len(comb)):
+    # print(comb[i])
+    cost=0
+    for j in range(len(comb[i])):
+        cost += cost_table[comb[i][j]][comb[i][(j+1)%3]]
+        # print(f"i={i}, j={j}, cost={cost}")
+    if cost < min_cost:
+        min_cost = cost
+        index_min = i
+
+
+# print(f" index_min={index_min}, min_cost={min_cost}")
+amer_index = comb[index_min]
+print(amer_index)
+
+amerA= amer_table[amer_index[0]]
+amerB= amer_table[amer_index[1]]
+amerC= amer_table[amer_index[2]]
+
+position_x, position_y = compute_position_3LOP(boat,amerA,amerB,amerC)
+
+plot_amer_angle(amerA,boat)
+plot_amer_angle(amerB,boat)
+plot_amer_angle(amerC,boat)
+
+
 plt.show()
 
 # %%
