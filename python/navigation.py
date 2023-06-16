@@ -1,19 +1,20 @@
 # %%
+from itertools import combinations
 import numpy as np
 import matplotlib.pyplot as plt
-from itertools import combinations
 
 #position fixing
 # Line Of Position (LOP)
 
-
 class Boat:
+    """ Boat class """
     def __init__(self,x,y):
         self.x=x
         self.y=y
         plt.plot(self.x,self.y,'^b', markerfacecolor='none', label='Boat position')
 
 class Amer:
+    """ Amer class """
     def __init__(self,x,y,angle,name):
         self.x=x
         self.y=y
@@ -22,6 +23,7 @@ class Amer:
         plt.plot(self.x,self.y,'*k', markersize = 10, label ="Amer")
 
 def compute_angle(amer,boat,sigma):
+    """ compute Bearing angle of an Amer from the Boat """
     x = amer.x - boat.x
     y = amer.y - boat.y
     angle = np.arctan2(x,y)
@@ -31,11 +33,13 @@ def compute_angle(amer,boat,sigma):
 
 
 def plot_amer_angle(amer,boat):
+    """ Plot LOP of an amer with dotted line"""
     x = np.linspace(amer.x,boat.x,10) 
     y = x * 1/np.tan(amer.angle) + amer.y - amer.x *  1/np.tan(amer.angle)
     plt.plot(x,y,'--k',linewidth=0.5, label = "Line of Position (LoP)")
 
 def compute_intersection(amer1,amer2):
+    """ Compute intersection between two LOP of amer1 and amer2"""
     # put in the form AX = B, then solve X=inv(A).B
     # the line  of an amer is given by y= x/tang(alpha)  + amer.y - amer.x/tang(alpha)
     A = np.array([[-1/np.tan(amer1.angle) , 1],
@@ -45,7 +49,9 @@ def compute_intersection(amer1,amer2):
     X = np.linalg.inv(A).dot(B)
     return(X)
 
-def compute_position_3LOP(boat,amer1,amer2,amer3):
+
+def compute_position_3lop(boat,amer1,amer2,amer3):
+    """ Comput fix position with triangulation of 3LOP"""
     sigma = np.pi/90 # 2 degree
     amer1.angle  = compute_angle(boat,amer1,sigma)
     amer2.angle  = compute_angle(boat,amer2,sigma)
@@ -61,7 +67,8 @@ def compute_position_3LOP(boat,amer1,amer2,amer3):
     plt.plot(barycentre[0], barycentre[1],'^r', markerfacecolor='none',label='Estimate')
     return barycentre[0], barycentre[1]
 
-def compute_position_2LOP(boat, amer1_up, amer2_up, show_LOP):
+def compute_position_2lop(boat, amer1_up, amer2_up, show_lop):
+    """ Compute estimated position with 2 LOP"""
     amer1_down = Amer(amer1_up.x,amer1_up.y,0,"Amer1_down")
     amer2_down = Amer(amer2_up.x,amer2_up.x,0,"Amer2_down")
 
@@ -70,12 +77,11 @@ def compute_position_2LOP(boat, amer1_up, amer2_up, show_LOP):
     amer2_up.angle  = compute_angle(boat,amer2_up,sigma)
     amer1_down.angle  = compute_angle(boat,amer1_down,-sigma)
     amer2_down.angle  = compute_angle(boat,amer2_down,-sigma)
-    
-    if show_LOP:
+    if show_lop:
         plot_amer_angle(amer1_up,boat)
         plot_amer_angle(amer2_up,boat)
         plot_amer_angle(amer1_down,boat)
-        plot_amer_angle(amer2_down,boat)    
+        plot_amer_angle(amer2_down,boat)
 
     inter1 = compute_intersection(amer1_up,amer2_up)
     inter2 = compute_intersection(amer1_up,amer2_down)
@@ -88,14 +94,14 @@ def compute_position_2LOP(boat, amer1_up, amer2_up, show_LOP):
             (inter1[1], inter2[1], inter3[1], inter4[1],  inter1[1]),'g',label="position area")
 
 
-def legend_unique(): # Remove duplicated labels
+def legend_unique():
+    """ Remove duplicated labels """
     handles, labels = plt.gca().get_legend_handles_labels()
     by_label = dict(zip(labels, handles))
     plt.legend(by_label.values(), by_label.keys())
-    
 
 def get_best_amers(amer_table):
-
+    """ Get the three best amer from a set of amer"""
     amer_table_size = len(amer_table)
     angle_table = np.zeros((amer_table_size ,amer_table_size ))
     cost_table= np.zeros((amer_table_size ,amer_table_size ))
@@ -117,7 +123,6 @@ def get_best_amers(amer_table):
     index_min = 0
     for i, comb_i in enumerate(comb):
         cost=0
-        print(comb_i)
         for j in range(3):
             cost += cost_table[comb_i[j]][comb_i[(j+1)%3]]
         if cost < min_cost:
@@ -127,4 +132,3 @@ def get_best_amers(amer_table):
     amer_index = comb[index_min]
 
     return(amer_table[amer_index[0]], amer_table[amer_index[1]], amer_table[amer_index[2]])
-
