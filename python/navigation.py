@@ -1,7 +1,6 @@
 # %%
 import numpy as np
 import matplotlib.pyplot as plt
-import random
 from itertools import combinations
 
 #position fixing
@@ -59,7 +58,7 @@ def compute_position_3LOP(boat,amer1,amer2,amer3):
     #circonscribed_circle does not work
     plt.plot( (intersection1[0], intersection2[0], intersection3[0], intersection1[0]),
              (intersection1[1], intersection2[1], intersection3[1], intersection1[1]),'g')
-    plt.plot(barycentre[0], barycentre[1],'^r', markerfacecolor='none',label='estimate')
+    plt.plot(barycentre[0], barycentre[1],'^r', markerfacecolor='none',label='Estimate')
     return barycentre[0], barycentre[1]
 
 def compute_position_2LOP(boat, amer1_up, amer2_up, show_LOP):
@@ -215,21 +214,21 @@ amer1 = Amer(100.0, 500.0, 0, "Amer1")
 amer2 = Amer(500.0, 500.0, 0, "Amer2")
 amer3 = Amer(500.0, 100.0, 0, "Amer3")
 amer4 = Amer(100.0, 100.0, 0, "Amer4")
-amer_table=[amer1, amer2, amer3, amer4]
+amer5 = Amer(250.0, 510.0, 0, "Amer5")
+amer_table=[amer1, amer2, amer3, amer4, amer5]
 
-#for i in range(150,200,100):
-#    for j in range(150,200,100):
-boat = Boat(200, 400)
-for amer in amer_table:
-    amer.angle  = compute_angle(boat,amer,sigma)
+for i in range(150,500,100):
+    for j in range(150,500,100):
+        boat = Boat(i, j)
+        for amer in amer_table:
+            amer.angle  = compute_angle(boat,amer,sigma)
+        amerA, amerB, amerC = get_best_amers(amer_table)   
+        compute_position_3LOP(boat,amerA,amerB,amerC)
+        plot_amer_angle(amerA,boat)
+        plot_amer_angle(amerB,boat)
+        plot_amer_angle(amerC,boat)
 
-amerA, amerB, amerC = get_best_amers(amer_table)   
-compute_position_3LOP(boat,amerA,amerB,amerC)
-
-plot_amer_angle(amerA,boat)
-plot_amer_angle(amerB,boat)
-plot_amer_angle(amerC,boat)
-
+legend_unique()
 plt.show()
 
 # %%
