@@ -95,6 +95,44 @@ def legend_unique(): # Remove duplicated labels
     plt.legend(by_label.values(), by_label.keys())
     
 
+def get_best_amers(amer_table):
+
+    amer_table_size = len(amer_table)
+    angle_table = np.zeros((amer_table_size ,amer_table_size ))
+    cost_table= np.zeros((amer_table_size ,amer_table_size ))
+    cost_table2= np.zeros((amer_table_size ,amer_table_size ))
+
+    for i , amer_i in enumerate(amer_table):
+        for j, amer_j in enumerate(amer_table):
+            angle_table[i][j] = (amer_j.angle - amer_i.angle)
+
+    cost_table = angle_table % (2*np.pi)
+    cost_table2 = - angle_table % (2*np.pi)
+    cost_table = np.minimum(cost_table,cost_table2)
+    cost_table = cost_table - (2*np.pi/3)
+    cost_table = abs(cost_table)
+    print("cost_table")
+
+    comb = list(combinations(range(amer_table_size),3))
+
+    min_cost = 1000.0
+    index_min = 0
+    for i, comb_i in enumerate(comb):
+        cost=0
+        print(comb_i)
+        for j in range(3):
+            cost += cost_table[comb_i[j]][comb_i[(j+1)%3]]
+        if cost < min_cost:
+            min_cost = cost
+            index_min = i
+        print(cost)
+
+    amer_index = comb[index_min]
+    print(amer_index)
+
+    return(amer_table[amer_index[0]], amer_table[amer_index[1]], amer_table[amer_index[2]])
+
+
 # %%
 
 amer1 = Amer(100,300,0,"Amer1")
@@ -170,7 +208,6 @@ legend_unique()
 plt.title("2 LOP position fix")
 plt.show()
 
-
 # %%
 sigma = np.pi/90 # 2 degree
 
@@ -178,56 +215,20 @@ amer1 = Amer(100.0, 500.0, 0, "Amer1")
 amer2 = Amer(500.0, 500.0, 0, "Amer2")
 amer3 = Amer(500.0, 100.0, 0, "Amer3")
 amer4 = Amer(100.0, 100.0, 0, "Amer4")
-
-boat = Boat(400.0, 200.0)
-
-amer1.angle  = compute_angle(boat,amer1,sigma)
-amer2.angle  = compute_angle(boat,amer2,sigma)
-amer3.angle  = compute_angle(boat,amer3,sigma)
-amer4.angle  = compute_angle(boat,amer4,sigma)
-
 amer_table=[amer1, amer2, amer3, amer4]
-amer_table_size = 4
 
-angle_table = np.zeros((amer_table_size ,amer_table_size ))
-cost_table= np.zeros((amer_table_size ,amer_table_size ))
-cost_table2= np.zeros((amer_table_size ,amer_table_size ))
+#for i in range(150,200,100):
+#    for j in range(150,200,100):
+boat = Boat(200, 400)
+for amer in amer_table:
+    amer.angle  = compute_angle(boat,amer,sigma)
 
-for i , amer_i in enumerate(amer_table):
-    for j, amer_j in enumerate(amer_table):
-        angle_table[i][j] = (amer_j.angle - amer_i.angle)
-
-cost_table = angle_table % (2*np.pi)
-cost_table2 = - angle_table % (2*np.pi)
-cost_table = np.minimum(cost_table,cost_table2)
-cost_table = cost_table - (2*np.pi/3)
-cost_table = abs(cost_table)
-
-comb = list(combinations(range(amer_table_size),3))
-
-min_cost = 1000.0
-index_min = 0
-for comb_i in comb:
-    cost=0
-    for j in range(3):
-        cost += cost_table[comb_i[j]][comb_i[(j+1)%3]]
-    if cost < min_cost:
-        min_cost = cost
-        index_min = i
-
-amer_index = comb[index_min]
-print(amer_index)
-
-amerA= amer_table[amer_index[0]]
-amerB= amer_table[amer_index[1]]
-amerC= amer_table[amer_index[2]]
-
-position_x, position_y = compute_position_3LOP(boat,amerA,amerB,amerC)
+amerA, amerB, amerC = get_best_amers(amer_table)   
+compute_position_3LOP(boat,amerA,amerB,amerC)
 
 plot_amer_angle(amerA,boat)
 plot_amer_angle(amerB,boat)
 plot_amer_angle(amerC,boat)
-
 
 plt.show()
 
