@@ -8,9 +8,11 @@ import matplotlib.pyplot as plt
 
 class Boat:
     """ Boat class """
-    def __init__(self,x,y):
+    def __init__(self,x,y,course,speed):
         self.x=x
         self.y=y
+        self.speed=speed
+        self.course=course
         plt.plot(self.x,self.y,'^b', markerfacecolor='none', label='Boat position')
 
 class Amer:
@@ -21,22 +23,21 @@ class Amer:
         self.angle = angle
         self.name = name
         plt.plot(self.x,self.y,'*k', markersize = 10, label ="Amer")
+        
+    def plot_amer_angle(self,boat):
+        """ Plot LOP of an amer with dotted line"""
+        x = np.linspace(self.x,boat.x,10) 
+        y = x * 1/np.tan(self.angle) + self.y - self.x *  1/np.tan(self.angle)
+        plt.plot(x,y,'--k',linewidth=0.5, label = "Line of Position (LoP)")
 
-def compute_angle(amer,boat,sigma):
-    """ compute Bearing angle of an Amer from the Boat """
-    x = amer.x - boat.x
-    y = amer.y - boat.y
-    angle = np.arctan2(x,y)
-    # angle = angle + random.normalvariate(mu=0.0,sigma = sigma)
-    angle = angle + sigma
-    return angle
+    def compute_angle(self,boat,sigma):
+        """ compute Bearing angle of an Amer from the Boat """
+        x = self.x - boat.x
+        y = self.y - boat.y
+        angle = np.arctan2(x,y)
+        # angle = angle + random.normalvariate(mu=0.0,sigma = sigma)
+        self.angle = angle + sigma
 
-
-def plot_amer_angle(amer,boat):
-    """ Plot LOP of an amer with dotted line"""
-    x = np.linspace(amer.x,boat.x,10) 
-    y = x * 1/np.tan(amer.angle) + amer.y - amer.x *  1/np.tan(amer.angle)
-    plt.plot(x,y,'--k',linewidth=0.5, label = "Line of Position (LoP)")
 
 def compute_intersection(amer1,amer2):
     """ Compute intersection between two LOP of amer1 and amer2"""
@@ -53,9 +54,9 @@ def compute_intersection(amer1,amer2):
 def compute_position_3lop(boat,amer1,amer2,amer3):
     """ Comput fix position with triangulation of 3LOP"""
     sigma = np.pi/90 # 2 degree
-    amer1.angle  = compute_angle(boat,amer1,sigma)
-    amer2.angle  = compute_angle(boat,amer2,sigma)
-    amer3.angle  = compute_angle(boat,amer3,sigma)
+    amer1.compute_angle(boat,sigma)
+    amer2.compute_angle(boat,sigma)
+    amer3.compute_angle(boat,sigma)
     intersection1 = compute_intersection(amer1,amer2)
     intersection2 = compute_intersection(amer2,amer3)
     intersection3 = compute_intersection(amer1,amer3)
@@ -73,15 +74,15 @@ def compute_position_2lop(boat, amer1_up, amer2_up, show_lop):
     amer2_down = Amer(amer2_up.x,amer2_up.x,0,"Amer2_down")
 
     sigma = np.pi/90 # 2d egrees
-    amer1_up.angle  = compute_angle(boat,amer1_up,sigma)
-    amer2_up.angle  = compute_angle(boat,amer2_up,sigma)
-    amer1_down.angle  = compute_angle(boat,amer1_down,-sigma)
-    amer2_down.angle  = compute_angle(boat,amer2_down,-sigma)
+    amer1_up.compute_angle(boat,sigma)
+    amer2_up.compute_angle(boat,sigma)
+    amer1_down.compute_angle(boat,-sigma)
+    amer2_down.compute_angle(boat,-sigma)
     if show_lop:
-        plot_amer_angle(amer1_up,boat)
-        plot_amer_angle(amer2_up,boat)
-        plot_amer_angle(amer1_down,boat)
-        plot_amer_angle(amer2_down,boat)
+        amer1_up.plot_amer_angle(boat)
+        amer2_up.plot_amer_angle(boat)
+        amer1_down.plot_amer_angle(boat)
+        amer2_down.plot_amer_angle(boat)
 
     inter1 = compute_intersection(amer1_up,amer2_up)
     inter2 = compute_intersection(amer1_up,amer2_down)
