@@ -70,41 +70,41 @@ plt.title("2 LOP fix")
 plt.show()
 
 # %%
-amer1_up = Amer(100,100,0,"Amer1_up")
-amer2_up = Amer(500,500,0,"Amer2_up")
-boat = Boat(400,310)
+amer1_up = nav.Amer(100,100,0,"Amer1_up")
+amer2_up = nav.Amer(500,500,0,"Amer2_up")
+boat = nav.Boat(400,310)
 
 for i in range(100,600,50):
     for j in range(-100,i,50):
-        boat = Boat(i,j)
-        compute_position_2LOP(boat,amer1_up,amer2_up,show_LOP=False)
+        boat = nav.Boat(i,j)
+        nav.compute_position_2LOP(boat,amer1_up,amer2_up,show_LOP=False)
 
-legend_unique()
+nav.legend_unique()
 plt.title("2 LOP position fix")
 plt.show()
 
 # %%
 sigma = np.pi/90 # 2 degree
 
-amer1 = Amer(100.0, 500.0, 0, "Amer1")
-amer2 = Amer(500.0, 500.0, 0, "Amer2")
-amer3 = Amer(500.0, 100.0, 0, "Amer3")
-amer4 = Amer(100.0, 100.0, 0, "Amer4")
-amer5 = Amer(250.0, 510.0, 0, "Amer5")
+amer1 = nav.Amer(100.0, 500.0, 0, "Amer1")
+amer2 = nav.Amer(500.0, 500.0, 0, "Amer2")
+amer3 = nav.Amer(500.0, 100.0, 0, "Amer3")
+amer4 = nav.Amer(100.0, 100.0, 0, "Amer4")
+amer5 = nav.Amer(250.0, 510.0, 0, "Amer5")
 amer_table=[amer1, amer2, amer3, amer4, amer5]
 
 for i in range(150,500,100):
     for j in range(150,500,100):
-        boat = Boat(i, j)
+        boat = nav.Boat(i, j)
         for amer in amer_table:
-            amer.angle  = compute_angle(boat,amer,sigma)
-        amerA, amerB, amerC = get_best_amers(amer_table)   
-        compute_position_3LOP(boat,amerA,amerB,amerC)
-        plot_amer_angle(amerA,boat)
-        plot_amer_angle(amerB,boat)
-        plot_amer_angle(amerC,boat)
+            amer.angle  = nav.compute_angle(boat,amer,sigma)
+        amerA, amerB, amerC = nav.get_best_amers(amer_table)   
+        nav.compute_position_3LOP(boat,amerA,amerB,amerC)
+        nav.plot_amer_angle(amerA,boat)
+        nav.plot_amer_angle(amerB,boat)
+        nav.plot_amer_angle(amerC,boat)
 
-legend_unique()
+nav.legend_unique()
 plt.show()
 
 # %%
