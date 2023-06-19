@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 
 class Boat:
     """ Boat class """
-    def __init__(self,x,y,course,speed):
+    def __init__(self,x,y,course = None,speed = None):
         self.x=x
         self.y=y
         self.speed=speed
@@ -39,7 +39,7 @@ class Boat:
 
 class Amer:
     """ Amer class """
-    def __init__(self,x,y,angle,name):
+    def __init__(self,x,y,angle = None, name = None):
         self.x=x
         self.y=y
         self.angle = angle
