@@ -30,6 +30,11 @@ class Boat:
     def plot_position(self):
         """ Plot position """
         plt.plot(self.x,self.y,'^b', markerfacecolor='none', label='Boat position')
+        
+    def set_position(self,position):
+        """ Set bot with new position """
+        self.x = position[0]
+        self.y = position[1]
 
 
 class Amer:
@@ -58,14 +63,13 @@ class Amer:
 
 def compute_intersection(amer1,amer2):
     """ Compute intersection between two LOP of amer1 and amer2"""
-    # put in the form AX = B, then solve X=inv(A).B
-    # the line  of an amer is given by y= x/tang(alpha)  + amer.y - amer.x/tang(alpha)
-    A = np.array([[-1/np.tan(amer1.angle) , 1],
-                  [-1/np.tan(amer2.angle) , 1]])
-    B = [[amer1.y - 1/np.tan(amer1.angle)*amer1.x],
-       [amer2.y -1/np.tan(amer2.angle)*amer2.x]]
-    X = np.linalg.inv(A).dot(B)
-    return(X)
+    # y = a1 x+ b1 (for LOP of amer1)
+    # y = a2 x+ b2 (for LOP of amer2)
+    #  thus intersection at x = (b1-b2)/(a2-a1)
+    intersection_x = ((amer1.y - 1/np.tan(amer1.angle)*amer1.x)-(amer2.y -1/np.tan(amer2.angle)*amer2.x)) / ((1/np.tan(amer2.angle)) - ( 1/np.tan(amer1.angle)))
+    intersection_y = 1/np.tan(amer1.angle) * x + amer1.y - 1/np.tan(amer1.angle)*amer1.x
+    intersection = np.array([intersection_x, intersection_y])
+    return(intersection)
 
 
 def compute_position_3lop(boat,amer1,amer2,amer3):
