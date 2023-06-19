@@ -12,8 +12,25 @@ class Boat:
         self.x=x
         self.y=y
         self.speed=speed
-        self.course=course
+        self.angle=course
         plt.plot(self.x,self.y,'^b', markerfacecolor='none', label='Boat position')
+        
+    def plot_speed(self):
+        """ Show speed with direction of course"""
+        plt.arrow(self.x,self.y,
+                  self.speed * np.sin(self.angle),
+                  self.speed * np.cos(self.angle),
+                  head_width = 10)
+        
+    def run(self,duration):
+        """ Run with speed for a duration """
+        self.x += self.speed * duration * np.sin(self.angle)
+        self.y += self.speed * duration * np.cos(self.angle)
+    
+    def plot_position(self):
+        """ Plot position """
+        plt.plot(self.x,self.y,'^b', markerfacecolor='none', label='Boat position')
+
 
 class Amer:
     """ Amer class """
@@ -26,12 +43,12 @@ class Amer:
         
     def plot_amer_angle(self,boat):
         """ Plot LOP of an amer with dotted line"""
-        x = np.linspace(self.x,boat.x,10) 
+        x = np.linspace(self.x,boat.x,10)
         y = x * 1/np.tan(self.angle) + self.y - self.x *  1/np.tan(self.angle)
         plt.plot(x,y,'--k',linewidth=0.5, label = "Line of Position (LoP)")
 
     def compute_angle(self,boat,sigma):
-        """ compute Bearing angle of an Amer from the Boat """
+        """ compute Bearing angle of an Amer from the point of vie of the Boat """
         x = self.x - boat.x
         y = self.y - boat.y
         angle = np.arctan2(x,y)
@@ -133,3 +150,5 @@ def get_best_amers(amer_table):
     amer_index = comb[index_min]
 
     return(amer_table[amer_index[0]], amer_table[amer_index[1]], amer_table[amer_index[2]])
+
+# %%
