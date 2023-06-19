@@ -1,51 +1,54 @@
 """ test running fix"""
 # %%
 
+import copy
 import numpy as np
 import matplotlib.pyplot as plt
 import navigation as nav
+
 
 
 # %%
 
 # initialisation
 amer1 = nav.Amer(100,500,0,"Amer1")
-boat = nav.Boat(300,310, course=np.pi/4, speed=100)
-boat.plot_speed()
+amer1.plot_position()
+boat = nav.Boat(300,310, course=np.pi/4, speed=150)
+boat.plot_position()
 
 sigma = np.pi/90
 amer1.compute_angle(boat, sigma)
 amer1.plot_amer_angle(boat)
 
-# use boat_temp to estimiate a boat position
-boat_tmp = nav.Boat(amer1.x,amer1.y, course=amer1.angle + np.pi, speed = boat.speed)
-boat_tmp.run(1)
-boat_tmp.plot_position()
+amer_save = copy.deepcopy(amer1)
+boat_save = copy.deepcopy(boat)
+amer_tmp = nav.Amer(boat_save.true_x, boat_save.true_y, boat_save.course)
 
-boat_tmp.course = boat.course
-boat_tmp.run(1)
-boat_tmp.plot_position()
-
-amer_tmp = nav.Amer(boat_tmp.x, boat_tmp.y, amer1.angle, "amer_tmp")
-
-
-#boat.run(1)
-boat.plot_position()
+# compute amer1 angle after running
 boat.run(1)
-boat.plot_position()
-
-amer1.compute_angle(boat, 0)
+amer1.compute_angle(boat, sigma)
 amer1.plot_amer_angle(boat)
 
 
-amer_tmp.plot_amer_angle(boat)
+# use boat_temp to estimiate a boat position
+
+estimate = nav.compute_intersection(amer_save,amer_tmp) # set boat on LOP
+boat_save.set_position(estimate)
+boat_save.run(1)
+boat_save.angle = amer_save.angle
+amer_tmp2 = nav.Amer(boat_save.true_x, boat_save.true_y, boat_save.course)
 
 
 
-estimate = nav.compute_intersection(amer_tmp,amer1)
-boat.x = estimate[0]
-boat.y = estimate[1]
+estimate = nav.compute_intersection(amer1,amer_tmp2)
+
+del amer_save
+del boat_save
+del amer_tmp
+del amer_tmp2
+plt.plot(estimate[0], estimate[1],'^r', markerfacecolor='none',label='Estimate')
 boat.plot_position()
+
 plt.show()
 
 
