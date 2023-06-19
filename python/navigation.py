@@ -67,7 +67,7 @@ def compute_intersection(amer1,amer2):
     # y = a2 x+ b2 (for LOP of amer2)
     #  thus intersection at x = (b1-b2)/(a2-a1)
     intersection_x = ((amer1.y - 1/np.tan(amer1.angle)*amer1.x)-(amer2.y -1/np.tan(amer2.angle)*amer2.x)) / ((1/np.tan(amer2.angle)) - ( 1/np.tan(amer1.angle)))
-    intersection_y = 1/np.tan(amer1.angle) * x + amer1.y - 1/np.tan(amer1.angle)*amer1.x
+    intersection_y = 1/np.tan(amer1.angle) * intersection_x + amer1.y - 1/np.tan(amer1.angle)*amer1.x
     intersection = np.array([intersection_x, intersection_y])
     return(intersection)
 
