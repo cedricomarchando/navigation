@@ -8,55 +8,66 @@ import matplotlib.pyplot as plt
 
 class Boat:
     """ Boat class """
-    def __init__(self,x,y,course = None,speed = None):
-        self.x=x
-        self.y=y
+    def __init__(self,true_x, true_y,estimate_x, estimate_y,course = None,speed = None):
+        self.true_x = true_x
+        self.true_y = true_y
+        self.estimate_x = estimate_x
+        self.estimate_y = estimate_y
         self.speed=speed
-        self.angle=course
-        plt.plot(self.x,self.y,'^b', markerfacecolor='none', label='Boat position')
-        
+        self.course=course
+
     def plot_speed(self):
         """ Show speed with direction of course"""
-        plt.arrow(self.x,self.y,
-                  self.speed * np.sin(self.angle),
-                  self.speed * np.cos(self.angle),
+        plt.arrow(self.true_x,self.true_y,
+                  self.speed * np.sin(self.course),
+                  self.speed * np.cos(self.course),
                   head_width = 10)
-        
+   
     def run(self,duration):
         """ Run with speed for a duration """
-        self.x += self.speed * duration * np.sin(self.angle)
-        self.y += self.speed * duration * np.cos(self.angle)
-    
+        self.true_x += self.speed * duration * np.sin(self.course)
+        self.true_y += self.speed * duration * np.cos(self.course)
+
     def plot_position(self):
         """ Plot position """
-        plt.plot(self.x,self.y,'^b', markerfacecolor='none', label='Boat position')
-        
+        plt.plot(self.true_x,self.true_y,'^b', markerfacecolor='none', label='Boat position')
+ 
     def set_position(self,position):
         """ Set bot with new position """
-        self.x = position[0]
-        self.y = position[1]
+        self.true_x = position[0]
+        self.true_y = position[1]
+        
+    def set_estimate(self,estimate):
+        """ Set bot with new position """
+        self.estimate_x = estimate[0]
+        self.estimate_y = estimate[1]
+
 
 
 class Amer:
     """ Amer class """
-    def __init__(self,x,y,angle = None, name = None):
-        self.x=x
-        self.y=y
+    def __init__(self,position_x,position_y,angle = None, name = None):
+        self.position_x = position_x
+        self.position_y = position_y
         self.angle = angle
         self.name = name
-        plt.plot(self.x,self.y,'*k', markersize = 10, label ="Amer")
         
+    def plot_position(self):
+        """ Plot position"""
+        plt.plot(self.position_x, self.position_y,'*k', markersize = 10, label ="Amer")
+    
+       
     def plot_amer_angle(self,boat):
         """ Plot LOP of an amer with dotted line"""
-        x = np.linspace(self.x,boat.x,10)
-        y = x * 1/np.tan(self.angle) + self.y - self.x *  1/np.tan(self.angle)
-        plt.plot(x,y,'--k',linewidth=0.5, label = "Line of Position (LoP)")
+        x_line = np.linspace(self.position_x,boat.true_x,10)
+        y_line = x_line * 1/np.tan(self.angle) + self.position_y - self.position_x *  1/np.tan(self.angle)
+        plt.plot(x_line, y_line, '--k', linewidth=0.5, label = "Line of Position (LoP)")
 
     def compute_angle(self,boat,sigma):
         """ compute Bearing angle of an Amer from the point of vie of the Boat """
-        x = self.x - boat.x
-        y = self.y - boat.y
-        angle = np.arctan2(x,y)
+        vector_x = self.position_x - boat.true_x
+        vector_y = self.position_y - boat.true_y
+        angle = np.arctan2(vector_x, vector_y)
         # angle = angle + random.normalvariate(mu=0.0,sigma = sigma)
         self.angle = angle + sigma
 
@@ -66,10 +77,11 @@ def compute_intersection(amer1,amer2):
     # y = a1 x+ b1 (for LOP of amer1)
     # y = a2 x+ b2 (for LOP of amer2)
     #  thus intersection at x = (b1-b2)/(a2-a1)
-    intersection_x = ((amer1.y - 1/np.tan(amer1.angle)*amer1.x)-(amer2.y -1/np.tan(amer2.angle)*amer2.x)) / ((1/np.tan(amer2.angle)) - ( 1/np.tan(amer1.angle)))
-    intersection_y = 1/np.tan(amer1.angle) * intersection_x + amer1.y - 1/np.tan(amer1.angle)*amer1.x
+    intersection_x = ((amer1.position_y - 1/np.tan(amer1.angle)*amer1.position_x)
+            - (amer2.position_y -1/np.tan(amer2.angle)*amer2.position_x)) / ((1/np.tan(amer2.angle)) - ( 1/np.tan(amer1.angle)))
+    intersection_y = 1/np.tan(amer1.angle) * intersection_x + amer1.position_y - 1/np.tan(amer1.angle)*amer1.position_x
     intersection = np.array([intersection_x, intersection_y])
-    return(intersection)
+    return intersection 
 
 
 def compute_position_3lop(boat,amer1,amer2,amer3):
@@ -87,12 +99,12 @@ def compute_position_3lop(boat,amer1,amer2,amer3):
     plt.plot( (intersection1[0], intersection2[0], intersection3[0], intersection1[0]),
              (intersection1[1], intersection2[1], intersection3[1], intersection1[1]),'g')
     plt.plot(barycentre[0], barycentre[1],'^r', markerfacecolor='none',label='Estimate')
-    return barycentre[0], barycentre[1]
+    return barycentre
 
 def compute_position_2lop(boat, amer1_up, amer2_up, show_lop):
     """ Compute estimated position with 2 LOP"""
-    amer1_down = Amer(amer1_up.x,amer1_up.y,0,"Amer1_down")
-    amer2_down = Amer(amer2_up.x,amer2_up.x,0,"Amer2_down")
+    amer1_down = Amer(amer1_up.position_x, amer1_up.position_y,0,"Amer1_down")
+    amer2_down = Amer(amer2_up.position_x, amer2_up.position_x,0,"Amer2_down")
 
     sigma = np.pi/90 # 2d egrees
     amer1_up.compute_angle(boat,sigma)
