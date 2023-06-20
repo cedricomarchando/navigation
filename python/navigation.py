@@ -2,6 +2,8 @@
 from itertools import combinations
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.transforms as transforms
+from matplotlib.path import Path # For marker construction
 
 #position fixing
 # Line Of Position (LOP)
@@ -30,9 +32,30 @@ class Boat:
 
     def plot_position(self):
         """ Plot position """
-        plt.plot(self.true_x,self.true_y,'^b', markerfacecolor='none', label='Boat position')
+        plt.plot(self.true_x, self.true_y, '^b', markerfacecolor='none', label='Boat position')
         if self.estimate_x is not None:
             plt.plot(self.estimate_x, self.estimate_y,'^r', markerfacecolor='none',label='Estimate')
+    
+    def plot_boat(self):
+        """ plot with a boat marker in the direction of the course """
+        vertices = [(0, 0), (-1, 1), (1, 1), (4, 0), (1, -1), (-1, -1), (0, 0)]
+        vertices = [(-2, 1), (1, 2), (3, 0), (1, -2), (-2, -1), (-2, 1)]
+        codes = [
+            Path.MOVETO, #begin the figure in the lower right
+            Path.CURVE3, #start a 3 point curve with the control point in lower left
+            Path.LINETO, #end curve in the upper left
+            Path.CURVE3, #start a new 3 point curve with the upper right as a control point
+            Path.LINETO, #end curve in lower right
+            Path.LINETO, #end curve in lower right
+        ]
+        boat_marker = Path(vertices,codes)
+        if self.course is not None:        
+            angle = self.course - np.pi/2
+            boat_marker = boat_marker.transformed(transforms.Affine2D().rotate(-angle))
+        plt.plot(self.true_x, self.true_y, marker=boat_marker, markersize=30, color='blue')
+        if self.estimate_x is not None:
+            plt.plot(self.estimate_x, self.estimate_y, marker=boat_marker, markersize=30, color='red')
+
     
     def set_position(self,position):
         """ Set bot with new position """
@@ -94,6 +117,7 @@ class Amer:
         bearing = np.arctan2(vector_x, vector_y)
         # bearing = bearing + random.normalvariate(mu=0.0,sigma = sigma)
         self.bearing = bearing + sigma
+        print(f"x={vector_x},y={vector_y}, bearing = {bearing}")
 
 
 def compute_intersection(amer1,amer2):
