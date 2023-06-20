@@ -8,13 +8,13 @@ import matplotlib.pyplot as plt
 
 class Boat:
     """ Boat class """
-    def __init__(self,true_x, true_y,estimate_x, estimate_y,course = None,speed = None):
+    def __init__(self,true_x, true_y,estimate_x = None, estimate_y = None,course = None,speed = None):
         self.true_x = true_x
         self.true_y = true_y
         self.estimate_x = estimate_x
         self.estimate_y = estimate_y
-        self.speed=speed
-        self.course=course
+        self.speed = speed
+        self.course = course
 
     def plot_speed(self):
         """ Show speed with direction of course"""
@@ -31,7 +31,9 @@ class Boat:
     def plot_position(self):
         """ Plot position """
         plt.plot(self.true_x,self.true_y,'^b', markerfacecolor='none', label='Boat position')
- 
+        if self.estimate_x is not None:
+            plt.plot(self.estimate_x, self.estimate_y,'^r', markerfacecolor='none',label='Estimate')
+    
     def set_position(self,position):
         """ Set bot with new position """
         self.true_x = position[0]
@@ -41,6 +43,28 @@ class Boat:
         """ Set bot with new position """
         self.estimate_x = estimate[0]
         self.estimate_y = estimate[1]
+        
+    def run_fix(self,amer,duration,sigma):
+        """ Run fix: get position from 1 amer and speed """
+        save_amgle = amer.angle
+        # compute amer angle after running
+        self.run(duration)
+        amer.compute_angle(self, sigma)
+        amer.plot_amer_angle(self)
+        # run amer in the direction of the boat
+        duration = 1
+        amer_tmp = Amer(
+            amer.position_x + self.speed * duration * np.sin(self.course),
+            amer.position_y + self.speed * duration * np.cos(self.course),
+            save_amgle
+            )
+        plt.plot(amer_tmp.position_x, amer_tmp.position_y,'+k', label ="Amer shifted")
+
+        amer_tmp.plot_amer_angle(self)
+
+        estimate = compute_intersection(amer,amer_tmp)
+        del amer_tmp
+        return estimate
 
 
 
@@ -98,7 +122,6 @@ def compute_position_3lop(boat,amer1,amer2,amer3):
     #circonscribed_circle does not work
     plt.plot( (intersection1[0], intersection2[0], intersection3[0], intersection1[0]),
              (intersection1[1], intersection2[1], intersection3[1], intersection1[1]),'g')
-    plt.plot(barycentre[0], barycentre[1],'^r', markerfacecolor='none',label='Estimate')
     return barycentre
 
 def compute_position_2lop(boat, amer1_up, amer2_up, show_lop):
