@@ -46,21 +46,21 @@ class Boat:
         
     def run_fix(self,amer,duration,sigma):
         """ Run fix: get position from 1 amer and speed """
-        save_amgle = amer.angle
-        # compute amer angle after running
+        save_bearing = amer.bearing
+        # compute amer bearing after running
         self.run(duration)
-        amer.compute_angle(self, sigma)
-        amer.plot_amer_angle(self)
+        amer.compute_bearing(self, sigma)
+        amer.plot_amer_bearing(self)
         # run amer in the direction of the boat
         duration = 1
         amer_tmp = Amer(
             amer.position_x + self.speed * duration * np.sin(self.course),
             amer.position_y + self.speed * duration * np.cos(self.course),
-            save_amgle
+            save_bearing
             )
         plt.plot(amer_tmp.position_x, amer_tmp.position_y,'+k', label ="Amer shifted")
 
-        amer_tmp.plot_amer_angle(self)
+        amer_tmp.plot_amer_bearing(self)
 
         estimate = compute_intersection(amer,amer_tmp)
         del amer_tmp
@@ -70,10 +70,10 @@ class Boat:
 
 class Amer:
     """ Amer class """
-    def __init__(self,position_x,position_y,angle = None, name = None):
+    def __init__(self,position_x,position_y,bearing = None, name = None):
         self.position_x = position_x
         self.position_y = position_y
-        self.angle = angle
+        self.bearing = bearing
         self.name = name
         
     def plot_position(self):
@@ -81,19 +81,19 @@ class Amer:
         plt.plot(self.position_x, self.position_y,'*k', markersize = 10, label ="Amer")
     
        
-    def plot_amer_angle(self,boat):
+    def plot_amer_bearing(self,boat):
         """ Plot LOP of an amer with dotted line"""
         x_line = np.linspace(self.position_x,boat.true_x,10)
-        y_line = x_line * 1/np.tan(self.angle) + self.position_y - self.position_x *  1/np.tan(self.angle)
+        y_line = x_line * 1/np.tan(self.bearing) + self.position_y - self.position_x *  1/np.tan(self.bearing)
         plt.plot(x_line, y_line, '--k', linewidth=0.5, label = "Line of Position (LoP)")
 
-    def compute_angle(self,boat,sigma):
+    def compute_bearing(self,boat,sigma):
         """ compute Bearing angle of an Amer from the point of vie of the Boat """
         vector_x = self.position_x - boat.true_x
         vector_y = self.position_y - boat.true_y
-        angle = np.arctan2(vector_x, vector_y)
-        # angle = angle + random.normalvariate(mu=0.0,sigma = sigma)
-        self.angle = angle + sigma
+        bearing = np.arctan2(vector_x, vector_y)
+        # bearing = bearing + random.normalvariate(mu=0.0,sigma = sigma)
+        self.bearing = bearing + sigma
 
 
 def compute_intersection(amer1,amer2):
@@ -101,9 +101,9 @@ def compute_intersection(amer1,amer2):
     # y = a1 x+ b1 (for LOP of amer1)
     # y = a2 x+ b2 (for LOP of amer2)
     #  thus intersection at x = (b1-b2)/(a2-a1)
-    intersection_x = ((amer1.position_y - 1/np.tan(amer1.angle)*amer1.position_x)
-            - (amer2.position_y -1/np.tan(amer2.angle)*amer2.position_x)) / ((1/np.tan(amer2.angle)) - ( 1/np.tan(amer1.angle)))
-    intersection_y = 1/np.tan(amer1.angle) * intersection_x + amer1.position_y - 1/np.tan(amer1.angle)*amer1.position_x
+    intersection_x = ((amer1.position_y - 1/np.tan(amer1.bearing)*amer1.position_x)
+            - (amer2.position_y -1/np.tan(amer2.bearing)*amer2.position_x)) / ((1/np.tan(amer2.bearing)) - ( 1/np.tan(amer1.bearing)))
+    intersection_y = 1/np.tan(amer1.bearing) * intersection_x + amer1.position_y - 1/np.tan(amer1.bearing)*amer1.position_x
     intersection = np.array([intersection_x, intersection_y])
     return intersection 
 
@@ -111,9 +111,9 @@ def compute_intersection(amer1,amer2):
 def compute_position_3lop(boat,amer1,amer2,amer3):
     """ Comput fix position with triangulation of 3LOP"""
     sigma = np.pi/90 # 2 degree
-    amer1.compute_angle(boat,sigma)
-    amer2.compute_angle(boat,sigma)
-    amer3.compute_angle(boat,sigma)
+    amer1.compute_bearing(boat,sigma)
+    amer2.compute_bearing(boat,sigma)
+    amer3.compute_bearing(boat,sigma)
     intersection1 = compute_intersection(amer1,amer2)
     intersection2 = compute_intersection(amer2,amer3)
     intersection3 = compute_intersection(amer1,amer3)
@@ -130,15 +130,15 @@ def compute_position_2lop(boat, amer1_up, amer2_up, show_lop):
     amer2_down = Amer(amer2_up.position_x, amer2_up.position_x,0,"Amer2_down")
 
     sigma = np.pi/90 # 2d egrees
-    amer1_up.compute_angle(boat,sigma)
-    amer2_up.compute_angle(boat,sigma)
-    amer1_down.compute_angle(boat,-sigma)
-    amer2_down.compute_angle(boat,-sigma)
+    amer1_up.compute_bearing(boat,sigma)
+    amer2_up.compute_bearing(boat,sigma)
+    amer1_down.compute_bearing(boat,-sigma)
+    amer2_down.compute_bearing(boat,-sigma)
     if show_lop:
-        amer1_up.plot_amer_angle(boat)
-        amer2_up.plot_amer_angle(boat)
-        amer1_down.plot_amer_angle(boat)
-        amer2_down.plot_amer_angle(boat)
+        amer1_up.plot_amer_bearing(boat)
+        amer2_up.plot_amer_bearing(boat)
+        amer1_down.plot_amer_bearing(boat)
+        amer2_down.plot_amer_bearing(boat)
 
     inter1 = compute_intersection(amer1_up,amer2_up)
     inter2 = compute_intersection(amer1_up,amer2_down)
@@ -160,16 +160,16 @@ def legend_unique():
 def get_best_amers(amer_table):
     """ Get the three best amer from a set of amer"""
     amer_table_size = len(amer_table)
-    angle_table = np.zeros((amer_table_size ,amer_table_size ))
+    bearing_table = np.zeros((amer_table_size ,amer_table_size ))
     cost_table= np.zeros((amer_table_size ,amer_table_size ))
     cost_table2= np.zeros((amer_table_size ,amer_table_size ))
 
     for i , amer_i in enumerate(amer_table):
         for j, amer_j in enumerate(amer_table):
-            angle_table[i][j] = (amer_j.angle - amer_i.angle)
+            bearing_table[i][j] = (amer_j.bearing - amer_i.bearing)
 
-    cost_table = angle_table % (2*np.pi)
-    cost_table2 = - angle_table % (2*np.pi)
+    cost_table = bearing_table % (2*np.pi)
+    cost_table2 = - bearing_table % (2*np.pi)
     cost_table = np.minimum(cost_table,cost_table2)
     cost_table = cost_table - (2*np.pi/3)
     cost_table = abs(cost_table)
