@@ -21,9 +21,9 @@ estimate = nav.compute_position_3lop(boat,amer1,amer2,amer3)
 boat.set_estimate(estimate)
 boat.plot_position()
 
-amer1.plot_amer_angle(boat)
-amer2.plot_amer_angle(boat)
-amer3.plot_amer_angle(boat)
+amer1.plot_amer_bearing(boat)
+amer2.plot_amer_bearing(boat)
+amer3.plot_amer_bearing(boat)
 # circle1 = plt.Circle((position_x,position_y),radius, fill=False)
 # plt.gca().add_patch(circle1)
 
@@ -127,14 +127,14 @@ for i in range(150,500,100):
     for j in range(150,500,100):
         boat = nav.Boat(i, j)
         for amer in amer_table:
-            amer.compute_angle(boat,sigma)
+            amer.compute_bearing(boat,sigma)
         amerA, amerB, amerC = nav.get_best_amers(amer_table)
         estimate = nav.compute_position_3lop(boat,amerA,amerB,amerC)
         boat.set_estimate(estimate)
         boat.plot_position()
-        amerA.plot_amer_angle(boat)
-        amerB.plot_amer_angle(boat)
-        amerC.plot_amer_angle(boat)
+        amerA.plot_amer_bearing(boat)
+        amerB.plot_amer_bearing(boat)
+        amerC.plot_amer_bearing(boat)
 
 nav.legend_unique()
 plt.show()
