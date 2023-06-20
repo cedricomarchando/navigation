@@ -13,8 +13,8 @@ boat = nav.Boat(50,50, course=np.pi/4, speed=100)
 boat.plot_position()
 
 sigma = np.pi/180
-amer.compute_angle(boat, sigma)
-amer.plot_amer_angle(boat)
+amer.compute_bearing(boat, sigma)
+amer.plot_amer_bearing(boat)
 
 for i in range(8):
     estimate = boat.run_fix(amer,1,sigma)
@@ -23,7 +23,7 @@ for i in range(8):
 
 
 nav.legend_unique()
-plt.title()
+plt.title("Runnig fix")
 plt.show()
 
 
