@@ -3,21 +3,21 @@ import matplotlib.pyplot as plt
 from matplotlib.path import Path
 
 
-def plot_nautical_symbol(position_x, position_y, shape_type, top_mark_type):
+def plot_nautical_symbol(position_x, position_y, markersize, shape_type, top_mark_type):
     """ plot nautical symbol """
     
     shape_height = 12
     topmark_size = 2
     color = select_color(top_mark_type)
     
-    shape_marker = select_shape(shape_type, shape_height)
+    width, shape_marker = select_shape(shape_type, shape_height)
     topmark_marker = select_topmark_marker(top_mark_type, topmark_size, shift_up=shape_height + 2)
     symbol_marker = Path.make_compound_path(shape_marker, topmark_marker)
     
     plt.plot(position_x, position_y, marker=symbol_marker, linestyle='solid',
             markerfacecolor=color, markeredgecolor='k',
-            markersize=50, label=top_mark_type)
-    plot_circle_line(position_x, position_y, 1.5 , 4)
+            markersize=markersize, label=top_mark_type)
+    plot_circle_line(position_x, position_y, 1.5 , width + 2)
     
 
 
@@ -28,6 +28,8 @@ def select_color(top_mark_type):
             color = 'green'
         case 'red':
             color = 'red'
+        case 'special':
+            color ='yellow'
         case _:
             color = 'black'
     return color
@@ -36,14 +38,26 @@ def select_shape(shape_type, shape_height):
     """ select shape """
     match shape_type:
         case 'spar':
-            shape_marker = build_rectangle_path(shape_height,2,0)
+            width = 2
+            shape_marker = build_rectangle_path(shape_height, width, 0)
         case 'can':
-            shape_marker = build_rectangle_path(shape_height,10,0)
+            width = 10
+            shape_marker = build_rectangle_path(shape_height, width,0)
+        case 'spherical':
+            width = 10
+            shape_marker = build_spherical(width*3/4)
         case 'conical':
-            shape_marker = build_conical_path(shape_height,10)
+            width = 10
+            shape_marker = build_conical_path(shape_height, width)
+        case 'pillar':
+            width = 10
+            shape_marker = build_pillar_path(shape_height, width)
+        case 'tower':
+            width = 10
+            shape_marker = build_tower_path(shape_height,width)
         case _:
             print('not defined shape')
-    return shape_marker
+    return width, shape_marker
 
 def select_topmark_marker(top_mark_type, size, shift_up):
     """ select topmark marker """
@@ -62,6 +76,8 @@ def select_topmark_marker(top_mark_type, size, shift_up):
             topmark_marker = west_topmark(size, shift_up)
         case 'danger':
             topmark_marker = danger_topmark(size, shift_up)
+        case 'special':
+            topmark_marker = build_cross_path(shift_up + size, size)
         case _:
             print(' Not a valid topmark')
     return topmark_marker
@@ -90,23 +106,58 @@ def build_rectangle_path(height, width, shift_up):
     rectangle_path = Path(vertices,codes)
     return rectangle_path
 
-def build_conical_path(height,width):
+def build_conical_path(height, width):
     """ Buils conocal path"""
     vertices =[(-width/2,0), (-width/2, height/3), (0,height), (width/2, height/3), (width/2,0),(-width/2,0),   ]
     codes = [1,3,2,3,2,79]
     conical_path = Path(vertices,codes)
     return conical_path
 
-def build_line_path(start,stop):
+def build_pillar_path(height, width):
+    """ Buils pillar path"""
+    vertices =[(-width/2,0), (-width/4, height/3), (0,height), (width/4, height/3), (width/2,0),(-width/2,0),   ]
+    codes = [1,2,2,2,2,79]
+    pillar_path = Path(vertices,codes)
+    return pillar_path
+
+def build_cross_path(height, width):
+    """ Build cross path """
+    vertices = [(width/3*0, width/3*1 + height), (width/3*2, width/3*3 + height), (width/3*3, width/3*2 + height),
+                (width/3*1, width/3*0 + height), (width/3*3, width/3*-2 + height), (width/3*2, width/3*-3 + height),
+                (width/3*0, width/3*-1 + height), (width/3*-2, width/3*-3 + height), (width/3*-3, width/3*-2 + height),
+                (width/3*-1, width/3*0 + height), (width/3*-3, width/3*2 + height), (width/3*-2, width/3*3 + height), (width/3*0, width/3*1 + height)]
+    codes = [1,2,2,2,2,2,2,2,2,2,2,2,79]
+    cross_path = Path(vertices, codes)
+    return cross_path
+
+def build_tower_path(height, width):
+    """ build tower path """
+    vertices = [(-width/2, 0), (-width/4, height), (width/4, height), (width/2,0), (-width/2,0)]
+    codes = [1, 2, 2, 2, 79]
+    tower_path = Path(vertices, codes)
+    return tower_path
+
+def build_spherical(width):
+    """ Build spherical path"""
+    tmp = Path.arc(-30,210)
+    vertices = tmp.vertices*width
+    for vertice in vertices:
+        vertice[1]=vertice[1]+width/2
+    codes = tmp.codes
+    spherical_path = Path(vertices, codes)  
+    return spherical_path
+
+
+def build_line_path(start, stop):
     """ Build line path """
-    vertices =[(0,start),(0,stop)]
+    vertices =[(0,start), (0,stop)]
     codes = [1,2]
     line_path = Path(vertices,codes)
     return line_path
 
-def build_h_line_path(start,stop):
+def build_h_line_path(start, stop):
     """ Build horizontal line path """
-    vertices =[(start,0),(stop,0)]
+    vertices =[(start,0), (stop,0)]
     codes = [1,2]
     line_path = Path(vertices,codes)
     return line_path
@@ -123,9 +174,8 @@ def plot_circle_line(position_x, position_y,circle_size, line_size):
     line_path2 = build_h_line_path(line_size, circle_size)
     marker = Path.make_compound_path(line_path1, circle_path, line_path2)
     plt.plot(position_x, position_y, marker=marker, linestyle='solid',
-            markerfacecolor='None', markeredgecolor='k',
-            markersize=10, label='Green Beacon')
-    
+            markerfacecolor='white', markeredgecolor='k',
+            markersize=line_size*2, label='Green Beacon')
     
 def green_topmark(size, shift_up):
     """ plot green beacon """
@@ -175,13 +225,21 @@ def danger_topmark(size, shift_up):
     
 if __name__ == "__main__":
     
-    topmark_type_list =['green','red','north','south','east','west','danger']
-    shape_type_list =['conical','can','spar']
+    topmark_type_list =['green','red','north','south','east','west','danger','special']
+    shape_type_list =['conical','can','spherical','spar','pillar','tower']
+    MARKERSIZE=50
     
+    for j, shape in enumerate(shape_type_list):
+        plt.text(1,j*2,shape, horizontalalignment='center')
     
     for i, topmark in enumerate(topmark_type_list):
+        plt.text(i+2,len(shape_type_list)*2, topmark, horizontalalignment='center')
         for j, shape in enumerate(shape_type_list):
-            plot_nautical_symbol(i, j*2, shape_type=shape, top_mark_type=topmark)
+            plot_nautical_symbol(i+2, j*2, MARKERSIZE, shape_type=shape, top_mark_type=topmark)
 
-    plot_circle_line(i+1, 10, 2, 4)
+    plot_circle_line(1, 12, 2, 4)
+    plt.axis('off')
+    plt.xlabel('topmark')
+    plt.ylabel('shape')
+    plt.title('Nautical symbols')
     plt.show()
