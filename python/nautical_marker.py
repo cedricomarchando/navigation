@@ -3,33 +3,53 @@ import matplotlib.pyplot as plt
 from matplotlib.path import Path
 import matplotlib.transforms as transforms
 
-def plot_land_marks(position_x, position_y, markersize, type):
-    """ plot land_marks"""
-    match type:
+
+def plot_danger_marks(position_x, position_y, markersize, mark_type ):
+    """ plot danger marks """
+    markersize = markersize/2
+    match mark_type:
+        case 'wreck':
+            marker = build_wreck_path()
+            facecolor ='k'
+            plot_circle_line(position_x, position_y, 2 , 12)
+        case 'danger':
+            marker = Path.unit_circle()
+            facecolor ='skyblue'
+        case _:
+            print('not defined danger')
+    plt.plot(position_x, position_y, marker=marker, linestyle='solid',
+        markerfacecolor=facecolor, markeredgecolor='k',
+        markersize=markersize, label=type)
+
+def plot_land_marks(position_x, position_y, markersize, mark_type):
+    """ plot land_marks """
+    match mark_type:
         case 'lighthouse':
             marker = Path.unit_regular_star(5,0.5)
             facecolor='k'
+            markersize = markersize/4
         case 'tower':
-            marker = build_land_tower_path(10,2)
+            marker = build_land_tower_path(10,3)
             facecolor='none'
         case 'water_tower':
-            marker = build_water_tower_path(10,2)
+            marker = build_water_tower_path(10,3)
             facecolor='none'
+        case 'church':
+            marker = build_church_path()
+            facecolor ='k'
+            markersize = markersize/4
         case _:
-            print('notdefined landmark')
-            
+            print('not defined landmark!')
     plt.plot(position_x, position_y, marker=marker, linestyle='solid',
             markerfacecolor=facecolor, markeredgecolor='k',
             markersize=markersize, label=type)
-    
+
 
 def plot_sea_marks(position_x, position_y, markersize, shape_type, top_mark_type, floating):
     """ plot nautical symbol """
-    
     shape_height = 12
     topmark_size = 2
     color = select_color(top_mark_type)
-    
     width, shape_marker = select_shape(shape_type, shape_height)
     if (top_mark_type  == 'green_no_top') or (top_mark_type  == 'red_no_top'):
         symbol_marker = shape_marker
@@ -128,7 +148,6 @@ def build_triangle_down_path(size, shift_up):
     triangle_path = Path(vertices,codes)
     return triangle_path 
 
-
 def build_rectangle_path(height, width, shift_up):
     """ Build a rectangle path """
     vertices = [(-width/2, shift_up), (-width/2, height + shift_up), 
@@ -168,6 +187,14 @@ def build_tower_path(height, width):
     tower_path = Path(vertices, codes)
     return tower_path
 
+def build_church_path():
+    """ Build church path """
+    vertices = [(0,0), (0,2), (-1,3), (1,3), (0,2), (0,0), (2,0), (3,1), (3,-1), (2,0),
+                (0,0), (0,-2), (1,-3), (-1,-3), (0,-2), (0,0), (-2,0), (-3,-1), (-3,1), (-2,0), (0,0)]
+    codes=[1,3,2,2,3, 2,3,2,2,3, 2,3,2,2,3, 2,3,2,2,3, 79]
+    church_path = Path(vertices, codes)
+    return church_path
+
 def build_land_tower_path(height, width):
     """ build tower path """
     botton_tower_path = build_tower_path(height*3/4,width)
@@ -182,7 +209,14 @@ def build_water_tower_path(height, width):
     land_tower_path = Path.make_compound_path(botton_tower_path, top_tower_path)
     return land_tower_path
 
-
+def build_wreck_path():
+    """ build wreck path"""
+    vertices =[(-2,0), (-3,2), (3,0), (-2,0)]
+    codes = [1,2,2,79]
+    boat_path = Path(vertices, codes)
+    mast_path = Path([(0,0), (1,3)], [1,2])
+    wreck_path = Path.make_compound_path(boat_path, mast_path)
+    return wreck_path
 
 def build_spherical(width):
     """ Build spherical path"""
@@ -274,7 +308,7 @@ if __name__ == "__main__":
     
     topmark_type_list =['green','red','north','south','east','west','danger','special','green_no_top','red_no_top']
     shape_type_list =['conical','can','spherical','spar','pillar','tower']
-    MARKERSIZE=50
+    MARKERSIZE=30
     
     plt.figure(1)
     for j, shape in enumerate(shape_type_list):
@@ -284,16 +318,24 @@ if __name__ == "__main__":
         plt.text(i+2,len(shape_type_list)*2, topmark, horizontalalignment='center')
         for j, shape in enumerate(shape_type_list):
             plot_sea_marks(i+2, j*2, MARKERSIZE, shape_type=shape, top_mark_type=topmark, floating=False)
+    plt.text(1,13,'Sea marks as a function of shape and topmark')
 
-    plot_circle_line(1, 16, 2, 4)
-    plot_land_marks(1, 15, MARKERSIZE/4, 'lighthouse')
-    plot_land_marks(2, 15, MARKERSIZE, 'tower')
-    plot_land_marks(3, 15, MARKERSIZE, 'water_tower')
+    landmarks_type_list = ['lighthouse', 'tower', 'water_tower', 'church']
+    plt.text(1,15,'land marks')
+    for i, mark in enumerate(landmarks_type_list):
+        plt.text(i*2+4,17,mark, horizontalalignment='center')
+        plot_land_marks(i*2+4, 15, MARKERSIZE, mark)
     
+    danger_type_list = ['wreck', 'danger']
+    plt.text(1,21,'danger marks')
+    for i, mark in enumerate(danger_type_list):
+        plt.text(i*2+4,22,mark, horizontalalignment='center')
+        plot_danger_marks(i*2+4,21, MARKERSIZE,mark)
+    
+    plot_circle_line(1, 23, 2, 4)
+
     plt.axis('off')
-    plt.xlabel('topmark')
-    plt.ylabel('shape')
-    plt.title('Nautical fixed mark symbols')
+    plt.title('Nautical symbols')
     
     plt.show()
     """
