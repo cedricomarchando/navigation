@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<svg
+    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns="http://www.w3.org/2000/svg"
+    xmlns:cc="http://creativecommons.org/ns#"
+    xmlns:dc="http://purl.org/dc/elements/1.1/"
+    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+    xmlns:svg="http://www.w3.org/2000/svg"
+    xmlns:ns1="http://sozi.baierouge.fr"
+    xmlns:xlink="http://www.w3.org/1999/xlink"
+    id="svg2762"
+    sodipodi:docname="chsym_buoy_BRB_c.svg"
+    viewBox="0 0 57.973 142.83"
+    sodipodi:version="0.32"
+    version="1.0"
+    inkscape:output_extension="org.inkscape.output.svg.inkscape"
+    inkscape:version="0.46"
+  >
+  <sodipodi:namedview
+      id="base"
+      bordercolor="#666666"
+      inkscape:pageshadow="2"
+      inkscape:window-y="360"
+      pagecolor="#ffffff"
+      inkscape:window-height="811"
+      inkscape:zoom="0.35"
+      inkscape:window-x="1124"
+      showgrid="false"
+      borderopacity="1.0"
+      inkscape:current-layer="layer1"
+      inkscape:cx="350"
+      inkscape:cy="520"
+      inkscape:window-width="788"
+      inkscape:pageopacity="0.0"
+      inkscape:document-units="px"
+  />
+  <g
+      id="layer1"
+      inkscape:label="Ebene 1"
+      inkscape:groupmode="layer"
+      transform="translate(-321.01 -460.95)"
+    >
+    <g
+        id="g7443"
+        style="stroke:#000000;stroke-width:1.063;stroke-miterlimit:3.9879"
+        transform="translate(267.23 -266.02)"
+      >
+      <path
+          id="path6765"
+          style="stroke:#000000;stroke-miterlimit:3.9879;stroke-width:1.063;fill:none"
+          d="m100.31 733.56l-5.198 32.59"
+      />
+      <g
+          id="g6769"
+          style="stroke:#000000;stroke-width:1.063;stroke-miterlimit:3.9879"
+          transform="translate(-16.436 628.33)"
+        >
+        <path
+            id="path6771"
+            style="stroke:#000000;stroke-miterlimit:3.9879;stroke-width:1.063;fill:none"
+            d="m70.756 237.48h25.065"
+        />
+        <path
+            id="path6773"
+            sodipodi:rx="3.0409236"
+            sodipodi:ry="3.2943337"
+            style="stroke:#000000;stroke-miterlimit:3.9879;stroke-width:1.063;fill:none"
+            sodipodi:type="arc"
+            d="m153.74 203.86a3.0409 3.2943 0 1 1 -6.09 0 3.0409 3.2943 0 1 1 6.09 0z"
+            transform="translate(-51.358 33.79)"
+            sodipodi:cy="203.86003"
+            sodipodi:cx="150.69466"
+        />
+        <path
+            id="path6775"
+            style="stroke:#000000;stroke-miterlimit:3.9879;stroke-width:1.063;fill:none"
+            d="m102.76 237.56h24.91"
+        />
+      </g
+      >
+      <path
+          id="path6777"
+          style="stroke:#000000;stroke-miterlimit:3.9879;stroke-width:1.063;fill:none"
+          d="m58.704 865.53l18.25-41.05 13.25-58.75 9.996 1.75-0.996 60.75 8.496 37.3"
+      />
+      <path
+          id="path6779"
+          style="stroke:#000000;stroke-miterlimit:3.9879;stroke-width:1.063;fill:none"
+          d="m83.204 798.2l16.996 2.03"
+      />
+      <path
+          id="path6781"
+          style="stroke:#000000;stroke-miterlimit:3.9879;stroke-width:1.063;fill:none"
+          d="m70.704 838.98l31.996 3.75"
+      />
+      <path
+          id="path6783"
+          style="fill-rule:evenodd;stroke:#000000;stroke-miterlimit:3.9879;stroke-width:1.063;fill:#000000"
+          d="m89.576 798.24c-4.932-0.58-5.803-0.87-5.51-1.85 0.191-0.64 1.768-7.48 3.505-15.19 1.737-7.72 3.262-14.13 3.389-14.25s2.061 0.1 4.297 0.49l4.066 0.7v10.08c0 5.54-0.206 12.51-0.457 15.48-0.521 6.17 0.49 5.67-9.29 4.54z"
+      />
+      <path
+          id="path6785"
+          style="fill-rule:evenodd;stroke:#000000;stroke-miterlimit:3.9879;stroke-width:1.063;fill:#000000"
+          d="m65.133 853.03c2.908-6.51 5.571-12.13 5.917-12.48 0.53-0.54 24.25 1.7 29.39 2.77 1.27 0.27 1.78 1.69 3.71 10.4 1.24 5.55 2.25 10.33 2.25 10.63 0 0.29-4.39 0.53-9.748 0.53-8.868 0-9.851-0.13-10.953-1.42-0.666-0.78-2.007-1.41-2.98-1.41-1.003 0-2.151 0.61-2.652 1.41-0.813 1.3-1.649 1.42-10.552 1.42h-9.668l5.286-11.85z"
+      />
+      <path
+          id="path6787"
+          style="fill-rule:evenodd;stroke:#000000;stroke-miterlimit:3.9879;stroke-width:1.063;fill:#ff0000"
+          d="m84.474 839.76c-6.806-0.87-12.436-1.62-12.511-1.67s1.231-3.19 2.901-6.98c2.107-4.78 3.853-10.57 5.701-18.91 1.466-6.62 2.865-12.25 3.11-12.52s3.707-0.14 7.693 0.29l7.248 0.79v14.34c0 13.38 0.497 18.29 2.554 25.2 0.47 1.58-0.48 1.55-16.696-0.54z"
+      />
+      <path
+          id="path6794"
+          sodipodi:rx="6.3660936"
+          sodipodi:ry="5.3149605"
+          style="fill-rule:evenodd;stroke:#000000;stroke-miterlimit:3.9879;stroke-width:.95360;fill:#000000"
+          sodipodi:type="arc"
+          d="m485.43 419.88a6.3661 5.315 0 1 1 -12.73 0 6.3661 5.315 0 1 1 12.73 0z"
+          transform="matrix(.99042 0 0 1.2546 -373.67 207.38)"
+          sodipodi:cy="419.88187"
+          sodipodi:cx="479.06699"
+      />
+      <path
+          id="path6796"
+          sodipodi:rx="6.3660936"
+          sodipodi:ry="5.3149605"
+          style="fill-rule:evenodd;stroke:#000000;stroke-miterlimit:3.9879;stroke-width:.95360;fill:#000000"
+          sodipodi:type="arc"
+          d="m485.43 419.88a6.3661 5.315 0 1 1 -12.73 0 6.3661 5.315 0 1 1 12.73 0z"
+          transform="matrix(.99042 0 0 1.2546 -376.86 224.68)"
+          sodipodi:cy="419.88187"
+          sodipodi:cx="479.06699"
+      />
+    </g
+    >
+  </g
+  >
+  <metadata
+    >
+    <rdf:RDF
+      >
+      <cc:Work
+        >
+        <dc:format
+          >image/svg+xml</dc:format
+        >
+        <dc:type
+            rdf:resource="http://purl.org/dc/dcmitype/StillImage"
+        />
+        <cc:license
+            rdf:resource="http://creativecommons.org/licenses/publicdomain/"
+        />
+        <dc:publisher
+          >
+          <cc:Agent
+              rdf:about="http://openclipart.org/"
+            >
+            <dc:title
+              >Openclipart</dc:title
+            >
+          </cc:Agent
+          >
+        </dc:publisher
+        >
+        <dc:title
+          >buoy black-red-black</dc:title
+        >
+        <dc:date
+          >2010-06-11T21:24:45</dc:date
+        >
+        <dc:description
+          >buoy black-red-black, sea chart symbol</dc:description
+        >
+        <dc:source
+          >https://openclipart.org/detail/66031/buoy-black-red-black-by-seafish-66031</dc:source
+        >
+        <dc:creator
+          >
+          <cc:Agent
+            >
+            <dc:title
+              >seafish</dc:title
+            >
+          </cc:Agent
+          >
+        </dc:creator
+        >
+        <dc:subject
+          >
+          <rdf:Bag
+            >
+            <rdf:li
+              >black-red-black</rdf:li
+            >
+            <rdf:li
+              >buoy</rdf:li
+            >
+            <rdf:li
+              >chart</rdf:li
+            >
+            <rdf:li
+              >navigation</rdf:li
+            >
+            <rdf:li
+              >sailing</rdf:li
+            >
+            <rdf:li
+              >sea</rdf:li
+            >
+            <rdf:li
+              >symbol</rdf:li
+            >
+          </rdf:Bag
+          >
+        </dc:subject
+        >
+      </cc:Work
+      >
+      <cc:License
+          rdf:about="http://creativecommons.org/licenses/publicdomain/"
+        >
+        <cc:permits
+            rdf:resource="http://creativecommons.org/ns#Reproduction"
+        />
+        <cc:permits
+            rdf:resource="http://creativecommons.org/ns#Distribution"
+        />
+        <cc:permits
+            rdf:resource="http://creativecommons.org/ns#DerivativeWorks"
+        />
+      </cc:License
+      >
+    </rdf:RDF
+    >
+  </metadata
+  >
+</svg
+>

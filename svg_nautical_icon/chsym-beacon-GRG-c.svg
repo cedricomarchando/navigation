@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<svg
+    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns="http://www.w3.org/2000/svg"
+    xmlns:cc="http://creativecommons.org/ns#"
+    xmlns:dc="http://purl.org/dc/elements/1.1/"
+    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+    xmlns:svg="http://www.w3.org/2000/svg"
+    xmlns:ns1="http://sozi.baierouge.fr"
+    xmlns:xlink="http://www.w3.org/1999/xlink"
+    id="svg11153"
+    sodipodi:docname="chsym_beacon_GRG_c.svg"
+    viewBox="0 0 21.896 66.363"
+    sodipodi:version="0.32"
+    version="1.0"
+    inkscape:output_extension="org.inkscape.output.svg.inkscape"
+    inkscape:version="0.46"
+  >
+  <sodipodi:namedview
+      id="base"
+      bordercolor="#666666"
+      inkscape:pageshadow="2"
+      inkscape:window-y="291"
+      pagecolor="#ffffff"
+      inkscape:window-height="811"
+      inkscape:zoom="0.35"
+      inkscape:window-x="1124"
+      showgrid="false"
+      borderopacity="1.0"
+      inkscape:current-layer="layer1"
+      inkscape:cx="350"
+      inkscape:cy="520"
+      inkscape:window-width="788"
+      inkscape:pageopacity="0.0"
+      inkscape:document-units="px"
+  />
+  <g
+      id="layer1"
+      inkscape:label="Ebene 1"
+      inkscape:groupmode="layer"
+      transform="translate(-339.05 -499.18)"
+    >
+    <g
+        id="g8636"
+        style="stroke:#000000;stroke-width:1.063;stroke-miterlimit:3.9879"
+        transform="translate(162.97 218.16)"
+      >
+      <g
+          id="g8592"
+          style="stroke:#000000;stroke-width:1.063;stroke-miterlimit:3.9879"
+        >
+        <path
+            id="path8397"
+            style="stroke:#000000;stroke-miterlimit:3.9879;stroke-width:1.063;fill:none"
+            d="m176.62 343.38h7.05"
+        />
+        <path
+            id="path8399"
+            sodipodi:rx="3.0409236"
+            sodipodi:ry="3.2943337"
+            style="stroke:#000000;stroke-miterlimit:3.9879;stroke-width:1.063;fill:none"
+            sodipodi:type="arc"
+            d="m153.74 203.86a3.0409 3.2943 0 1 1 -6.09 0 3.0409 3.2943 0 1 1 6.09 0z"
+            transform="translate(36.122 139.7)"
+            sodipodi:cy="203.86003"
+            sodipodi:cx="150.69466"
+        />
+        <path
+            id="path8401"
+            style="stroke:#000000;stroke-miterlimit:3.9879;stroke-width:1.063;fill:none"
+            d="m181.54 291.89l10.99 0.29-5.47-10.63-5.52 10.34z"
+        />
+        <path
+            id="path8403"
+            style="fill-rule:evenodd;stroke:#000000;stroke-miterlimit:3.9879;stroke-width:1.063;fill:#008000"
+            d="m184.76 287.13c1.19-2.24 2.22-4.07 2.29-4.06 0.11 0 3.96 7.4 4.25 8.16 0.05 0.11-1.9 0.15-4.31 0.08l-4.4-0.11 2.17-4.07z"
+        />
+        <path
+            id="path8405"
+            style="stroke:#000000;stroke-miterlimit:3.9879;stroke-width:1.063;fill:none"
+            d="m187.24 291.65l-0.24 8.93"
+        />
+        <path
+            id="path8407"
+            style="stroke:#000000;stroke-miterlimit:3.9879;stroke-width:1.063;fill:none"
+            d="m190.39 343.7h7.06"
+        />
+        <rect
+            id="rect8409"
+            style="stroke:#000000;stroke-miterlimit:3.9879;stroke-width:1.063;fill:none"
+            height="43"
+            width="13"
+            y="300.2"
+            x="180.92"
+        />
+        <path
+            id="path8540"
+            style="stroke:#000000;stroke-miterlimit:3.9879;stroke-width:1.063;fill:none"
+            d="m181.25 315.86h12.75"
+        />
+        <path
+            id="path8542"
+            style="stroke:#000000;stroke-miterlimit:3.9879;stroke-width:1.063;fill:none"
+            d="m181.5 329.53h12.75"
+        />
+        <path
+            id="path8552"
+            style="fill-rule:evenodd;stroke:#000000;stroke-miterlimit:3.9879;stroke-width:1.063;fill:#008000"
+            d="m181.62 336.32v-6.13h5.88 5.87v6.13 6.12h-1.47c-1.42 0-1.5-0.03-1.99-0.87-1.47-2.49-4.83-2.45-6.2 0.06-0.37 0.66-0.6 0.81-1.27 0.81h-0.82v-6.12z"
+        />
+        <path
+            id="path8560"
+            style="fill-rule:evenodd;stroke:#000000;stroke-miterlimit:3.9879;stroke-width:1.063;fill:#ff0000"
+            d="m181.62 322.69v-6.25h5.88 5.87v6.25 6.25h-5.87-5.88v-6.25z"
+        />
+        <path
+            id="path8562"
+            style="fill-rule:evenodd;stroke:#000000;stroke-miterlimit:3.9879;stroke-width:1.063;fill:#008000"
+            d="m181.62 308.07v-7.13h5.88 5.87v7.13 7.12h-5.87-5.88v-7.12z"
+        />
+      </g
+      >
+    </g
+    >
+  </g
+  >
+  <metadata
+    >
+    <rdf:RDF
+      >
+      <cc:Work
+        >
+        <dc:format
+          >image/svg+xml</dc:format
+        >
+        <dc:type
+            rdf:resource="http://purl.org/dc/dcmitype/StillImage"
+        />
+        <cc:license
+            rdf:resource="http://creativecommons.org/licenses/publicdomain/"
+        />
+        <dc:publisher
+          >
+          <cc:Agent
+              rdf:about="http://openclipart.org/"
+            >
+            <dc:title
+              >Openclipart</dc:title
+            >
+          </cc:Agent
+          >
+        </dc:publisher
+        >
+        <dc:title
+          >beacon green red green</dc:title
+        >
+        <dc:date
+          >2010-06-11T21:13:03</dc:date
+        >
+        <dc:description
+          >beacon, naviagtion, sea, chart, sailing, symbol</dc:description
+        >
+        <dc:source
+          >https://openclipart.org/detail/65971/beacon-green-red-green-by-seafish-65971</dc:source
+        >
+        <dc:creator
+          >
+          <cc:Agent
+            >
+            <dc:title
+              >seafish</dc:title
+            >
+          </cc:Agent
+          >
+        </dc:creator
+        >
+        <dc:subject
+          >
+          <rdf:Bag
+            >
+            <rdf:li
+              >beacon</rdf:li
+            >
+            <rdf:li
+              >chart</rdf:li
+            >
+            <rdf:li
+              >green-red-gree</rdf:li
+            >
+            <rdf:li
+              >naviagtion</rdf:li
+            >
+            <rdf:li
+              >sailing</rdf:li
+            >
+            <rdf:li
+              >sea</rdf:li
+            >
+            <rdf:li
+              >starbord</rdf:li
+            >
+            <rdf:li
+              >symbol</rdf:li
+            >
+          </rdf:Bag
+          >
+        </dc:subject
+        >
+      </cc:Work
+      >
+      <cc:License
+          rdf:about="http://creativecommons.org/licenses/publicdomain/"
+        >
+        <cc:permits
+            rdf:resource="http://creativecommons.org/ns#Reproduction"
+        />
+        <cc:permits
+            rdf:resource="http://creativecommons.org/ns#Distribution"
+        />
+        <cc:permits
+            rdf:resource="http://creativecommons.org/ns#DerivativeWorks"
+        />
+      </cc:License
+      >
+    </rdf:RDF
+    >
+  </metadata
+  >
+</svg
+>

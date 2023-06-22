@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<svg
+    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns="http://www.w3.org/2000/svg"
+    xmlns:cc="http://creativecommons.org/ns#"
+    xmlns:dc="http://purl.org/dc/elements/1.1/"
+    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+    xmlns:svg="http://www.w3.org/2000/svg"
+    xmlns:ns1="http://sozi.baierouge.fr"
+    xmlns:xlink="http://www.w3.org/1999/xlink"
+    id="svg10183"
+    sodipodi:docname="chsym_con_buoy_G_c.svg"
+    viewBox="0 0 57.973 47.696"
+    sodipodi:version="0.32"
+    version="1.0"
+    inkscape:output_extension="org.inkscape.output.svg.inkscape"
+    inkscape:version="0.46"
+  >
+  <sodipodi:namedview
+      id="base"
+      bordercolor="#666666"
+      inkscape:pageshadow="2"
+      inkscape:window-y="291"
+      pagecolor="#ffffff"
+      inkscape:window-height="811"
+      inkscape:zoom="0.35"
+      inkscape:window-x="1124"
+      showgrid="false"
+      borderopacity="1.0"
+      inkscape:current-layer="layer1"
+      inkscape:cx="350"
+      inkscape:cy="520"
+      inkscape:window-width="788"
+      inkscape:pageopacity="0.0"
+      inkscape:document-units="px"
+  />
+  <g
+      id="layer1"
+      inkscape:label="Ebene 1"
+      inkscape:groupmode="layer"
+      transform="translate(-159.59 -257.09)"
+    >
+    <g
+        id="g7911"
+        style="stroke:#000000;stroke-width:1.063;stroke-miterlimit:3.9879"
+        transform="translate(-74.429 62.836)"
+      >
+      <g
+          id="g6973"
+          style="stroke:#000000;stroke-width:1.063;stroke-miterlimit:3.9879"
+          transform="translate(163.79 .46925)"
+        >
+        <path
+            id="path6975"
+            style="stroke:#000000;stroke-miterlimit:3.9879;stroke-width:1.063;fill:none"
+            d="m70.756 237.48h25.065"
+        />
+        <path
+            id="path6977"
+            sodipodi:rx="3.0409236"
+            sodipodi:ry="3.2943337"
+            style="stroke:#000000;stroke-miterlimit:3.9879;stroke-width:1.063;fill:none"
+            sodipodi:type="arc"
+            d="m153.74 203.86a3.0409 3.2943 0 1 1 -6.09 0 3.0409 3.2943 0 1 1 6.09 0z"
+            transform="translate(-51.358 33.79)"
+            sodipodi:cy="203.86003"
+            sodipodi:cx="150.69466"
+        />
+        <path
+            id="path6979"
+            style="stroke:#000000;stroke-miterlimit:3.9879;stroke-width:1.063;fill:none"
+            d="m102.76 237.56h24.91"
+        />
+      </g
+      >
+      <path
+          id="path6981"
+          sodipodi:nodetypes="cscsc"
+          style="stroke:#000000;stroke-miterlimit:3.9879;stroke-width:1.063;fill:none"
+          d="m238.34 237.35s3.73-12.46 6.75-17.06c5.95-9.04 25.51-25.51 25.51-25.51s11.39 17.02 14.36 25.2c1.86 5.13 3.23 17.88 3.23 17.88"
+      />
+      <path
+          id="path6983"
+          style="fill-rule:evenodd;stroke:#000000;stroke-miterlimit:3.9879;stroke-width:1.063;fill:#009500"
+          d="m239.08 236.95c0.26-1.07 2.68-8.01 3.55-10.15 1.96-4.86 3.14-6.79 6.56-10.78 2.26-2.64 8.2-8.61 12.34-12.41 3.07-2.82 8.45-7.59 8.81-7.81 0.12-0.07 0.38 0.19 0.69 0.68 0.28 0.45 1.56 2.48 2.86 4.52 3.45 5.46 5.71 9.33 7.95 13.6 2.23 4.26 3 6.41 3.93 11.02 0.53 2.62 1.69 10.37 1.69 11.28v0.51h-10.35l-10.35-0.01-0.5-1.04c-0.68-1.41-1.66-2.05-3.13-2.05s-2.44 0.64-3.12 2.05l-0.51 1.04-10.27 0.01h-10.26l0.11-0.46z"
+      />
+    </g
+    >
+  </g
+  >
+  <metadata
+    >
+    <rdf:RDF
+      >
+      <cc:Work
+        >
+        <dc:format
+          >image/svg+xml</dc:format
+        >
+        <dc:type
+            rdf:resource="http://purl.org/dc/dcmitype/StillImage"
+        />
+        <cc:license
+            rdf:resource="http://creativecommons.org/licenses/publicdomain/"
+        />
+        <dc:publisher
+          >
+          <cc:Agent
+              rdf:about="http://openclipart.org/"
+            >
+            <dc:title
+              >Openclipart</dc:title
+            >
+          </cc:Agent
+          >
+        </dc:publisher
+        >
+        <dc:title
+          >conical buoy green</dc:title
+        >
+        <dc:date
+          >2010-06-11T21:58:11</dc:date
+        >
+        <dc:description
+          >conical buoy, symbol, IALA A</dc:description
+        >
+        <dc:source
+          >https://openclipart.org/detail/66193/conical-buoy-green-by-seafish</dc:source
+        >
+        <dc:creator
+          >
+          <cc:Agent
+            >
+            <dc:title
+              >seafish</dc:title
+            >
+          </cc:Agent
+          >
+        </dc:creator
+        >
+        <dc:subject
+          >
+          <rdf:Bag
+            >
+            <rdf:li
+              >buoy</rdf:li
+            >
+            <rdf:li
+              >chart</rdf:li
+            >
+            <rdf:li
+              >conical</rdf:li
+            >
+            <rdf:li
+              >green</rdf:li
+            >
+            <rdf:li
+              >navigation</rdf:li
+            >
+            <rdf:li
+              >sailing</rdf:li
+            >
+            <rdf:li
+              >sea</rdf:li
+            >
+            <rdf:li
+              >symbol</rdf:li
+            >
+          </rdf:Bag
+          >
+        </dc:subject
+        >
+      </cc:Work
+      >
+      <cc:License
+          rdf:about="http://creativecommons.org/licenses/publicdomain/"
+        >
+        <cc:permits
+            rdf:resource="http://creativecommons.org/ns#Reproduction"
+        />
+        <cc:permits
+            rdf:resource="http://creativecommons.org/ns#Distribution"
+        />
+        <cc:permits
+            rdf:resource="http://creativecommons.org/ns#DerivativeWorks"
+        />
+      </cc:License
+      >
+    </rdf:RDF
+    >
+  </metadata
+  >
+</svg
+>

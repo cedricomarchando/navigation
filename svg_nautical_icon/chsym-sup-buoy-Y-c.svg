@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<svg
+    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns="http://www.w3.org/2000/svg"
+    xmlns:cc="http://creativecommons.org/ns#"
+    xmlns:dc="http://purl.org/dc/elements/1.1/"
+    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+    xmlns:svg="http://www.w3.org/2000/svg"
+    xmlns:ns1="http://sozi.baierouge.fr"
+    xmlns:xlink="http://www.w3.org/1999/xlink"
+    id="svg3161"
+    sodipodi:docname="chsym_sup_buoy_Y_c.svg"
+    viewBox="0 0 77.445 38.094"
+    sodipodi:version="0.32"
+    version="1.0"
+    inkscape:output_extension="org.inkscape.output.svg.inkscape"
+    inkscape:version="0.46"
+  >
+  <sodipodi:namedview
+      id="base"
+      bordercolor="#666666"
+      inkscape:pageshadow="2"
+      inkscape:window-y="291"
+      pagecolor="#ffffff"
+      inkscape:window-height="811"
+      inkscape:zoom="0.35"
+      inkscape:window-x="1124"
+      showgrid="false"
+      borderopacity="1.0"
+      inkscape:current-layer="layer1"
+      inkscape:cx="350"
+      inkscape:cy="520"
+      inkscape:window-width="788"
+      inkscape:pageopacity="0.0"
+      inkscape:document-units="px"
+  />
+  <g
+      id="layer1"
+      inkscape:label="Ebene 1"
+      inkscape:groupmode="layer"
+      transform="translate(-115.56 -187.6)"
+    >
+    <g
+        id="g9924"
+        style="stroke:#000000;stroke-width:1.063;stroke-miterlimit:3.9879"
+        transform="translate(-160.72 -180.65)"
+      >
+      <path
+          id="path9908"
+          style="stroke:#000000;stroke-miterlimit:3.9879;stroke-width:1.063;fill:none"
+          d="m276.81 401.61h33.75"
+      />
+      <path
+          id="path9910"
+          sodipodi:rx="3.0409236"
+          sodipodi:ry="3.2943337"
+          style="stroke:#000000;stroke-miterlimit:3.9879;stroke-width:.83461;fill:none"
+          sodipodi:type="arc"
+          d="m153.74 203.86a3.0409 3.2943 0 1 1 -6.09 0 3.0409 3.2943 0 1 1 6.09 0z"
+          transform="matrix(1.3257 0 0 1.2236 115.39 152.34)"
+          sodipodi:cy="203.86003"
+          sodipodi:cx="150.69466"
+      />
+      <path
+          id="path9912"
+          style="stroke:#000000;stroke-miterlimit:3.9879;stroke-width:1.063;fill:none"
+          d="m319.66 401.57h33.53"
+      />
+      <path
+          id="path9914"
+          style="stroke:#000000;stroke-miterlimit:3.9879;stroke-width:1.063;fill:none"
+          d="m281.06 401.15l9.25-32.37 49.38 0.25 8.62 31.87"
+      />
+      <path
+          id="path9922"
+          style="fill-rule:evenodd;stroke:#000000;stroke-miterlimit:3.9879;stroke-width:1.063;fill:#ffff00"
+          d="m285.43 389.28c1.87-6.47 3.85-13.45 4.42-15.52l1.02-3.77 24.1 0.27 24.1 0.27 3.84 14c2.11 7.7 3.85 14.56 3.86 15.25 0.01 0.93-3.29 1.25-13.24 1.25-12.18 0-13.37-0.17-14.51-2-0.71-1.14-2.34-2-3.75-2-1.38 0-3.28 0.9-4.22 2-1.55 1.81-2.95 2-15.36 2h-13.66l3.4-11.75z"
+      />
+    </g
+    >
+  </g
+  >
+  <metadata
+    >
+    <rdf:RDF
+      >
+      <cc:Work
+        >
+        <dc:format
+          >image/svg+xml</dc:format
+        >
+        <dc:type
+            rdf:resource="http://purl.org/dc/dcmitype/StillImage"
+        />
+        <cc:license
+            rdf:resource="http://creativecommons.org/licenses/publicdomain/"
+        />
+        <dc:publisher
+          >
+          <cc:Agent
+              rdf:about="http://openclipart.org/"
+            >
+            <dc:title
+              >Openclipart</dc:title
+            >
+          </cc:Agent
+          >
+        </dc:publisher
+        >
+        <dc:title
+          >super buoy sea chart symbol</dc:title
+        >
+        <dc:date
+          >2010-06-11T22:13:08</dc:date
+        >
+        <dc:description
+          >symbol for super buoy</dc:description
+        >
+        <dc:source
+          >https://openclipart.org/detail/66289/super-buoy-sea-chart-symbol-by-seafish-66289</dc:source
+        >
+        <dc:creator
+          >
+          <cc:Agent
+            >
+            <dc:title
+              >seafish</dc:title
+            >
+          </cc:Agent
+          >
+        </dc:creator
+        >
+        <dc:subject
+          >
+          <rdf:Bag
+            >
+            <rdf:li
+              >chart</rdf:li
+            >
+            <rdf:li
+              >navigation</rdf:li
+            >
+            <rdf:li
+              >sailing</rdf:li
+            >
+            <rdf:li
+              >sea</rdf:li
+            >
+            <rdf:li
+              >super buoy</rdf:li
+            >
+            <rdf:li
+              >symbol</rdf:li
+            >
+          </rdf:Bag
+          >
+        </dc:subject
+        >
+      </cc:Work
+      >
+      <cc:License
+          rdf:about="http://creativecommons.org/licenses/publicdomain/"
+        >
+        <cc:permits
+            rdf:resource="http://creativecommons.org/ns#Reproduction"
+        />
+        <cc:permits
+            rdf:resource="http://creativecommons.org/ns#Distribution"
+        />
+        <cc:permits
+            rdf:resource="http://creativecommons.org/ns#DerivativeWorks"
+        />
+      </cc:License
+      >
+    </rdf:RDF
+    >
+  </metadata
+  >
+</svg
+>

@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<svg
+    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns="http://www.w3.org/2000/svg"
+    xmlns:cc="http://creativecommons.org/ns#"
+    xmlns:dc="http://purl.org/dc/elements/1.1/"
+    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+    xmlns:svg="http://www.w3.org/2000/svg"
+    xmlns:ns1="http://sozi.baierouge.fr"
+    xmlns:xlink="http://www.w3.org/1999/xlink"
+    id="svg2858"
+    sodipodi:docname="chsym_beacon_BRB_c.svg"
+    viewBox="0 0 21.896 87.661"
+    sodipodi:version="0.32"
+    version="1.0"
+    inkscape:output_extension="org.inkscape.output.svg.inkscape"
+    inkscape:version="0.46"
+  >
+  <sodipodi:namedview
+      id="base"
+      bordercolor="#666666"
+      inkscape:pageshadow="2"
+      inkscape:window-y="360"
+      pagecolor="#ffffff"
+      inkscape:window-height="811"
+      inkscape:zoom="6.4794871"
+      inkscape:window-x="1124"
+      showgrid="false"
+      borderopacity="1.0"
+      inkscape:current-layer="layer1"
+      inkscape:cx="10.948236"
+      inkscape:cy="43.830632"
+      inkscape:window-width="788"
+      inkscape:pageopacity="0.0"
+      inkscape:document-units="px"
+  />
+  <g
+      id="layer1"
+      inkscape:label="Ebene 1"
+      inkscape:groupmode="layer"
+      transform="translate(-54.766 -225.67)"
+    >
+    <g
+        id="g2595"
+      >
+      <path
+          id="path7212"
+          style="stroke:#000000;stroke-miterlimit:3.9879;stroke-width:1.063;fill:none"
+          d="m55.298 309.34h7.054"
+      />
+      <path
+          id="path7214"
+          sodipodi:rx="3.0409236"
+          sodipodi:ry="3.2943337"
+          style="stroke:#000000;stroke-miterlimit:3.9879;stroke-width:1.063;fill:none"
+          sodipodi:type="arc"
+          d="m153.74 203.86a3.0409 3.2943 0 1 1 -6.09 0 3.0409 3.2943 0 1 1 6.09 0z"
+          transform="translate(-85.196 105.65)"
+          sodipodi:cy="203.86003"
+          sodipodi:cx="150.69466"
+      />
+      <path
+          id="path7216"
+          style="stroke:#000000;stroke-miterlimit:3.9879;stroke-width:1.063;fill:none"
+          d="m69.076 309.65h7.055"
+      />
+      <rect
+          id="rect7218"
+          style="stroke:#000000;stroke-miterlimit:3.9879;stroke-width:1.063;fill:none"
+          height="43"
+          width="13"
+          y="266.15"
+          x="59.604"
+      />
+      <path
+          id="path7220"
+          style="stroke:#000000;stroke-miterlimit:3.9879;stroke-width:1.063;fill:none"
+          d="m60.214 294.51h12"
+      />
+      <path
+          id="path7222"
+          style="stroke:#000000;stroke-miterlimit:3.9879;stroke-width:1.063;fill:none"
+          d="m59.964 280.46h12.5"
+      />
+      <g
+          id="g7375"
+          style="stroke:#000000;stroke-width:1.063;stroke-miterlimit:3.9879"
+          transform="matrix(.98902 -.14781 .14781 .98902 -478.91 -424.8)"
+        >
+        <path
+            id="path7377"
+            style="stroke:#000000;stroke-miterlimit:3.9879;stroke-width:1.063;fill:none"
+            d="m442.61 730.59l-5.2 32.58"
+        />
+        <path
+            id="path7379"
+            sodipodi:rx="6.3660936"
+            sodipodi:ry="5.3149605"
+            style="fill-rule:evenodd;stroke:#000000;stroke-miterlimit:3.9879;stroke-width:.95360;fill:#000000"
+            sodipodi:type="arc"
+            d="m485.43 419.88a6.3661 5.315 0 1 1 -12.73 0 6.3661 5.315 0 1 1 12.73 0z"
+            transform="matrix(.99042 0 0 1.2546 -31.376 204.4)"
+            sodipodi:cy="419.88187"
+            sodipodi:cx="479.06699"
+        />
+        <path
+            id="path7381"
+            sodipodi:rx="6.3660936"
+            sodipodi:ry="5.3149605"
+            style="fill-rule:evenodd;stroke:#000000;stroke-miterlimit:3.9879;stroke-width:.95360;fill:#000000"
+            sodipodi:type="arc"
+            d="m485.43 419.88a6.3661 5.315 0 1 1 -12.73 0 6.3661 5.315 0 1 1 12.73 0z"
+            transform="matrix(.99042 0 0 1.2546 -34.56 221.7)"
+            sodipodi:cy="419.88187"
+            sodipodi:cx="479.06699"
+        />
+      </g
+      >
+      <path
+          id="path2589"
+          d="m5.454 61.826v-6.482h5.865 5.864v6.482 6.482h-5.864-5.865v-6.482z"
+          style="fill-rule:evenodd;stroke-miterlimit:3.9879;stroke-width:.2;fill:#ff0000"
+          transform="translate(54.766 225.67)"
+      />
+      <path
+          id="path2591"
+          d="m5.454 47.627v-6.482h5.865 5.864v6.482 6.482h-5.864-5.865v-6.482z"
+          style="fill-rule:evenodd;stroke-miterlimit:3.9879;stroke-width:.2;fill:#000000"
+          transform="translate(54.766 225.67)"
+      />
+      <path
+          id="path2593"
+          d="m5.454 76.102v-6.714h5.865 5.864v6.714 6.713h-1.448-1.448l-0.408-0.833c-1.12-2.291-4.0949-2.707-5.7637-0.807-0.2603 0.297-0.5629 0.787-0.6723 1.09-0.197 0.545-0.2081 0.55-1.094 0.55h-0.895v-6.713z"
+          style="fill-rule:evenodd;stroke-miterlimit:3.9879;stroke-width:.2;fill:#000000"
+          transform="translate(54.766 225.67)"
+      />
+    </g
+    >
+  </g
+  >
+  <metadata
+    >
+    <rdf:RDF
+      >
+      <cc:Work
+        >
+        <dc:format
+          >image/svg+xml</dc:format
+        >
+        <dc:type
+            rdf:resource="http://purl.org/dc/dcmitype/StillImage"
+        />
+        <cc:license
+            rdf:resource="http://creativecommons.org/licenses/publicdomain/"
+        />
+        <dc:publisher
+          >
+          <cc:Agent
+              rdf:about="http://openclipart.org/"
+            >
+            <dc:title
+              >Openclipart</dc:title
+            >
+          </cc:Agent
+          >
+        </dc:publisher
+        >
+        <dc:title
+          >beacon black red black</dc:title
+        >
+        <dc:date
+          >2010-06-11T21:05:21</dc:date
+        >
+        <dc:description
+          >beacon, black red black, single danger</dc:description
+        >
+        <dc:source
+          >https://openclipart.org/detail/65935/beacon-black-red-black-by-seafish-65935</dc:source
+        >
+        <dc:creator
+          >
+          <cc:Agent
+            >
+            <dc:title
+              >seafish</dc:title
+            >
+          </cc:Agent
+          >
+        </dc:creator
+        >
+        <dc:subject
+          >
+          <rdf:Bag
+            >
+            <rdf:li
+              >beacon</rdf:li
+            >
+            <rdf:li
+              >chart</rdf:li
+            >
+            <rdf:li
+              >naviagtion</rdf:li
+            >
+            <rdf:li
+              >sailing</rdf:li
+            >
+            <rdf:li
+              >sea</rdf:li
+            >
+            <rdf:li
+              >symbol</rdf:li
+            >
+          </rdf:Bag
+          >
+        </dc:subject
+        >
+      </cc:Work
+      >
+      <cc:License
+          rdf:about="http://creativecommons.org/licenses/publicdomain/"
+        >
+        <cc:permits
+            rdf:resource="http://creativecommons.org/ns#Reproduction"
+        />
+        <cc:permits
+            rdf:resource="http://creativecommons.org/ns#Distribution"
+        />
+        <cc:permits
+            rdf:resource="http://creativecommons.org/ns#DerivativeWorks"
+        />
+      </cc:License
+      >
+    </rdf:RDF
+    >
+  </metadata
+  >
+</svg
+>

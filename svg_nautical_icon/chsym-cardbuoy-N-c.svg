@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<svg
+    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns="http://www.w3.org/2000/svg"
+    xmlns:cc="http://creativecommons.org/ns#"
+    xmlns:dc="http://purl.org/dc/elements/1.1/"
+    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+    xmlns:svg="http://www.w3.org/2000/svg"
+    xmlns:ns1="http://sozi.baierouge.fr"
+    xmlns:xlink="http://www.w3.org/1999/xlink"
+    id="svg3664"
+    sodipodi:docname="chsym_card_N_c.svg"
+    viewBox="0 0 57.973 143.86"
+    sodipodi:version="0.32"
+    version="1.0"
+    inkscape:output_extension="org.inkscape.output.svg.inkscape"
+    inkscape:version="0.46"
+  >
+  <sodipodi:namedview
+      id="base"
+      bordercolor="#666666"
+      inkscape:pageshadow="2"
+      inkscape:window-y="360"
+      pagecolor="#ffffff"
+      inkscape:window-height="811"
+      inkscape:zoom="0.35"
+      inkscape:window-x="1124"
+      showgrid="false"
+      borderopacity="1.0"
+      inkscape:current-layer="layer1"
+      inkscape:cx="350"
+      inkscape:cy="520"
+      inkscape:window-width="788"
+      inkscape:pageopacity="0.0"
+      inkscape:document-units="px"
+  />
+  <g
+      id="layer1"
+      inkscape:label="Ebene 1"
+      inkscape:groupmode="layer"
+      transform="translate(-321.01 -460.43)"
+    >
+    <g
+        id="g8828"
+        style="stroke:#000000;stroke-width:1.063;stroke-miterlimit:3.9879"
+        transform="translate(177.42 -23.403)"
+      >
+      <g
+          id="g6485"
+          style="stroke:#000000;stroke-width:1.063;stroke-miterlimit:3.9879"
+          transform="translate(73.366 386.22)"
+        >
+        <path
+            id="path6487"
+            style="stroke:#000000;stroke-miterlimit:3.9879;stroke-width:1.063;fill:none"
+            d="m70.756 237.48h25.065"
+        />
+        <path
+            id="path6489"
+            sodipodi:rx="3.0409236"
+            sodipodi:ry="3.2943337"
+            style="stroke:#000000;stroke-miterlimit:3.9879;stroke-width:1.063;fill:none"
+            sodipodi:type="arc"
+            d="m153.74 203.86a3.0409 3.2943 0 1 1 -6.09 0 3.0409 3.2943 0 1 1 6.09 0z"
+            transform="translate(-51.358 33.79)"
+            sodipodi:cy="203.86003"
+            sodipodi:cx="150.69466"
+        />
+        <path
+            id="path6491"
+            style="stroke:#000000;stroke-miterlimit:3.9879;stroke-width:1.063;fill:none"
+            d="m102.76 237.56h24.91"
+        />
+      </g
+      >
+      <path
+          id="path6493"
+          style="stroke:#000000;stroke-miterlimit:3.9879;stroke-width:1.063;fill:none"
+          d="m148.51 623.42l18.25-41.05 13.25-58.75 10 1.75-1 60.75 8.5 37.3"
+      />
+      <path
+          id="path6495"
+          style="stroke:#000000;stroke-miterlimit:3.9879;stroke-width:1.063;fill:none"
+          d="m168.01 575.37l21 2.25"
+      />
+      <path
+          id="path6547"
+          style="fill-rule:evenodd;stroke:#000000;stroke-miterlimit:3.9879;stroke-width:1.063;fill:#000000"
+          d="m177.87 575.66c-4.44-0.54-8.16-1.06-8.26-1.16-0.23-0.23 10.8-49.32 11.15-49.65 0.13-0.12 2.11 0.1 4.41 0.5l4.18 0.73-0.47 18.05c-0.25 9.93-0.46 21.35-0.46 25.37 0 6.52-0.14 7.3-1.24 7.22-0.68-0.04-4.87-0.52-9.31-1.06z"
+      />
+      <path
+          id="path6557"
+          style="fill-rule:evenodd;stroke:#000000;stroke-miterlimit:3.9879;stroke-width:1.063;fill:#ffff00"
+          d="m158.78 602.3c5.01-11.26 9.31-21.78 9.57-23.37 0.42-2.66 0.61-2.87 2.31-2.54 1.02 0.19 5.43 0.73 9.8 1.19l7.96 0.83v4.42c0 2.82 1.41 10.65 3.89 21.56 2.14 9.41 3.89 17.4 3.89 17.75s-4.39 0.63-9.75 0.63c-8.86 0-9.85-0.13-10.95-1.41-0.67-0.78-2.01-1.42-2.98-1.42-1 0-2.15 0.61-2.65 1.42-0.81 1.3-1.65 1.41-10.54 1.41h-9.66l9.11-20.47z"
+      />
+      <g
+          id="g6602"
+          style="stroke:#000000;stroke-width:0.836;stroke-miterlimit:3.9879"
+          transform="matrix(1.2883 0 0 1.2549 -84.435 41.761)"
+        >
+        <path
+            id="path6575"
+            style="stroke:#000000;stroke-miterlimit:3.9879;stroke-width:0.836;fill:none"
+            d="m204.75 375.85l10.78 2.2-3.55-11.42-7.23 9.22z"
+        />
+        <path
+            id="path6577"
+            style="stroke:#000000;stroke-miterlimit:3.9879;stroke-width:0.836;fill:none"
+            d="m207.32 361.91l10.78 2.2-3.55-11.42-7.23 9.22z"
+        />
+        <path
+            id="path6579"
+            style="fill-rule:evenodd;stroke:#000000;stroke-miterlimit:3.9879;stroke-width:0.836;fill:#000000"
+            d="m208.56 361.42c0.02-0.1 1.33-1.81 2.89-3.79l2.85-3.61 1.42 4.53c0.78 2.49 1.4 4.59 1.39 4.66-0.02 0.07-1.96-0.26-4.32-0.74s-4.26-0.95-4.23-1.05z"
+        />
+        <path
+            id="path6581"
+            style="fill-rule:evenodd;stroke:#000000;stroke-miterlimit:3.9879;stroke-width:0.836;fill:#000000"
+            d="m208.75 371.73c1.56-2 2.9-3.62 2.97-3.61 0.1 0.03 2.61 7.99 2.76 8.78 0.03 0.11-1.89-0.18-4.26-0.67l-4.31-0.87 2.84-3.63z"
+        />
+      </g
+      >
+      <path
+          id="path6583"
+          style="stroke:#000000;stroke-miterlimit:3.9879;stroke-width:1.063;fill:none"
+          d="m190.11 491.57l-5.2 32.59"
+      />
+    </g
+    >
+  </g
+  >
+  <metadata
+    >
+    <rdf:RDF
+      >
+      <cc:Work
+        >
+        <dc:format
+          >image/svg+xml</dc:format
+        >
+        <dc:type
+            rdf:resource="http://purl.org/dc/dcmitype/StillImage"
+        />
+        <cc:license
+            rdf:resource="http://creativecommons.org/licenses/publicdomain/"
+        />
+        <dc:publisher
+          >
+          <cc:Agent
+              rdf:about="http://openclipart.org/"
+            >
+            <dc:title
+              >Openclipart</dc:title
+            >
+          </cc:Agent
+          >
+        </dc:publisher
+        >
+        <dc:title
+          >cardinal buoy north</dc:title
+        >
+        <dc:date
+          >2010-06-11T21:50:40</dc:date
+        >
+        <dc:description
+          >cardinal buoy north, symbol</dc:description
+        >
+        <dc:source
+          >https://openclipart.org/detail/66163/cardinal-buoy-north-by-seafish-66163</dc:source
+        >
+        <dc:creator
+          >
+          <cc:Agent
+            >
+            <dc:title
+              >seafish</dc:title
+            >
+          </cc:Agent
+          >
+        </dc:creator
+        >
+        <dc:subject
+          >
+          <rdf:Bag
+            >
+            <rdf:li
+              >buoy</rdf:li
+            >
+            <rdf:li
+              >cardinal</rdf:li
+            >
+            <rdf:li
+              >chart</rdf:li
+            >
+            <rdf:li
+              >navigation</rdf:li
+            >
+            <rdf:li
+              >north</rdf:li
+            >
+            <rdf:li
+              >sailing</rdf:li
+            >
+            <rdf:li
+              >sea</rdf:li
+            >
+            <rdf:li
+              >symbol</rdf:li
+            >
+          </rdf:Bag
+          >
+        </dc:subject
+        >
+      </cc:Work
+      >
+      <cc:License
+          rdf:about="http://creativecommons.org/licenses/publicdomain/"
+        >
+        <cc:permits
+            rdf:resource="http://creativecommons.org/ns#Reproduction"
+        />
+        <cc:permits
+            rdf:resource="http://creativecommons.org/ns#Distribution"
+        />
+        <cc:permits
+            rdf:resource="http://creativecommons.org/ns#DerivativeWorks"
+        />
+      </cc:License
+      >
+    </rdf:RDF
+    >
+  </metadata
+  >
+</svg
+>
