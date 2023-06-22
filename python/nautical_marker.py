@@ -6,12 +6,11 @@ from matplotlib.path import Path
 def plot_nautical_symbol(position_x, position_y, shape_type, top_mark_type):
     """ plot nautical symbol """
     
-    shape_height = 10
-    shape_width = 2
+    shape_height = 12
     topmark_size = 2
     color = select_color(top_mark_type)
-    shape_marker = build_rectangle_path(shape_height,shape_width,0)
-    #topmark_marker = green_topmark( size=topmark_size, height=shape_height +1)
+    
+    shape_marker = select_shape(shape_type, shape_height)
     topmark_marker = select_topmark_marker(top_mark_type, topmark_size, shift_up=shape_height + 2)
     symbol_marker = Path.make_compound_path(shape_marker, topmark_marker)
     
@@ -19,6 +18,8 @@ def plot_nautical_symbol(position_x, position_y, shape_type, top_mark_type):
             markerfacecolor=color, markeredgecolor='k',
             markersize=50, label=top_mark_type)
     plot_circle_line(position_x, position_y, 1.5 , 4)
+    
+
 
 def select_color(top_mark_type):
     """ select color """
@@ -30,6 +31,19 @@ def select_color(top_mark_type):
         case _:
             color = 'black'
     return color
+
+def select_shape(shape_type, shape_height):
+    """ select shape """
+    match shape_type:
+        case 'spar':
+            shape_marker = build_rectangle_path(shape_height,2,0)
+        case 'can':
+            shape_marker = build_rectangle_path(shape_height,10,0)
+        case 'conical':
+            shape_marker = build_conical_path(shape_height,10)
+        case _:
+            print('not defined shape')
+    return shape_marker
 
 def select_topmark_marker(top_mark_type, size, shift_up):
     """ select topmark marker """
@@ -53,7 +67,6 @@ def select_topmark_marker(top_mark_type, size, shift_up):
     return topmark_marker
             
 
-
 def build_triangle_path(size, shift_up):
     """ Build a triangle path """
     vertices = [(-size, shift_up), (0, shift_up + 2*size), (size, shift_up), (-size, shift_up)]
@@ -76,6 +89,13 @@ def build_rectangle_path(height, width, shift_up):
     codes = [1, 2, 2, 2, 79]
     rectangle_path = Path(vertices,codes)
     return rectangle_path
+
+def build_conical_path(height,width):
+    """ Buils conocal path"""
+    vertices =[(-width/2,0), (-width/2, height/3), (0,height), (width/2, height/3), (width/2,0),(-width/2,0),   ]
+    codes = [1,3,2,3,2,79]
+    conical_path = Path(vertices,codes)
+    return conical_path
 
 def build_line_path(start,stop):
     """ Build line path """
@@ -105,6 +125,7 @@ def plot_circle_line(position_x, position_y,circle_size, line_size):
     plt.plot(position_x, position_y, marker=marker, linestyle='solid',
             markerfacecolor='None', markeredgecolor='k',
             markersize=10, label='Green Beacon')
+    
     
 def green_topmark(size, shift_up):
     """ plot green beacon """
@@ -154,13 +175,13 @@ def danger_topmark(size, shift_up):
     
 if __name__ == "__main__":
     
-    plot_nautical_symbol(4, 10, shape_type='pilar', top_mark_type='green')
-    plot_nautical_symbol(5, 10, shape_type='pilar', top_mark_type='red')
-    plot_nautical_symbol(6, 10, shape_type='pilar', top_mark_type='north')
-    plot_nautical_symbol(7, 10, shape_type='pilar', top_mark_type='south')
-    plot_nautical_symbol(8, 10, shape_type='pilar', top_mark_type='east')
-    plot_nautical_symbol(9, 10, shape_type='pilar', top_mark_type='west')
-    plot_nautical_symbol(10, 10, shape_type='pilar', top_mark_type='danger')
+    topmark_type_list =['green','red','north','south','east','west','danger']
+    shape_type_list =['conical','can','spar']
     
-    plot_circle_line(11, 10, 2, 4)
+    
+    for i, topmark in enumerate(topmark_type_list):
+        for j, shape in enumerate(shape_type_list):
+            plot_nautical_symbol(i, j*2, shape_type=shape, top_mark_type=topmark)
+
+    plot_circle_line(i+1, 10, 2, 4)
     plt.show()
