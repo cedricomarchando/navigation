@@ -19,7 +19,7 @@ plt.imshow(img, origin='upper', extent=img_extent, transform=ccrs.PlateCarree())
 #plt.figure(figsize=(10, 5))
 
 
-text_shift = 0.0005
+text_shift = 0.0002
 markersize = 30
 
 church = marker.PlotMark(-3.33851, 47.72356, markersize,'church')
@@ -33,6 +33,10 @@ light = marker.PlotMark(-3.36752, 47.72670, markersize, 'major_lighthouse')
 light.plot_land_mark('green')
 light = marker.PlotMark(-3.37188, 47.71705, markersize, 'major_lighthouse')
 light.plot_land_mark('red')
+light = marker.PlotMark(-3.36705, 47.72751, markersize, 'lighthouse')
+light.plot_land_mark('red')
+light = marker.PlotMark(-3.36774, 47.72757, markersize, 'lighthouse')
+light.plot_land_mark('green')
 
 tower = marker.PlotMark(-3.36032, 47.72448, markersize,'tower')
 tower.plot_land_mark()
@@ -43,6 +47,9 @@ tower = marker.PlotMark(-3.35917, 47.72771, markersize,'tower')
 tower.plot_land_mark()
 tower.mark_type = 'major_lighthouse'
 tower.plot_land_mark('green')
+tower = marker.PlotMark(-3.35995, 47.72535, markersize,'tower','Tourelle Aimé')
+tower.plot_land_mark()
+tower.plot_text(text_shift)
 
 green = marker.PlotMark(-3.35197, 47.72534, markersize, 'spar')
 green.plot_sea_mark('green', show_top_mark=False)
@@ -65,6 +72,13 @@ green.plot_sea_mark('green', show_top_mark=False, floating=True)
 green = marker.PlotMark(-3.35857, 47.72813, markersize, 'spar','No7')
 green.plot_sea_mark('green')
 green.plot_light_mark('green')
+green = marker.PlotMark(-3.36118, 47.72575, markersize, 'conical','N°5')
+green.plot_sea_mark('green', floating=True)
+green.plot_light_mark('green')
+green.plot_text(text_shift)
+green = marker.PlotMark(-3.35366, 47.72457, markersize, 'conical','M5')
+green.plot_sea_mark('green', floating=True)
+green.plot_text(text_shift)
 
 
 red = marker.PlotMark(-3.35152, 47.72559, markersize, 'spar')
@@ -86,6 +100,11 @@ red4.plot_text(text_shift)
 red4 = marker.PlotMark(-3.35353, 47.72723, markersize,'can','M6')
 red4.plot_sea_mark('red', show_top_mark=False, floating=True)
 red4.plot_text(text_shift)
+red4 = marker.PlotMark(-3.36601, 47.71843, markersize,'can','N°4')
+red4.plot_sea_mark('red', show_top_mark=False, floating=True)
+red4.plot_text(text_shift)
+red4 = marker.PlotMark(-3.36722, 47.71793, markersize,'spar')
+red4.plot_sea_mark('red')
 
 
 south = marker.PlotMark(-3.3665, 47.71862, markersize, 'spar')
@@ -100,19 +119,18 @@ east = marker.PlotMark(-3.3703, 47.72651, markersize, 'spar')
 east.plot_sea_mark('east', show_top_mark=False)
 
 wreck = marker.PlotMark(-3.36989, 47.72604, markersize,'wreck_depth')
-wreck.plot_danger_mark()
 wreck2 = marker.PlotMark(-3.36894, 47.72544, markersize,'wreck_depth')
-wreck2.plot_danger_mark()
 wreck3 = marker.PlotMark(-3.35034, 47.728, markersize,'wreck')
-wreck3.plot_danger_mark()
 wreck3 = marker.PlotMark(-3.34759, 47.7275, markersize,'wreck')
-wreck3.plot_danger_mark()
 wreck4 = marker.PlotMark(-3.3578, 47.72015, markersize,'wreck')
-wreck4.plot_danger_mark()
 wreck5 = marker.PlotMark(-3.35807, 47.72099, markersize,'wreck')
-wreck5.plot_danger_mark()
+wreck5 = marker.PlotMark(-3.35662, 47.72181, markersize,'wreck')
+wreck5 = marker.PlotMark(-3.34620, 47.72670, markersize,'wreck')
+wreck5 = marker.PlotMark(-3.34620, 47.72670, markersize,'wreck')
+wreck5 = marker.PlotMark(-3.34673, 47.72586, markersize,'wreck')
+wreck5 = marker.PlotMark(-3.37243, 47.71915, markersize,'wreck')
 
-
+    
 plt.show()
 
 
