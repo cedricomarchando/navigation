@@ -3,17 +3,22 @@ import matplotlib.pyplot as plt
 from matplotlib.path import Path
 import matplotlib.transforms as transforms
 
-
+TOPMARKS_LIST =['green','red','north','south','east','west','danger','special','safe_Water']
+LANDMARKS_LIST = ['lighthouse','major_lighthouse', 'tower', 'water_tower', 'church']
+DANGERS_LIST = ['wreck', 'wreck_depth', 'danger','rock_covers','rock_depth']
 
 class PlotMark:
     """ Plot mark """
-    def __init__(self, position_x, position_y, markersize, mark_type, name = None):
+    
+    def __init__(self, position_x, position_y, markersize, mark_type, name = None ):
         self.position_x = position_x
         self.position_y = position_y
         self.markersize = markersize
         self.mark_type = mark_type
         self.name = name
-        
+        if self.mark_type in DANGERS_LIST:
+            self.plot_danger_mark()
+                
     def plot_text(self, shift):
         """ Plot text """
         if self.name is not None:
@@ -40,7 +45,6 @@ class PlotMark:
         match self.mark_type.lower():
             case 'wreck':
                 marker = build_wreck_path()
-                plot_circle_line(self.position_x, self.position_y, 2 , 12)
             case 'wreck_depth':
                 marker = build_wreck_depth_path()
             case 'danger':
@@ -54,16 +58,25 @@ class PlotMark:
                 print('not defined danger')
         plt.plot(self.position_x, self.position_y, marker=marker, linestyle='solid',
             markerfacecolor=facecolor, markeredgecolor='k',
+            markeredgewidth=0.5,
             markersize=markersize, label=type)
+        if self.mark_type.lower() == 'wreck':
+            plot_circle_line(self.position_x, self.position_y, 1.5 , 12)
 
-    def plot_land_mark(self):
+    def plot_land_mark(self,color=None):
         """ plot land_marks """
         markersize = self.markersize
         match self.mark_type.lower():
             case 'lighthouse':
-                marker = Path.unit_regular_star(5,0.5)
+                marker = Path.unit_regular_star(5,0.3)
                 facecolor='k'
                 markersize = markersize/4
+                self.plot_light_mark(color)
+            case 'major_lighthouse':
+                marker = Path.unit_regular_star(5,0.3)
+                facecolor='k'
+                markersize = markersize/3
+                self.plot_light_mark(color)
             case 'tower':
                 marker = build_land_tower_path(10,3)
                 facecolor='none'
@@ -79,15 +92,20 @@ class PlotMark:
         plt.plot(self.position_x, self.position_y, marker=marker, linestyle='solid',
                 markerfacecolor=facecolor, markeredgecolor='k',
                 markersize=markersize, label=type)
+        if self.mark_type.lower() == 'major_lighthouse':
+            plt.plot(self.position_x, self.position_y, marker='o', linestyle='solid',
+                markerfacecolor=color, markeredgecolor=color,
+                markersize=markersize/6, label=type)
+            
 
-    def plot_sea_mark(self, top_mark_type = None, floating = False):
+    def plot_sea_mark(self, top_mark_type = None, show_top_mark = True, floating = False):
         """ plot nautical symbol """
         shape_height = 12
         topmark_size = 2
         color = select_color(top_mark_type)
         markersize = self.markersize
         width, shape_marker = select_shape(self.mark_type, shape_height)
-        if (top_mark_type.lower()  == 'green_no_top') or (top_mark_type.lower()  == 'red_no_top') or (top_mark_type is None):
+        if show_top_mark is not True:
             symbol_marker = shape_marker
             markersize = markersize/2
         else:
@@ -98,7 +116,7 @@ class PlotMark:
             symbol_marker = symbol_marker.transformed(transforms.Affine2D().rotate(-0.3))
 
         plt.plot(self.position_x, self.position_y, marker=symbol_marker, linestyle='solid',
-                markerfacecolor=color, markeredgecolor='k',
+                markerfacecolor=color, markeredgecolor='k',markeredgewidth=0.5,
                 markersize=markersize, label=top_mark_type)
         plot_circle_line(self.position_x, self.position_y, 1.5 , width + 2)
 
@@ -107,14 +125,12 @@ def select_color(top_mark_type):
     match top_mark_type.lower():
         case 'green':
             color = 'green'
-        case 'green_no_top':
-            color = 'green'
         case 'red' :
-            color = 'red'
-        case 'red_no_top' :
             color = 'red'
         case 'special':
             color ='yellow'
+        case 'safe_water':
+            color ='red'
         case _:
             color = 'black'
     return color
@@ -163,6 +179,8 @@ def select_topmark_marker(top_mark_type, size, shift_up):
             topmark_marker = danger_topmark(size, shift_up)
         case 'special':
             topmark_marker = build_cross_path(shift_up + size, size)
+        case 'safe_water':
+            topmark_marker = build_circle_path(size, shift_up + size)
         case _:
             print(' Not a valid topmark')
     return topmark_marker
@@ -305,6 +323,7 @@ def plot_circle_line(position_x, position_y,circle_size, line_size):
     marker = Path.make_compound_path(line_path1, circle_path, line_path2)
     plt.plot(position_x, position_y, marker=marker, linestyle='solid',
             markerfacecolor='white', markeredgecolor='k',
+            markeredgewidth=0.2,
             markersize=line_size*2, label='Green Beacon')
 
 def green_topmark(size, shift_up):
@@ -354,19 +373,19 @@ def danger_topmark(size, shift_up):
 
 if __name__ == "__main__":
 
-    topmark_type_list =['Green','Red','North','South','East','West','Danger','Special','Green_no_top','Red_no_top']
-    shape_type_list =['Conical','Can','Spherical','Spar','Pillar','Tower']
+    
+    shape_type_list =['conical','can','spherical','spar','pillar','tower']
     markersize=40
 
     plt.figure(1)
     for j, shape in enumerate(shape_type_list):
-        plt.text(1,j*2,shape, horizontalalignment='center')
+        plt.text(1,j*2,shape.capitalize(), horizontalalignment='center')
 
-    for i, topmark in enumerate(topmark_type_list):
-        plt.text(i+2,len(shape_type_list)*2, topmark, horizontalalignment='center')
+    for i, topmark in enumerate(TOPMARKS_LIST):
+        plt.text(i+2,len(shape_type_list)*2, topmark.capitalize(), horizontalalignment='center')
         for j, shape in enumerate(shape_type_list):
             sea_mark = PlotMark(i+2, j*2, markersize,shape)
-            sea_mark.plot_sea_marks(top_mark_type=topmark, floating=False)
+            sea_mark.plot_sea_mark(top_mark_type=topmark, floating=False)
     plt.title('Sea marks as a function of shape and topmark')
     plot_circle_line(1, 13, 2, 4)
     plt.axis('off')
@@ -375,39 +394,35 @@ if __name__ == "__main__":
 
     plt.figure(2)
     markersize = 50
-    landmarks_type_list = ['Lighthouse', 'Tower', 'Water_tower', 'Church']
-
-    plt.text(1,15,'Land marks')
-    for i, mark in enumerate(landmarks_type_list):
-        plt.text(i*2+4,17,mark, horizontalalignment='center')
-        land_mark = PlotMark(i*2+4, 15, markersize, mark)
-        land_mark.plot_land_marks()
     
 
-    danger_type_list = ['Wreck', 'Wreck_depth', 'Danger','Rock_covers','Rock_depth']
+    plt.text(1,15,'Land marks')
+    for i, mark in enumerate(LANDMARKS_LIST):
+        plt.text(i*2+4,17,mark.capitalize(), horizontalalignment='center')
+        land_mark = PlotMark(i*2+4, 15, markersize, mark)
+        land_mark.plot_land_mark()
+    
     plt.text(1,19,'Danger marks')
-    for i, mark in enumerate(danger_type_list):
-        plt.text(i*2+4,21,mark, horizontalalignment='center')
+    for i, mark in enumerate(DANGERS_LIST):
+        plt.text(i*2+4,21,mark.capitalize(), horizontalalignment='center')
         danger_mark = PlotMark(i*2+4,19, markersize,mark)
-        danger_mark.plot_danger_marks()
-
     plt.text(1,23,'Light')
     
     
     light1 = PlotMark(3,23, markersize,'Spar')
-    light1.plot_sea_marks('East',floating=True)
-    light1.plot_light_marks(-0.5, 'yellow')
+    light1.plot_sea_mark('East',floating=True)
+    light1.plot_light_mark('yellow')
     
     light2 = PlotMark(5,23, markersize,'Can')
-    light2.plot_sea_marks('Green', floating=False)
-    light2.plot_light_marks(-1.5, 'Green')
+    light2.plot_sea_mark('Green', floating=False)
+    light2.plot_light_mark('Green')
     
     light3 = PlotMark(7,23,markersize,'Lighthouse')
-    light3.plot_land_marks()
-    light3.plot_light_marks(0.5, 'Red')
-    
+    light3.plot_land_mark('Red')
+   
     
     plot_circle_line(1, 25, 2, 4)
+    
 
     plt.axis('off')
     plt.title('Nautical symbols')
