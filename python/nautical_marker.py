@@ -7,20 +7,29 @@ import matplotlib.transforms as transforms
 
 class PlotMark:
     """ Plot mark """
-    def __init__(self, position_x, position_y, markersize, mark_type):
+    def __init__(self, position_x, position_y, markersize, mark_type, name = None):
         self.position_x = position_x
         self.position_y = position_y
         self.markersize = markersize
         self.mark_type = mark_type
+        self.name = name
+        
+    def plot_text(self, shift):
+        """ Plot text """
+        if self.name is not None:
+            plt.text(self.position_x + shift, self.position_y + shift, self.name)
+        
 
-    def plot_light_marks(self, angle, color):
+    def plot_light_mark(self, color, angle = None):
         """ Plot light mark """
+        if angle is None:
+            angle = -0.45
         marker = build_light_path(angle)
-        plt.plot(self.position_x, self.position_y, marker=marker, linestyle='solid',
-        markerfacecolor=color, markeredgecolor='k',
-        markersize=self.markersize, label=color)
+        plt.plot(self.position_x, self.position_y, marker=marker, linestyle= None, 
+                 markeredgecolor=color,
+                markerfacecolor=color, markersize=self.markersize)
 
-    def plot_danger_marks(self):
+    def plot_danger_mark(self):
         """ plot danger marks """
         markersize = self.markersize/2
         
@@ -47,7 +56,7 @@ class PlotMark:
             markerfacecolor=facecolor, markeredgecolor='k',
             markersize=markersize, label=type)
 
-    def plot_land_marks(self):
+    def plot_land_mark(self):
         """ plot land_marks """
         markersize = self.markersize
         match self.mark_type.lower():
@@ -71,7 +80,7 @@ class PlotMark:
                 markerfacecolor=facecolor, markeredgecolor='k',
                 markersize=markersize, label=type)
 
-    def plot_sea_marks(self, top_mark_type = None, floating = False):
+    def plot_sea_mark(self, top_mark_type = None, floating = False):
         """ plot nautical symbol """
         shape_height = 12
         topmark_size = 2
