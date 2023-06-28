@@ -18,7 +18,7 @@ ax.set_extent( [-3.3782, -3.33217, 47.715, 47.7309], crs=ccrs.PlateCarree())
 plt.imshow(img, origin='upper', extent=img_extent, transform=ccrs.PlateCarree())
 #plt.figure(figsize=(10, 5))
 
-marker.PlotMark.markersize=30
+marker.PlotMark.markersize=50
 
 marker.PlotMark(-3.33851, 47.72356,'church')
 marker.PlotMark(-3.36444, 47.72712,'lighthouse', 'magenta','Keroman')
@@ -29,13 +29,13 @@ marker.PlotMark(-3.36705, 47.72751, 'lighthouse', 'red')
 marker.PlotMark(-3.36774, 47.72757, 'lighthouse', 'green')
 
 
-tower = marker.PlotMark(-3.36032, 47.72448, 'tower', 'green')
+tower = marker.PlotMark(-3.36032, 47.72448, 'land_tower', 'green')
 tower.mark_type = 'major_lighthouse'
 tower.plot_land_mark()
-tower = marker.PlotMark(-3.35917, 47.72712, 'tower', 'green')
+tower = marker.PlotMark(-3.35917, 47.72712, 'land_tower', 'green')
 tower.mark_type = 'major_lighthouse'
 tower.plot_land_mark()
-tower2 = marker.PlotMark(-3.35995, 47.72535,'tower', None, 'Tourelle Aimé')
+tower2 = marker.PlotMark(-3.35995, 47.72535,'land_tower', None, 'Tourelle Aimé')
 
 green = marker.PlotMark(-3.35197, 47.72534, 'spar','green')
 green.plot_sea_mark('green', show_top_mark=False)
