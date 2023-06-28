@@ -10,20 +10,24 @@ DANGERS_LIST = ['wreck', 'wreck_depth', 'danger','rock_covers','rock_depth']
 class PlotMark:
     """ Plot mark """
     
-    def __init__(self, position_x, position_y, markersize, mark_type, name = None ):
+    
+    def __init__(self, position_x, position_y, markersize, mark_type, light_color=None, name = None ):
+        text_shift = 0.0002
         self.position_x = position_x
         self.position_y = position_y
         self.markersize = markersize
         self.mark_type = mark_type
         self.name = name
+        self.ligh_color = light_color
         if self.mark_type in DANGERS_LIST:
             self.plot_danger_mark()
-                
-    def plot_text(self, shift):
-        """ Plot text """
+        if self.mark_type in LANDMARKS_LIST:
+            self.plot_land_mark()
+        if light_color is not None:
+            self.plot_light_mark(light_color)
         if self.name is not None:
-            plt.text(self.position_x + shift, self.position_y + shift, self.name)
-        
+            plt.text(self.position_x + text_shift, self.position_y + text_shift, self.name)    
+
 
     def plot_light_mark(self, color, angle = None):
         """ Plot light mark """
@@ -63,7 +67,7 @@ class PlotMark:
         if self.mark_type.lower() == 'wreck':
             plot_circle_line(self.position_x, self.position_y, 1.5 , 12)
 
-    def plot_land_mark(self,color=None):
+    def plot_land_mark(self):
         """ plot land_marks """
         markersize = self.markersize
         match self.mark_type.lower():
@@ -71,12 +75,10 @@ class PlotMark:
                 marker = Path.unit_regular_star(5,0.3)
                 facecolor='k'
                 markersize = markersize/4
-                self.plot_light_mark(color)
             case 'major_lighthouse':
                 marker = Path.unit_regular_star(5,0.3)
                 facecolor='k'
                 markersize = markersize/3
-                self.plot_light_mark(color)
             case 'tower':
                 marker = build_land_tower_path(10,3)
                 facecolor='none'
@@ -94,7 +96,7 @@ class PlotMark:
                 markersize=markersize, label=type)
         if self.mark_type.lower() == 'major_lighthouse':
             plt.plot(self.position_x, self.position_y, marker='o', linestyle='solid',
-                markerfacecolor=color, markeredgecolor=color,
+                markerfacecolor=self.ligh_color, markeredgecolor=self.ligh_color,
                 markersize=markersize/6, label=type)
             
 
@@ -400,7 +402,6 @@ if __name__ == "__main__":
     for i, mark in enumerate(LANDMARKS_LIST):
         plt.text(i*2+4,17,mark.capitalize(), horizontalalignment='center')
         land_mark = PlotMark(i*2+4, 15, markersize, mark)
-        land_mark.plot_land_mark()
     
     plt.text(1,19,'Danger marks')
     for i, mark in enumerate(DANGERS_LIST):
@@ -409,16 +410,13 @@ if __name__ == "__main__":
     plt.text(1,23,'Light')
     
     
-    light1 = PlotMark(3,23, markersize,'Spar')
+    light1 = PlotMark(3,23, markersize,'Spar',light_color='yellow')
     light1.plot_sea_mark('East',floating=True)
-    light1.plot_light_mark('yellow')
     
-    light2 = PlotMark(5,23, markersize,'Can')
+    light2 = PlotMark(5,23, markersize,'Can', light_color='green')
     light2.plot_sea_mark('Green', floating=False)
-    light2.plot_light_mark('Green')
     
-    light3 = PlotMark(7,23,markersize,'Lighthouse')
-    light3.plot_land_mark('Red')
+    light3 = PlotMark(7,23,markersize,'Lighthouse',light_color='red')
    
     
     plot_circle_line(1, 25, 2, 4)
