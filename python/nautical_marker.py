@@ -4,18 +4,17 @@ from matplotlib.path import Path
 import matplotlib.transforms as transforms
 
 TOPMARKS_LIST =['green','red','north','south','east','west','danger','special','safe_Water']
-LANDMARKS_LIST = ['lighthouse','major_lighthouse', 'tower', 'water_tower', 'church']
+LANDMARKS_LIST = ['lighthouse','major_lighthouse', 'land_tower', 'water_tower', 'church']
 DANGERS_LIST = ['wreck', 'wreck_depth', 'danger','rock_covers','rock_depth']
 
 class PlotMark:
     """ Plot mark """
+    text_shift = 0.0002
+    markersize = 30
     
-    
-    def __init__(self, position_x, position_y, markersize, mark_type, light_color=None, name = None ):
-        text_shift = 0.0002
+    def __init__(self, position_x, position_y, mark_type, light_color=None, name = None ):
         self.position_x = position_x
         self.position_y = position_y
-        self.markersize = markersize
         self.mark_type = mark_type
         self.name = name
         self.ligh_color = light_color
@@ -26,7 +25,7 @@ class PlotMark:
         if light_color is not None:
             self.plot_light_mark(light_color)
         if self.name is not None:
-            plt.text(self.position_x + text_shift, self.position_y + text_shift, self.name)    
+            plt.text(self.position_x + self.text_shift, self.position_y + self.text_shift, self.name)
 
 
     def plot_light_mark(self, color, angle = None):
@@ -40,7 +39,7 @@ class PlotMark:
 
     def plot_danger_mark(self):
         """ plot danger marks """
-        markersize = self.markersize/2
+        marker_size = self.markersize/2
         
         if self.mark_type.lower() == 'danger':
             facecolor ='skyblue'
@@ -63,7 +62,7 @@ class PlotMark:
         plt.plot(self.position_x, self.position_y, marker=marker, linestyle='solid',
             markerfacecolor=facecolor, markeredgecolor='k',
             markeredgewidth=0.5,
-            markersize=markersize, label=type)
+            markersize=marker_size, label=type)
         if self.mark_type.lower() == 'wreck':
             plot_circle_line(self.position_x, self.position_y, 1.5 , 12)
 
@@ -79,7 +78,7 @@ class PlotMark:
                 marker = Path.unit_regular_star(5,0.3)
                 facecolor='k'
                 markersize = markersize/3
-            case 'tower':
+            case 'land_tower':
                 marker = build_land_tower_path(10,3)
                 facecolor='none'
             case 'water_tower':
@@ -377,7 +376,7 @@ if __name__ == "__main__":
 
     
     shape_type_list =['conical','can','spherical','spar','pillar','tower']
-    markersize=40
+    #markersize=40
 
     plt.figure(1)
     for j, shape in enumerate(shape_type_list):
@@ -386,7 +385,7 @@ if __name__ == "__main__":
     for i, topmark in enumerate(TOPMARKS_LIST):
         plt.text(i+2,len(shape_type_list)*2, topmark.capitalize(), horizontalalignment='center')
         for j, shape in enumerate(shape_type_list):
-            sea_mark = PlotMark(i+2, j*2, markersize,shape)
+            sea_mark = PlotMark(i+2, j*2,shape)
             sea_mark.plot_sea_mark(top_mark_type=topmark, floating=False)
     plt.title('Sea marks as a function of shape and topmark')
     plot_circle_line(1, 13, 2, 4)
@@ -395,29 +394,28 @@ if __name__ == "__main__":
     plt.draw()
 
     plt.figure(2)
-    markersize = 50
     
 
     plt.text(1,15,'Land marks')
     for i, mark in enumerate(LANDMARKS_LIST):
         plt.text(i*2+4,17,mark.capitalize(), horizontalalignment='center')
-        land_mark = PlotMark(i*2+4, 15, markersize, mark)
+        land_mark = PlotMark(i*2+4, 15, mark)
     
     plt.text(1,19,'Danger marks')
     for i, mark in enumerate(DANGERS_LIST):
         plt.text(i*2+4,21,mark.capitalize(), horizontalalignment='center')
-        danger_mark = PlotMark(i*2+4,19, markersize,mark)
+        danger_mark = PlotMark(i*2+4,19,mark)
     plt.text(1,23,'Light')
     
     
-    light1 = PlotMark(3,23, markersize,'Spar',light_color='yellow')
+    light1 = PlotMark(3, 23,'Spar',light_color='yellow')
     light1.plot_sea_mark('East',floating=True)
     
-    light2 = PlotMark(5,23, markersize,'Can', light_color='green')
+    light2 = PlotMark(5, 23,'Can', light_color='green')
     light2.plot_sea_mark('Green', floating=False)
     
-    light3 = PlotMark(7,23,markersize,'Lighthouse',light_color='red')
-   
+    light3 = PlotMark(7, 23, 'Lighthouse',light_color='red')
+    
     
     plot_circle_line(1, 25, 2, 4)
     
