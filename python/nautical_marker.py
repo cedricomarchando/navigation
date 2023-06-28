@@ -15,9 +15,9 @@ class PlotMark:
     def __init__(self, position_x, position_y, mark_type, light_color=None, name = None ):
         self.position_x = position_x
         self.position_y = position_y
-        self.mark_type = mark_type
+        self.mark_type = mark_type.lower()
         self.name = name
-        self.ligh_color = light_color
+        self.light_color = light_color
         if self.mark_type in DANGERS_LIST:
             self.plot_danger_mark()
         if self.mark_type in LANDMARKS_LIST:
@@ -41,11 +41,11 @@ class PlotMark:
         """ plot danger marks """
         marker_size = self.markersize/2
         
-        if self.mark_type.lower() == 'danger':
+        if self.mark_type == 'danger':
             facecolor ='skyblue'
         else:
             facecolor='k'
-        match self.mark_type.lower():
+        match self.mark_type:
             case 'wreck':
                 marker = build_wreck_path()
             case 'wreck_depth':
@@ -63,13 +63,13 @@ class PlotMark:
             markerfacecolor=facecolor, markeredgecolor='k',
             markeredgewidth=0.5,
             markersize=marker_size, label=type)
-        if self.mark_type.lower() == 'wreck':
-            plot_circle_line(self.position_x, self.position_y, 1.5 , 12)
+        if self.mark_type == 'wreck':
+            self.plot_white_circle(10)
 
     def plot_land_mark(self):
         """ plot land_marks """
         markersize = self.markersize
-        match self.mark_type.lower():
+        match self.mark_type:
             case 'lighthouse':
                 marker = Path.unit_regular_star(5,0.3)
                 facecolor='k'
@@ -81,9 +81,11 @@ class PlotMark:
             case 'land_tower':
                 marker = build_land_tower_path(10,3)
                 facecolor='none'
+                self.plot_white_circle(10)
             case 'water_tower':
                 marker = build_water_tower_path(10,3)
                 facecolor='none'
+                self.plot_white_circle(10)
             case 'church':
                 marker = build_church_path()
                 facecolor ='k'
@@ -95,7 +97,7 @@ class PlotMark:
                 markersize=markersize, label=type)
         if self.mark_type.lower() == 'major_lighthouse':
             plt.plot(self.position_x, self.position_y, marker='o', linestyle='solid',
-                markerfacecolor=self.ligh_color, markeredgecolor=self.ligh_color,
+                markerfacecolor=self.light_color, markeredgecolor=self.light_color,
                 markersize=markersize/6, label=type)
             
 
@@ -108,7 +110,7 @@ class PlotMark:
         width, shape_marker = select_shape(self.mark_type, shape_height)
         if show_top_mark is not True:
             symbol_marker = shape_marker
-            markersize = markersize/2
+            markersize = 2*markersize/3
         else:
             topmark_marker = select_topmark_marker(top_mark_type, topmark_size, shift_up=shape_height + 2)
             symbol_marker = Path.make_compound_path(shape_marker, topmark_marker)
@@ -116,10 +118,33 @@ class PlotMark:
         if floating:
             symbol_marker = symbol_marker.transformed(transforms.Affine2D().rotate(-0.3))
 
+        if self.mark_type == 'spar':
+            self.plot_ref_line(self.markersize/4)
+        else:
+            self.plot_ref_line(self.markersize/2)
+        
         plt.plot(self.position_x, self.position_y, marker=symbol_marker, linestyle='solid',
                 markerfacecolor=color, markeredgecolor='k',markeredgewidth=0.5,
-                markersize=markersize, label=top_mark_type)
-        plot_circle_line(self.position_x, self.position_y, 1.5 , width + 2)
+                markersize=markersize)
+        self.plot_white_circle(shape_height)
+        
+        
+    def plot_ref_line(self,size):
+        """ Build point path """
+        marker = Path([(-1,0), (1,0)],[1,2])
+        plt.plot(self.position_x, self.position_y, marker=marker, 
+                markeredgecolor='k',
+                markeredgewidth=0.5,
+                markersize=size)
+        
+    def plot_white_circle(self,circle_size):
+        """ plot white circle"""
+        circle_path = build_circle_path(circle_size,0)
+        plt.plot(self.position_x, self.position_y, marker=circle_path,
+                markerfacecolor='white', markeredgecolor='k',
+                markeredgewidth=0.2,
+                markersize=self.markersize/12)
+        
 
 def select_color(top_mark_type):
     """ select color """
@@ -267,7 +292,8 @@ def build_wreck_path():
     codes = [1,2,2,79]
     boat_path = Path(vertices, codes)
     mast_path = Path([(0,0), (1,3)], [1,2])
-    wreck_path = Path.make_compound_path(boat_path, mast_path)
+    ref_line_path = Path([(-3,0), (3.5,0) ],[1,2])
+    wreck_path = Path.make_compound_path(boat_path, mast_path, ref_line_path)
     return wreck_path
 
 def build_wreck_depth_path():
@@ -296,36 +322,10 @@ def build_spherical(width):
     spherical_path = Path(vertices, codes)  
     return spherical_path
 
-
-def build_line_path(start, stop):
-    """ Build line path """
-    vertices =[(0,start), (0,stop)]
-    codes = [1,2]
-    line_path = Path(vertices,codes)
-    return line_path
-
-def build_h_line_path(start, stop):
-    """ Build horizontal line path """
-    vertices =[(start,0), (stop,0)]
-    codes = [1,2]
-    line_path = Path(vertices,codes)
-    return line_path
-
 def build_circle_path(size, shift_up):
     """ Build circle path """
     circle = Path.circle([0.0, shift_up], size)
     return circle
-
-def plot_circle_line(position_x, position_y,circle_size, line_size):
-    """ Build point path """
-    line_path1 = build_h_line_path(-line_size, -circle_size)
-    circle_path = build_circle_path(circle_size,0)
-    line_path2 = build_h_line_path(line_size, circle_size)
-    marker = Path.make_compound_path(line_path1, circle_path, line_path2)
-    plt.plot(position_x, position_y, marker=marker, linestyle='solid',
-            markerfacecolor='white', markeredgecolor='k',
-            markeredgewidth=0.2,
-            markersize=line_size*2, label='Green Beacon')
 
 def green_topmark(size, shift_up):
     """ plot green beacon """
@@ -376,7 +376,8 @@ if __name__ == "__main__":
 
     
     shape_type_list =['conical','can','spherical','spar','pillar','tower']
-    #markersize=40
+    
+    PlotMark.markersize = 60
 
     plt.figure(1)
     for j, shape in enumerate(shape_type_list):
@@ -388,7 +389,9 @@ if __name__ == "__main__":
             sea_mark = PlotMark(i+2, j*2,shape)
             sea_mark.plot_sea_mark(top_mark_type=topmark, floating=False)
     plt.title('Sea marks as a function of shape and topmark')
-    plot_circle_line(1, 13, 2, 4)
+    
+    
+    plt.plot(1,13,'*')
     plt.axis('off')
     #plt.show(block="True")
     plt.draw()
@@ -414,10 +417,9 @@ if __name__ == "__main__":
     light2 = PlotMark(5, 23,'Can', light_color='green')
     light2.plot_sea_mark('Green', floating=False)
     
-    light3 = PlotMark(7, 23, 'Lighthouse',light_color='red')
+    light3 = PlotMark(7, 23, 'lighthouse',light_color='red')
     
-    
-    plot_circle_line(1, 25, 2, 4)
+    plt.plot(1,25,'*')
     
 
     plt.axis('off')
