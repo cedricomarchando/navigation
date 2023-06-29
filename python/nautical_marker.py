@@ -55,8 +55,10 @@ class PlotMark:
             case 'rock_covers':
                 # plt.plot(position_x, position_y,'xk', markersize=markersize,)
                 marker = (8,2,0.5)
+                marker_size = marker_size/2
             case 'rock_depth':
                 marker = '+'
+                marker_size = marker_size/2
             case _:
                 print('not defined danger')
         plt.plot(self.position_x, self.position_y, marker=marker, linestyle='solid',
@@ -105,18 +107,21 @@ class PlotMark:
         """ plot nautical symbol """
         shape_height = 12
         topmark_size = 2
-        color = select_color(top_mark_type)
+        color, color2 = select_color(top_mark_type)
         markersize = self.markersize
-        width, shape_marker = select_shape(self.mark_type, shape_height)
+        shape_marker, shape_marker2 = self.select_shape(top_mark_type, shape_height)
         if show_top_mark is not True:
             symbol_marker = shape_marker
+            symbol_marker2 = shape_marker2
             markersize = 2*markersize/3
         else:
             topmark_marker = select_topmark_marker(top_mark_type, topmark_size, shift_up=shape_height + 2)
             symbol_marker = Path.make_compound_path(shape_marker, topmark_marker)
+            symbol_marker2 = Path.make_compound_path(shape_marker2, topmark_marker)
 
         if floating:
             symbol_marker = symbol_marker.transformed(transforms.Affine2D().rotate(-0.3))
+            symbol_marker2 = symbol_marker2.transformed(transforms.Affine2D().rotate(-0.3))
 
         if self.mark_type == 'spar':
             self.plot_ref_line(self.markersize/4)
@@ -124,8 +129,14 @@ class PlotMark:
             self.plot_ref_line(self.markersize/2)
         
         plt.plot(self.position_x, self.position_y, marker=symbol_marker, linestyle='solid',
-                markerfacecolor=color, markeredgecolor='k',markeredgewidth=0.5,
+                markerfacecolor=color,
+                markeredgecolor='k',markeredgewidth=0.5,
                 markersize=markersize)
+        plt.plot(self.position_x, self.position_y, marker=symbol_marker2, linestyle='solid',
+                markerfacecolor=color2,
+                markeredgecolor='k',markeredgewidth=0.5,
+                markersize=markersize)
+        
         self.plot_white_circle(shape_height)
         
         
@@ -144,6 +155,45 @@ class PlotMark:
                 markerfacecolor='white', markeredgecolor='k',
                 markeredgewidth=0.2,
                 markersize=self.markersize/12)
+
+    def select_shape(self, top_mark_type, shape_height):
+        """ select shape """
+        width = 10
+        match self.mark_type:
+            case 'spar':
+                shape_marker = build_rectangle_path(shape_height, width/5, 0)
+                match top_mark_type:
+                    case 'north':
+                        shape_marker2 = build_rectangle_path(shape_height/2, width/5, shape_height/2)
+                    case 'south':
+                        shape_marker2 = build_rectangle_path(shape_height/2, width/5, 0)   
+                    case 'west':
+                        shape_marker2 = build_rectangle_path(shape_height/3, width/5, shape_height/3)
+                    case 'east':
+                        marker_tmp1 = build_rectangle_path(shape_height/3, width/5, 0)
+                        marker_tmp2 = build_rectangle_path(shape_height/3, width/5, 2*shape_height/3)
+                        shape_marker2 = Path.make_compound_path( marker_tmp1, marker_tmp2)
+                    case _:
+                        shape_marker2 = shape_marker
+            case 'can':
+                shape_marker = build_rectangle_path(shape_height, width,0)
+                shape_marker2 = shape_marker
+            case 'spherical':
+                shape_marker = build_spherical(width*3/4)
+                shape_marker2 = shape_marker
+            case 'conical':
+                shape_marker = build_conical_path(shape_height, width)
+                shape_marker2 = shape_marker
+            case 'pillar':
+                shape_marker = build_pillar_path(shape_height, width)
+                shape_marker2 = shape_marker
+            case 'tower':
+                shape_marker = build_tower_path(shape_height,width)
+                shape_marker2 = shape_marker
+            case _:
+                print('not defined shape')
+        return shape_marker, shape_marker2
+
         
 
 def select_color(top_mark_type):
@@ -151,40 +201,22 @@ def select_color(top_mark_type):
     match top_mark_type.lower():
         case 'green':
             color = 'green'
+            color2 = 'green'
         case 'red' :
             color = 'red'
+            color2 = 'red'
         case 'special':
             color ='yellow'
+            color2 ='yellow'
         case 'safe_water':
             color ='red'
+            color2 ='red'
         case _:
-            color = 'black'
-    return color
+            color = 'yellow'
+            color2 = 'black'
+    return color, color2
 
-def select_shape(shape_type, shape_height):
-    """ select shape """
-    match shape_type.lower():
-        case 'spar':
-            width = 2
-            shape_marker = build_rectangle_path(shape_height, width, 0)
-        case 'can':
-            width = 10
-            shape_marker = build_rectangle_path(shape_height, width,0)
-        case 'spherical':
-            width = 10
-            shape_marker = build_spherical(width*3/4)
-        case 'conical':
-            width = 10
-            shape_marker = build_conical_path(shape_height, width)
-        case 'pillar':
-            width = 10
-            shape_marker = build_pillar_path(shape_height, width)
-        case 'tower':
-            width = 10
-            shape_marker = build_tower_path(shape_height,width)
-        case _:
-            print('not defined shape')
-    return width, shape_marker
+
 
 def select_topmark_marker(top_mark_type, size, shift_up):
     """ select topmark marker """
