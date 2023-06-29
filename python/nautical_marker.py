@@ -13,12 +13,18 @@ class PlotMark:
     text_shift = 0.0002
     markersize = 30
     
-    def __init__(self, position_x, position_y, mark_type, light_color=None, name = None ):
+    def __init__(self, position_x, position_y, mark_type, top_mark_type = None, light_color=None, name = None, show_top_mark = True, floating = False):
         self.position_x = position_x
         self.position_y = position_y
         self.mark_type = mark_type.lower()
+        self.top_mark_type = top_mark_type
         self.name = name
         self.light_color = light_color
+        self.show_top_mark = show_top_mark
+        self.floating = floating
+        if self.top_mark_type is not None:
+            self.top_mark_type = self.top_mark_type.lower()
+            self.plot_sea_mark()
         if self.mark_type in DANGERS_LIST:
             self.plot_danger_mark()
         if self.mark_type in LANDMARKS_LIST:
@@ -104,23 +110,23 @@ class PlotMark:
                 markersize=markersize/6, label=type)
             
 
-    def plot_sea_mark(self, top_mark_type = None, show_top_mark = True, floating = False):
+    def plot_sea_mark(self):
         """ plot nautical symbol """
         shape_height = 12
         topmark_size = 2
-        color, color2 = select_color(top_mark_type)
+        color, color2 = self.select_color()
         markersize = self.markersize
-        shape_marker, shape_marker2 = self.select_shape(top_mark_type, shape_height)
-        if show_top_mark is not True:
+        shape_marker, shape_marker2 = self.select_shape(self.top_mark_type, shape_height)
+        if self.show_top_mark is not True:
             symbol_marker = shape_marker
             symbol_marker2 = shape_marker2
             markersize = 2*markersize/3
         else:
-            topmark_marker = select_topmark_marker(top_mark_type, topmark_size, shift_up=shape_height + 2)
+            topmark_marker = self.select_topmark_marker(topmark_size, shift_up=shape_height + 2)
             symbol_marker = Path.make_compound_path(shape_marker, topmark_marker)
             symbol_marker2 = Path.make_compound_path(shape_marker2, topmark_marker)
 
-        if floating:
+        if self.floating:
             symbol_marker = symbol_marker.transformed(transforms.Affine2D().rotate(-0.3))
             symbol_marker2 = symbol_marker2.transformed(transforms.Affine2D().rotate(-0.3))
 
@@ -199,8 +205,6 @@ class PlotMark:
                         shape_marker2 = build_rectangle_path(shape_height, width/3, 0)
                     case _:
                         shape_marker2 = shape_marker
-                
-                
             case 'spherical':
                 shape_marker = build_spherical(width*3/4, -30, 210, width*3/8)
                 match top_mark_type:
@@ -213,7 +217,7 @@ class PlotMark:
                     case 'south':
                         shape_marker2 = build_tower_path(width/3, 5*width/8, width*3/4, 0)
                     case 'west':
-                        shape_marker2 = build_tower_path(width/3, width*3/4, 5*width/8, width/3)
+                        shape_marker2 = build_tower_path(width/3, width*3/4, 2*width/3, width/3)
                     case 'safe_water':
                         shape_marker2 = build_triangle_path(width/2, shape_height, 0)
                     case 'emergency':
@@ -260,18 +264,18 @@ class PlotMark:
                     case _:
                         shape_marker2 = shape_marker
             case 'tower':
-                shape_marker = build_tower_path(shape_height, width, 3*width/4, 0)
+                shape_marker = build_tower_path(shape_height, width/2, 3*width/8, 0)
                 match top_mark_type:
                     case 'green_bis' | 'red_bis' | 'danger' | 'east':
-                        marker_tmp1 = build_tower_path(shape_height/3, width, 10*width/12, 0)
-                        marker_tmp2 = build_tower_path(shape_height/3, 10*width/12, 3*width/4, 2*shape_height/3)
+                        marker_tmp1 = build_tower_path(shape_height/3, width/2, 11*width/24, 0)
+                        marker_tmp2 = build_tower_path(shape_height/3, 10*width/24, 3*width/8, 2*shape_height/3)
                         shape_marker2 = Path.make_compound_path( marker_tmp1, marker_tmp2)
                     case 'north':
-                        shape_marker2 = build_tower_path(shape_height/2, 10*width/12, 3*width/4, shape_height/2)
+                        shape_marker2 = build_tower_path(shape_height/2, 11*width/24, 3*width/8, shape_height/2)
                     case 'south':
-                        shape_marker2 = build_tower_path(shape_height/2, width, 10*width/12, 0)
+                        shape_marker2 = build_tower_path(shape_height/2, width/2, 11*width/24, 0)
                     case 'west':
-                        shape_marker2 = build_tower_path(shape_height/3, 11*width/12, 10*width/12, shape_height/3)
+                        shape_marker2 = build_tower_path(shape_height/3, 11*width/24, 10*width/24, shape_height/3)
                     case 'safe_water':
                         shape_marker2 = build_rectangle_path(shape_height, width/3, 0)
                     case 'emergency':
@@ -282,70 +286,68 @@ class PlotMark:
                 print('not defined shape')
         return shape_marker, shape_marker2
 
-def select_color(top_mark_type):
-    """ select color """
-    match top_mark_type.lower():
-        case 'green':
-            color = 'green'
-            color2 = 'green'
-        case 'green_bis':
-            color = 'red'
-            color2 = 'green'
-        case 'red' :
-            color = 'red'
-            color2 = 'red'
-        case 'red_bis':
-            color = 'green'
-            color2 = 'red'
-        case 'special':
-            color ='yellow'
-            color2 ='yellow'
-        case 'safe_water':
-            color ='white'
-            color2 ='red'
-        case 'danger':
-            color ='red'
-            color2 = 'black'
-        case 'emergency':
-            color = 'blue'
-            color2 = 'yellow'
-        case _:
-            color = 'yellow'
-            color2 = 'black'
-    return color, color2
+    def select_color(self):
+        """ select color """
+        match self.top_mark_type.lower():
+            case 'green':
+                color = 'green'
+                color2 = 'green'
+            case 'green_bis':
+                color = 'red'
+                color2 = 'green'
+            case 'red' :
+                color = 'red'
+                color2 = 'red'
+            case 'red_bis':
+                color = 'green'
+                color2 = 'red'
+            case 'special':
+                color ='yellow'
+                color2 ='yellow'
+            case 'safe_water':
+                color ='white'
+                color2 ='red'
+            case 'danger':
+                color ='red'
+                color2 = 'black'
+            case 'emergency':
+                color = 'blue'
+                color2 = 'yellow'
+            case _:
+                color = 'yellow'
+                color2 = 'black'
+        return color, color2
 
-
-
-def select_topmark_marker(top_mark_type, size, shift_up):
-    """ select topmark marker """
-    match top_mark_type.lower():
-        case 'green':
-            topmark_marker = green_topmark(size, shift_up)
-        case 'green_bis':
-            topmark_marker = green_topmark(size, shift_up)
-        case 'red':
-            topmark_marker = red_topmark(height=size*2, width=size*2, shift_up=shift_up)
-        case 'red_bis':
-            topmark_marker = red_topmark(height=size*2, width=size*2, shift_up=shift_up)
-        case 'south':
-            topmark_marker = south_topmark(size, shift_up)
-        case 'north':
-            topmark_marker = north_topmark(size, shift_up)
-        case 'east':
-            topmark_marker = east_topmark(size, shift_up)
-        case 'west':
-            topmark_marker = west_topmark(size, shift_up)
-        case 'danger':
-            topmark_marker = danger_topmark(size, shift_up)
-        case 'special':
-            topmark_marker = build_cross_path(shift_up + size, size)
-        case 'safe_water':
-            topmark_marker = build_circle_path(size, shift_up + size)
-        case 'emergency':
-            topmark_marker = build_cross_path2(shift_up + size, size)
-        case _:
-            print(' Not a valid topmark')
-    return topmark_marker
+    def select_topmark_marker(self, size, shift_up):
+        """ select topmark marker """
+        match self.top_mark_type:
+            case 'green':
+                topmark_marker = green_topmark(size, shift_up)
+            case 'green_bis':
+                topmark_marker = green_topmark(size, shift_up)
+            case 'red':
+                topmark_marker = red_topmark(height=size*2, width=size*2, shift_up=shift_up)
+            case 'red_bis':
+                topmark_marker = red_topmark(height=size*2, width=size*2, shift_up=shift_up)
+            case 'south':
+                topmark_marker = south_topmark(size, shift_up)
+            case 'north':
+                topmark_marker = north_topmark(size, shift_up)
+            case 'east':
+                topmark_marker = east_topmark(size, shift_up)
+            case 'west':
+                topmark_marker = west_topmark(size, shift_up)
+            case 'danger':
+                topmark_marker = danger_topmark(size, shift_up)
+            case 'special':
+                topmark_marker = build_cross_path(shift_up + size, size)
+            case 'safe_water':
+                topmark_marker = build_circle_path(size, shift_up + size)
+            case 'emergency':
+                topmark_marker = build_cross_path2(shift_up + size, size)
+            case _:
+                print(' Not a valid topmark')
+        return topmark_marker
 
 def build_triangle_path(width, height, shift_up):
     """ Build a triangle path """
@@ -523,7 +525,7 @@ if __name__ == "__main__":
     
     shape_type_list =['conical','can','spherical','spar','pillar','tower']
     
-    PlotMark.markersize = 50
+    PlotMark.markersize = 100
 
     plt.figure(1,figsize=(10,5) )
     for j, shape in enumerate(shape_type_list):
@@ -533,8 +535,7 @@ if __name__ == "__main__":
         plt.text(i+2,len(shape_type_list)*2, topmark.capitalize(),
                  horizontalalignment='left', rotation = 30)
         for j, shape in enumerate(shape_type_list):
-            sea_mark = PlotMark(i+2, j*2,shape)
-            sea_mark.plot_sea_mark(top_mark_type=topmark, floating=False)
+            sea_mark = PlotMark(i+2, j*2, shape, topmark, floating=False)
     plt.title('Sea marks as a function of shape and topmark')
     
     
@@ -558,11 +559,9 @@ if __name__ == "__main__":
     plt.text(1,23,'Light')
     
     
-    light1 = PlotMark(3, 23,'Spar',light_color='yellow')
-    light1.plot_sea_mark('East',floating=True)
+    light1 = PlotMark(3, 23,'Spar','East',light_color='yellow', floating=True)
     
-    light2 = PlotMark(5, 23,'Can', light_color='green')
-    light2.plot_sea_mark('Green', floating=False)
+    light2 = PlotMark(5, 23,'Can','Green', light_color='green', floating=False)
     
     light3 = PlotMark(7, 23, 'lighthouse',light_color='red')
     
