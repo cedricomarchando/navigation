@@ -164,11 +164,7 @@ class PlotMark:
             case 'spar':
                 shape_marker = build_rectangle_path(shape_height, width/5, 0)
                 match top_mark_type:
-                    case 'green_bis':
-                        marker_tmp1 = build_rectangle_path(shape_height/3, width/5, 0)
-                        marker_tmp2 = build_rectangle_path(shape_height/3, width/5, 2*shape_height/3)
-                        shape_marker2 = Path.make_compound_path( marker_tmp1, marker_tmp2)
-                    case 'red_bis':
+                    case 'green_bis' | 'red_bis' | 'danger' | 'east':
                         marker_tmp1 = build_rectangle_path(shape_height/3, width/5, 0)
                         marker_tmp2 = build_rectangle_path(shape_height/3, width/5, 2*shape_height/3)
                         shape_marker2 = Path.make_compound_path( marker_tmp1, marker_tmp2)
@@ -178,14 +174,6 @@ class PlotMark:
                         shape_marker2 = build_rectangle_path(shape_height/2, width/5, 0)   
                     case 'west':
                         shape_marker2 = build_rectangle_path(shape_height/3, width/5, shape_height/3)
-                    case 'east':
-                        marker_tmp1 = build_rectangle_path(shape_height/3, width/5, 0)
-                        marker_tmp2 = build_rectangle_path(shape_height/3, width/5, 2*shape_height/3)
-                        shape_marker2 = Path.make_compound_path( marker_tmp1, marker_tmp2)
-                    case 'danger':
-                        marker_tmp1 = build_rectangle_path(shape_height/3, width/5, 0)
-                        marker_tmp2 = build_rectangle_path(shape_height/3, width/5, 2*shape_height/3)
-                        shape_marker2 = Path.make_compound_path( marker_tmp1, marker_tmp2)
                     case 'safe_water':
                         shape_marker2 = build_rectangle_path(shape_height, width/15, 0)
                     case 'emergency':
@@ -195,11 +183,7 @@ class PlotMark:
             case 'can':
                 shape_marker = build_rectangle_path(shape_height, width,0)
                 match top_mark_type:
-                    case 'green_bis':
-                        marker_tmp1 = build_rectangle_path(shape_height/3, width, 0)
-                        marker_tmp2 = build_rectangle_path(shape_height/3, width, 2*shape_height/3)
-                        shape_marker2 = Path.make_compound_path( marker_tmp1, marker_tmp2)
-                    case 'red_bis':
+                    case 'green_bis' | 'red_bis' | 'danger' | 'east':
                         marker_tmp1 = build_rectangle_path(shape_height/3, width, 0)
                         marker_tmp2 = build_rectangle_path(shape_height/3, width, 2*shape_height/3)
                         shape_marker2 = Path.make_compound_path( marker_tmp1, marker_tmp2)
@@ -209,14 +193,6 @@ class PlotMark:
                         shape_marker2 = build_rectangle_path(shape_height/2, width, 0)   
                     case 'west':
                         shape_marker2 = build_rectangle_path(shape_height/3, width, shape_height/3)
-                    case 'east':
-                        marker_tmp1 = build_rectangle_path(shape_height/3, width, 0)
-                        marker_tmp2 = build_rectangle_path(shape_height/3, width, 2*shape_height/3)
-                        shape_marker2 = Path.make_compound_path( marker_tmp1, marker_tmp2)
-                    case 'danger':
-                        marker_tmp1 = build_rectangle_path(shape_height/3, width, 0)
-                        marker_tmp2 = build_rectangle_path(shape_height/3, width, 2*shape_height/3)
-                        shape_marker2 = Path.make_compound_path( marker_tmp1, marker_tmp2)
                     case 'safe_water':
                         shape_marker2 = build_rectangle_path(shape_height, width/3, 0)
                     case 'emergency':
@@ -226,8 +202,18 @@ class PlotMark:
                 
                 
             case 'spherical':
-                shape_marker = build_spherical(width*3/4, -30, 210)
+                shape_marker = build_spherical(width*3/4, -30, 210, width*3/8)
                 match top_mark_type:
+                    case 'green_bis' | 'red_bis' | 'danger' | 'east':
+                        marker_tmp1 = build_spherical(width*3/4, 30, 150, width*3/8)
+                        marker_tmp2 = build_tower_path(width/3, 5*width/8, width*3/4, 0)
+                        shape_marker2 = Path.make_compound_path( marker_tmp1, marker_tmp2)
+                    case 'north':
+                        shape_marker2 = build_spherical(width*3/4, 0, 180, width*3/8)
+                    case 'south':
+                        shape_marker2 = build_tower_path(width/3, 5*width/8, width*3/4, 0)
+                    case 'west':
+                        shape_marker2 = build_tower_path(width/3, width*3/4, 5*width/8, width/3)
                     case 'safe_water':
                         shape_marker2 = build_triangle_path(width/2, shape_height, 0)
                     case 'emergency':
@@ -237,11 +223,7 @@ class PlotMark:
             case 'conical':
                 shape_marker = build_conical_path(shape_height, width)
                 match top_mark_type:
-                    case 'red_bis':
-                        marker_tmp1 = build_tower_path(shape_height/3, width/2, 3*width/8, 0)
-                        marker_tmp2 = build_triangle_path(  width/2 ,shape_height/3, 2*shape_height/3)
-                        shape_marker2 = Path.make_compound_path( marker_tmp1, marker_tmp2)
-                    case 'green_bis':
+                    case 'green_bis' | 'red_bis' | 'danger' | 'east':
                         marker_tmp1 = build_tower_path(shape_height/3, width/2, 3*width/8, 0)
                         marker_tmp2 = build_triangle_path(  width/2 ,shape_height/3, 2*shape_height/3)
                         shape_marker2 = Path.make_compound_path( marker_tmp1, marker_tmp2)
@@ -251,25 +233,17 @@ class PlotMark:
                         shape_marker2 = build_tower_path(shape_height/3, width/2, 3*width/8, 0)
                     case 'west':
                         shape_marker2 = build_tower_path(shape_height/3, width/2, width/4, shape_height/4)
-                    case 'danger':
-                        marker_tmp1 = build_tower_path(shape_height/3, width/2, 3*width/8, 0)
-                        marker_tmp2 = build_triangle_path(  width/2 ,shape_height/3, 2*shape_height/3)
-                        shape_marker2 = Path.make_compound_path( marker_tmp1, marker_tmp2)
                     case 'safe_water':
                         shape_marker2 = build_triangle_path(shape_height/2, shape_height, 0)
                     case 'emergency':
-                        shape_marker2 = build_triangle_path(shape_height/2, shape_height, 0) 
+                        shape_marker2 = build_triangle_path(shape_height/2, shape_height, 0)
                     case _:
                         shape_marker2 = shape_marker
                 
             case 'pillar':
                 shape_marker = build_pillar_path(shape_height, width)
                 match top_mark_type:
-                    case 'green_bis':
-                        marker_tmp1 = build_tower_path(shape_height/3, width/2, width/4,0)
-                        marker_tmp2 = build_tower_path(shape_height/3, width/6, width/8, 2*shape_height/3)
-                        shape_marker2 = Path.make_compound_path( marker_tmp1, marker_tmp2)
-                    case 'red_bis':
+                    case 'green_bis' | 'red_bis' | 'danger' | 'east':
                         marker_tmp1 = build_tower_path(shape_height/3, width/2, width/4,0)
                         marker_tmp2 = build_tower_path(shape_height/3, width/6, width/8, 2*shape_height/3)
                         shape_marker2 = Path.make_compound_path( marker_tmp1, marker_tmp2)
@@ -279,10 +253,6 @@ class PlotMark:
                         shape_marker2 = build_tower_path(2*shape_height/3, width/4, width/8, shape_height/3)
                     case 'west':
                         shape_marker2 = build_tower_path(shape_height/3, width/4, width/6, shape_height/3)
-                    case 'east':
-                        marker_tmp1 = build_tower_path(shape_height/3, width/2, width/4,0)
-                        marker_tmp2 = build_tower_path(shape_height/3, width/6, width/8, 2*shape_height/3)
-                        shape_marker2 = Path.make_compound_path( marker_tmp1, marker_tmp2)
                     case 'safe_water':
                         shape_marker2 = build_rectangle_path(shape_height, width/8, 0)
                     case 'emergency':
@@ -292,11 +262,7 @@ class PlotMark:
             case 'tower':
                 shape_marker = build_tower_path(shape_height, width, 3*width/4, 0)
                 match top_mark_type:
-                    case 'green_bis':
-                        marker_tmp1 = build_tower_path(shape_height/3, width, 10*width/12, 0)
-                        marker_tmp2 = build_tower_path(shape_height/3, 10*width/12, 3*width/4, 2*shape_height/3)
-                        shape_marker2 = Path.make_compound_path( marker_tmp1, marker_tmp2)
-                    case 'red_bis':
+                    case 'green_bis' | 'red_bis' | 'danger' | 'east':
                         marker_tmp1 = build_tower_path(shape_height/3, width, 10*width/12, 0)
                         marker_tmp2 = build_tower_path(shape_height/3, 10*width/12, 3*width/4, 2*shape_height/3)
                         shape_marker2 = Path.make_compound_path( marker_tmp1, marker_tmp2)
@@ -304,16 +270,8 @@ class PlotMark:
                         shape_marker2 = build_tower_path(shape_height/2, 10*width/12, 3*width/4, shape_height/2)
                     case 'south':
                         shape_marker2 = build_tower_path(shape_height/2, width, 10*width/12, 0)
-                    case 'east':
-                        marker_tmp1 = build_tower_path(shape_height/3, width, 10*width/12, 0)
-                        marker_tmp2 = build_tower_path(shape_height/3, 10*width/12, 3*width/4, 2*shape_height/3)
-                        shape_marker2 = Path.make_compound_path( marker_tmp1, marker_tmp2)
                     case 'west':
                         shape_marker2 = build_tower_path(shape_height/3, 11*width/12, 10*width/12, shape_height/3)
-                    case 'danger':
-                        marker_tmp1 = build_tower_path(shape_height/3, width, 10*width/12, 0)
-                        marker_tmp2 = build_tower_path(shape_height/3, 10*width/12, 3*width/4, 2*shape_height/3)
-                        shape_marker2 = Path.make_compound_path( marker_tmp1, marker_tmp2)
                     case 'safe_water':
                         shape_marker2 = build_rectangle_path(shape_height, width/3, 0)
                     case 'emergency':
@@ -323,8 +281,6 @@ class PlotMark:
             case _:
                 print('not defined shape')
         return shape_marker, shape_marker2
-
-        
 
 def select_color(top_mark_type):
     """ select color """
@@ -502,12 +458,12 @@ def build_light_path(angle):
     light_path = light_path.transformed(transforms.Affine2D().rotate(angle))
     return light_path
 
-def build_spherical(width, angle_start, angle_stop):
+def build_spherical(width, angle_start, angle_stop, shift_up):
     """ Build spherical path"""
     tmp = Path.arc(angle_start,angle_stop)
     vertices = tmp.vertices*width
     for vertice in vertices:
-        vertice[1]=vertice[1]+width/2
+        vertice[1]=vertice[1] + shift_up
     codes = tmp.codes
     spherical_path = Path(vertices, codes)
     return spherical_path
@@ -592,12 +548,12 @@ if __name__ == "__main__":
 
     plt.text(1,15,'Land marks')
     for i, mark in enumerate(LANDMARKS_LIST):
-        plt.text(i*2+4,17,mark.capitalize(), horizontalalignment='center')
+        plt.text(i*2 + 4,16,mark.capitalize(), horizontalalignment='left', rotation = 30)
         land_mark = PlotMark(i*2+4, 15, mark)
     
     plt.text(1,19,'Danger marks')
     for i, mark in enumerate(DANGERS_LIST):
-        plt.text(i*2+4,21,mark.capitalize(), horizontalalignment='center')
+        plt.text(i*2 + 4,20,mark.capitalize(), horizontalalignment='left', rotation = 30)
         danger_mark = PlotMark(i*2+4,19,mark)
     plt.text(1,23,'Light')
     
