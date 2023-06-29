@@ -3,8 +3,9 @@ import matplotlib.pyplot as plt
 from matplotlib.path import Path
 import matplotlib.transforms as transforms
 
-TOPMARKS_LIST =['green','red','north','south','east','west','danger','special','safe_Water']
-LANDMARKS_LIST = ['lighthouse','major_lighthouse', 'land_tower', 'water_tower', 'church']
+TOPMARKS_LIST =['green', 'green_bis', 'red', 'red_bis', 'north', 'south', 'east', 'west', 
+                'danger', 'special', 'safe_water', 'emergency']
+LANDMARKS_LIST = ['lighthouse', 'major_lighthouse', 'land_tower', 'water_tower', 'church']
 DANGERS_LIST = ['wreck', 'wreck_depth', 'danger','rock_covers','rock_depth']
 
 class PlotMark:
@@ -163,6 +164,14 @@ class PlotMark:
             case 'spar':
                 shape_marker = build_rectangle_path(shape_height, width/5, 0)
                 match top_mark_type:
+                    case 'green_bis':
+                        marker_tmp1 = build_rectangle_path(shape_height/3, width/5, 0)
+                        marker_tmp2 = build_rectangle_path(shape_height/3, width/5, 2*shape_height/3)
+                        shape_marker2 = Path.make_compound_path( marker_tmp1, marker_tmp2)
+                    case 'red_bis':
+                        marker_tmp1 = build_rectangle_path(shape_height/3, width/5, 0)
+                        marker_tmp2 = build_rectangle_path(shape_height/3, width/5, 2*shape_height/3)
+                        shape_marker2 = Path.make_compound_path( marker_tmp1, marker_tmp2)
                     case 'north':
                         shape_marker2 = build_rectangle_path(shape_height/2, width/5, shape_height/2)
                     case 'south':
@@ -173,23 +182,144 @@ class PlotMark:
                         marker_tmp1 = build_rectangle_path(shape_height/3, width/5, 0)
                         marker_tmp2 = build_rectangle_path(shape_height/3, width/5, 2*shape_height/3)
                         shape_marker2 = Path.make_compound_path( marker_tmp1, marker_tmp2)
+                    case 'danger':
+                        marker_tmp1 = build_rectangle_path(shape_height/3, width/5, 0)
+                        marker_tmp2 = build_rectangle_path(shape_height/3, width/5, 2*shape_height/3)
+                        shape_marker2 = Path.make_compound_path( marker_tmp1, marker_tmp2)
+                    case 'safe_water':
+                        shape_marker2 = build_rectangle_path(shape_height, width/15, 0)
+                    case 'emergency':
+                        shape_marker2 = build_rectangle_path(shape_height, width/15, 0)
                     case _:
                         shape_marker2 = shape_marker
             case 'can':
                 shape_marker = build_rectangle_path(shape_height, width,0)
-                shape_marker2 = shape_marker
+                match top_mark_type:
+                    case 'green_bis':
+                        marker_tmp1 = build_rectangle_path(shape_height/3, width, 0)
+                        marker_tmp2 = build_rectangle_path(shape_height/3, width, 2*shape_height/3)
+                        shape_marker2 = Path.make_compound_path( marker_tmp1, marker_tmp2)
+                    case 'red_bis':
+                        marker_tmp1 = build_rectangle_path(shape_height/3, width, 0)
+                        marker_tmp2 = build_rectangle_path(shape_height/3, width, 2*shape_height/3)
+                        shape_marker2 = Path.make_compound_path( marker_tmp1, marker_tmp2)
+                    case 'north':
+                        shape_marker2 = build_rectangle_path(shape_height/2, width, shape_height/2)
+                    case 'south':
+                        shape_marker2 = build_rectangle_path(shape_height/2, width, 0)   
+                    case 'west':
+                        shape_marker2 = build_rectangle_path(shape_height/3, width, shape_height/3)
+                    case 'east':
+                        marker_tmp1 = build_rectangle_path(shape_height/3, width, 0)
+                        marker_tmp2 = build_rectangle_path(shape_height/3, width, 2*shape_height/3)
+                        shape_marker2 = Path.make_compound_path( marker_tmp1, marker_tmp2)
+                    case 'danger':
+                        marker_tmp1 = build_rectangle_path(shape_height/3, width, 0)
+                        marker_tmp2 = build_rectangle_path(shape_height/3, width, 2*shape_height/3)
+                        shape_marker2 = Path.make_compound_path( marker_tmp1, marker_tmp2)
+                    case 'safe_water':
+                        shape_marker2 = build_rectangle_path(shape_height, width/3, 0)
+                    case 'emergency':
+                        shape_marker2 = build_rectangle_path(shape_height, width/3, 0)
+                    case _:
+                        shape_marker2 = shape_marker
+                
+                
             case 'spherical':
-                shape_marker = build_spherical(width*3/4)
-                shape_marker2 = shape_marker
+                shape_marker = build_spherical(width*3/4, -30, 210)
+                match top_mark_type:
+                    case 'safe_water':
+                        shape_marker2 = build_triangle_path(width/2, shape_height, 0)
+                    case 'emergency':
+                        shape_marker2 = build_triangle_path(width/2, shape_height, 0)
+                    case _:
+                        shape_marker2 = shape_marker
             case 'conical':
                 shape_marker = build_conical_path(shape_height, width)
-                shape_marker2 = shape_marker
+                match top_mark_type:
+                    case 'red_bis':
+                        marker_tmp1 = build_tower_path(shape_height/3, width/2, 3*width/8, 0)
+                        marker_tmp2 = build_triangle_path(  width/2 ,shape_height/3, 2*shape_height/3)
+                        shape_marker2 = Path.make_compound_path( marker_tmp1, marker_tmp2)
+                    case 'green_bis':
+                        marker_tmp1 = build_tower_path(shape_height/3, width/2, 3*width/8, 0)
+                        marker_tmp2 = build_triangle_path(  width/2 ,shape_height/3, 2*shape_height/3)
+                        shape_marker2 = Path.make_compound_path( marker_tmp1, marker_tmp2)
+                    case 'north':
+                        shape_marker2 = build_triangle_path(3*width/4, 2*shape_height/3, shape_height/3)
+                    case 'south':
+                        shape_marker2 = build_tower_path(shape_height/3, width/2, 3*width/8, 0)
+                    case 'west':
+                        shape_marker2 = build_tower_path(shape_height/3, width/2, width/4, shape_height/4)
+                    case 'danger':
+                        marker_tmp1 = build_tower_path(shape_height/3, width/2, 3*width/8, 0)
+                        marker_tmp2 = build_triangle_path(  width/2 ,shape_height/3, 2*shape_height/3)
+                        shape_marker2 = Path.make_compound_path( marker_tmp1, marker_tmp2)
+                    case 'safe_water':
+                        shape_marker2 = build_triangle_path(shape_height/2, shape_height, 0)
+                    case 'emergency':
+                        shape_marker2 = build_triangle_path(shape_height/2, shape_height, 0) 
+                    case _:
+                        shape_marker2 = shape_marker
+                
             case 'pillar':
                 shape_marker = build_pillar_path(shape_height, width)
-                shape_marker2 = shape_marker
+                match top_mark_type:
+                    case 'green_bis':
+                        marker_tmp1 = build_tower_path(shape_height/3, width/2, width/4,0)
+                        marker_tmp2 = build_tower_path(shape_height/3, width/6, width/8, 2*shape_height/3)
+                        shape_marker2 = Path.make_compound_path( marker_tmp1, marker_tmp2)
+                    case 'red_bis':
+                        marker_tmp1 = build_tower_path(shape_height/3, width/2, width/4,0)
+                        marker_tmp2 = build_tower_path(shape_height/3, width/6, width/8, 2*shape_height/3)
+                        shape_marker2 = Path.make_compound_path( marker_tmp1, marker_tmp2)
+                    case 'south':
+                        shape_marker2 = build_tower_path(shape_height/3, width/2, width/4,0)
+                    case 'north':
+                        shape_marker2 = build_tower_path(2*shape_height/3, width/4, width/8, shape_height/3)
+                    case 'west':
+                        shape_marker2 = build_tower_path(shape_height/3, width/4, width/6, shape_height/3)
+                    case 'east':
+                        marker_tmp1 = build_tower_path(shape_height/3, width/2, width/4,0)
+                        marker_tmp2 = build_tower_path(shape_height/3, width/6, width/8, 2*shape_height/3)
+                        shape_marker2 = Path.make_compound_path( marker_tmp1, marker_tmp2)
+                    case 'safe_water':
+                        shape_marker2 = build_rectangle_path(shape_height, width/8, 0)
+                    case 'emergency':
+                        shape_marker2 = build_rectangle_path(shape_height, width/8, 0)
+                    case _:
+                        shape_marker2 = shape_marker
             case 'tower':
-                shape_marker = build_tower_path(shape_height,width)
-                shape_marker2 = shape_marker
+                shape_marker = build_tower_path(shape_height, width, 3*width/4, 0)
+                match top_mark_type:
+                    case 'green_bis':
+                        marker_tmp1 = build_tower_path(shape_height/3, width, 10*width/12, 0)
+                        marker_tmp2 = build_tower_path(shape_height/3, 10*width/12, 3*width/4, 2*shape_height/3)
+                        shape_marker2 = Path.make_compound_path( marker_tmp1, marker_tmp2)
+                    case 'red_bis':
+                        marker_tmp1 = build_tower_path(shape_height/3, width, 10*width/12, 0)
+                        marker_tmp2 = build_tower_path(shape_height/3, 10*width/12, 3*width/4, 2*shape_height/3)
+                        shape_marker2 = Path.make_compound_path( marker_tmp1, marker_tmp2)
+                    case 'north':
+                        shape_marker2 = build_tower_path(shape_height/2, 10*width/12, 3*width/4, shape_height/2)
+                    case 'south':
+                        shape_marker2 = build_tower_path(shape_height/2, width, 10*width/12, 0)
+                    case 'east':
+                        marker_tmp1 = build_tower_path(shape_height/3, width, 10*width/12, 0)
+                        marker_tmp2 = build_tower_path(shape_height/3, 10*width/12, 3*width/4, 2*shape_height/3)
+                        shape_marker2 = Path.make_compound_path( marker_tmp1, marker_tmp2)
+                    case 'west':
+                        shape_marker2 = build_tower_path(shape_height/3, 11*width/12, 10*width/12, shape_height/3)
+                    case 'danger':
+                        marker_tmp1 = build_tower_path(shape_height/3, width, 10*width/12, 0)
+                        marker_tmp2 = build_tower_path(shape_height/3, 10*width/12, 3*width/4, 2*shape_height/3)
+                        shape_marker2 = Path.make_compound_path( marker_tmp1, marker_tmp2)
+                    case 'safe_water':
+                        shape_marker2 = build_rectangle_path(shape_height, width/3, 0)
+                    case 'emergency':
+                        shape_marker2 = build_rectangle_path(shape_height, width/3, 0)
+                    case _:
+                        shape_marker2 = shape_marker
             case _:
                 print('not defined shape')
         return shape_marker, shape_marker2
@@ -202,15 +332,27 @@ def select_color(top_mark_type):
         case 'green':
             color = 'green'
             color2 = 'green'
+        case 'green_bis':
+            color = 'red'
+            color2 = 'green'
         case 'red' :
             color = 'red'
+            color2 = 'red'
+        case 'red_bis':
+            color = 'green'
             color2 = 'red'
         case 'special':
             color ='yellow'
             color2 ='yellow'
         case 'safe_water':
-            color ='red'
+            color ='white'
             color2 ='red'
+        case 'danger':
+            color ='red'
+            color2 = 'black'
+        case 'emergency':
+            color = 'blue'
+            color2 = 'yellow'
         case _:
             color = 'yellow'
             color2 = 'black'
@@ -223,7 +365,11 @@ def select_topmark_marker(top_mark_type, size, shift_up):
     match top_mark_type.lower():
         case 'green':
             topmark_marker = green_topmark(size, shift_up)
+        case 'green_bis':
+            topmark_marker = green_topmark(size, shift_up)
         case 'red':
+            topmark_marker = red_topmark(height=size*2, width=size*2, shift_up=shift_up)
+        case 'red_bis':
             topmark_marker = red_topmark(height=size*2, width=size*2, shift_up=shift_up)
         case 'south':
             topmark_marker = south_topmark(size, shift_up)
@@ -239,13 +385,15 @@ def select_topmark_marker(top_mark_type, size, shift_up):
             topmark_marker = build_cross_path(shift_up + size, size)
         case 'safe_water':
             topmark_marker = build_circle_path(size, shift_up + size)
+        case 'emergency':
+            topmark_marker = build_cross_path2(shift_up + size, size)
         case _:
             print(' Not a valid topmark')
     return topmark_marker
 
-def build_triangle_path(size, shift_up):
+def build_triangle_path(width, height, shift_up):
     """ Build a triangle path """
-    vertices = [(-size, shift_up), (0, shift_up + 2*size), (size, shift_up), (-size, shift_up)]
+    vertices = [(-width/2, shift_up), (0, shift_up + height), (width/2, shift_up), (-width/2, shift_up)]
     codes = [1, 2, 2, 79]
     triangle_path = Path(vertices,codes)
     return triangle_path 
@@ -266,7 +414,7 @@ def build_rectangle_path(height, width, shift_up):
     return rectangle_path
 
 def build_conical_path(height, width):
-    """ Buils conocal path"""
+    """ Buils conocal curved path"""
     vertices =[(-width/2,0), (-width/2, height/3), (0,height), (width/2, height/3), (width/2,0),(-width/2,0)]
     codes = [1,3,2,3,2,79]
     conical_path = Path(vertices,codes)
@@ -274,13 +422,13 @@ def build_conical_path(height, width):
 
 def build_pillar_path(height, width):
     """ Buils pillar path"""
-    vertices =[(-width/2,0), (-width/4, height/3), (0,height), (width/4, height/3), (width/2,0),(-width/2,0)]
-    codes = [1,2,2,2,2,79]
+    vertices =[(-width/2,0), (-width/4, height/3), (-width/8,height),(width/8,height), (width/4, height/3), (width/2,0),(-width/2,0)]
+    codes = [1,2,2,2,2,2,79]
     pillar_path = Path(vertices,codes)
     return pillar_path
 
 def build_cross_path(height, width):
-    """ Build cross path """
+    """ Build diagonal cross path """
     vertices = [(width/3*0, width/3*1 + height), (width/3*2, width/3*3 + height), (width/3*3, width/3*2 + height),
         (width/3*1, width/3*0 + height), (width/3*3, width/3*-2 + height), (width/3*2, width/3*-3 + height),
         (width/3*0, width/3*-1 + height), (width/3*-2, width/3*-3 + height), (width/3*-3, width/3*-2 + height),
@@ -289,9 +437,19 @@ def build_cross_path(height, width):
     cross_path = Path(vertices, codes)
     return cross_path
 
-def build_tower_path(height, width):
+def build_cross_path2(height, width):
+    """ Build horizontal cross path """
+    vertices = [(width/4, width/4 + height), (width, width/4 + height), (width, -width/4 + height), (width/4, -width/4 + height),
+        (width/4, -width + height), (-width/4, -width + height), (-width/4, -width/4 + height),
+        (-width, -width/4 + height), (-width, width/4 + height), (-width/4, width/4 + height),
+        (-width/4, width/4 + height), (-width/4, width + height), (width/4, width + height), (width/4, width/4 + height)]
+    codes = [1,2,2,2,2,2,2,2,2,2,2,2,2,79]
+    cross_path = Path(vertices, codes)
+    return cross_path
+
+def build_tower_path(height, width_botton, width_top, shift_up):
     """ build tower path """
-    vertices = [(-width/2, 0), (-width/4, height), (width/4, height), (width/2,0), (-width/2,0)]
+    vertices = [(-width_botton, shift_up), (-width_top, height + shift_up), (width_top, height + shift_up), (width_botton,shift_up), (-width_botton,shift_up)]
     codes = [1, 2, 2, 2, 79]
     tower_path = Path(vertices, codes)
     return tower_path
@@ -306,15 +464,15 @@ def build_church_path():
 
 def build_land_tower_path(height, width):
     """ build tower path """
-    botton_tower_path = build_tower_path(height*3/4,width)
-    top_tower_path = build_rectangle_path(height/8,width/2,height*3/4)
+    botton_tower_path = build_tower_path(height*3/4, width, width/2, 0)
+    top_tower_path = build_rectangle_path(height/4,width,height*3/4)
     land_tower_path = Path.make_compound_path(botton_tower_path, top_tower_path)
     return land_tower_path
 
 def build_water_tower_path(height, width):
     """ build tower path """
-    botton_tower_path = build_tower_path(height*3/4,width)
-    top_tower_path = build_rectangle_path(height/8,width,height*3/4)
+    botton_tower_path = build_tower_path(height*3/4, width, width/2, 0)
+    top_tower_path = build_rectangle_path(height/4, 2*width, height*3/4)
     land_tower_path = Path.make_compound_path(botton_tower_path, top_tower_path)
     return land_tower_path
 
@@ -344,14 +502,14 @@ def build_light_path(angle):
     light_path = light_path.transformed(transforms.Affine2D().rotate(angle))
     return light_path
 
-def build_spherical(width):
+def build_spherical(width, angle_start, angle_stop):
     """ Build spherical path"""
-    tmp = Path.arc(-30,210)
+    tmp = Path.arc(angle_start,angle_stop)
     vertices = tmp.vertices*width
     for vertice in vertices:
         vertice[1]=vertice[1]+width/2
     codes = tmp.codes
-    spherical_path = Path(vertices, codes)  
+    spherical_path = Path(vertices, codes)
     return spherical_path
 
 def build_circle_path(size, shift_up):
@@ -361,7 +519,7 @@ def build_circle_path(size, shift_up):
 
 def green_topmark(size, shift_up):
     """ plot green beacon """
-    triangle_marker = build_triangle_path(size,shift_up)
+    triangle_marker = build_triangle_path(2*size, 2*size, shift_up)
     return triangle_marker
 
 def red_topmark(height, width, shift_up):
@@ -371,8 +529,8 @@ def red_topmark(height, width, shift_up):
 
 def north_topmark(size, shift_up):
     """ Plot north beacon """
-    triangle_marker1 = build_triangle_path(size, shift_up)
-    triangle_marker2 = build_triangle_path(size, shift_up + 2*size + 2)
+    triangle_marker1 = build_triangle_path(2*size, 2*size, shift_up)
+    triangle_marker2 = build_triangle_path(2*size, 2*size, shift_up + 2*size + 2)
     north_marker = Path.make_compound_path(triangle_marker1, triangle_marker2)
     return north_marker
 
@@ -386,13 +544,13 @@ def south_topmark(size, shift_up):
 def east_topmark(size, shift_up):
     """ Plot east beacon """
     triangle_marker1 = build_triangle_down_path(size, shift_up)
-    triangle_marker2 = build_triangle_path(size, shift_up + 2*size + 2)
+    triangle_marker2 = build_triangle_path(2*size, 2*size, shift_up + 2*size + 2)
     east_marker = Path.make_compound_path(triangle_marker1, triangle_marker2)
     return east_marker
 
 def west_topmark(size, shift_up):
     """ Plot west beacon """
-    triangle_marker1 = build_triangle_path(size, shift_up)
+    triangle_marker1 = build_triangle_path(2*size, 2*size, shift_up)
     triangle_marker2 = build_triangle_down_path(size, shift_up + 2*size + 2)
     west_marker = Path.make_compound_path(triangle_marker1, triangle_marker2)
     return west_marker
@@ -409,14 +567,15 @@ if __name__ == "__main__":
     
     shape_type_list =['conical','can','spherical','spar','pillar','tower']
     
-    PlotMark.markersize = 60
+    PlotMark.markersize = 50
 
-    plt.figure(1)
+    plt.figure(1,figsize=(10,5) )
     for j, shape in enumerate(shape_type_list):
         plt.text(1,j*2,shape.capitalize(), horizontalalignment='center')
 
     for i, topmark in enumerate(TOPMARKS_LIST):
-        plt.text(i+2,len(shape_type_list)*2, topmark.capitalize(), horizontalalignment='center')
+        plt.text(i+2,len(shape_type_list)*2, topmark.capitalize(),
+                 horizontalalignment='left', rotation = 30)
         for j, shape in enumerate(shape_type_list):
             sea_mark = PlotMark(i+2, j*2,shape)
             sea_mark.plot_sea_mark(top_mark_type=topmark, floating=False)
