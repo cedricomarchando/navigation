@@ -7,9 +7,9 @@ import navigation as nav
 
 # %%
 plt.figure(1)
-mark1 = nav.Mark(100,300)
-mark2 = nav.Mark(500,500)
-mark3 = nav.Mark(500,100,0)
+mark1 = nav.Mark(100,300, 'church')
+mark2 = nav.Mark(500,500, 'lighthouse')
+mark3 = nav.Mark(500,100, 'land_tower')
 boat_simu = nav.BoatSimu(300,310)
 mark1.plot_position()
 mark2.plot_position()
@@ -32,9 +32,9 @@ plt.draw()
 
 # %%
 plt.figure(2)
-mark1 = nav.Mark(100,300)
-mark2 = nav.Mark(500,500)
-mark3 = nav.Mark(500,100)
+mark1 = nav.Mark(100,300, 'church')
+mark2 = nav.Mark(500,500, 'lighthouse')
+mark3 = nav.Mark(500,100, 'water_tower')
 mark1.plot_position()
 mark2.plot_position()
 mark3.plot_position()
@@ -52,8 +52,8 @@ plt.draw()
 
 # %% 2 LOP intersection
 plt.figure(4)
-mark1_up = nav.Mark(100,100)
-mark2_up = nav.Mark(500,500)
+mark1_up = nav.Mark(100, 100, 'church')
+mark2_up = nav.Mark(500, 500, 'water_tower')
 mark1_up.plot_position()
 mark2_up.plot_position()
 
@@ -68,8 +68,8 @@ plt.draw()
 
 # %%
 plt.figure(5)
-mark1_up = nav.Mark(100,100)
-mark2_up = nav.Mark(500,500)
+mark1_up = nav.Mark(100, 100, 'church')
+mark2_up = nav.Mark(500, 500, 'tower')
 mark1_up.plot_position()
 mark2_up.plot_position()
 boat = nav.Boat(400,310)
