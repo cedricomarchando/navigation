@@ -4,9 +4,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.transforms as transforms
 from matplotlib.path import Path # For marker construction
+import nautical_marker as  marker
 
-#position fixing
-# Line Of Position (LOP)
 
 class BoatSimu:
     """ BoatSimu class, 
@@ -15,11 +14,12 @@ class BoatSimu:
     def __init__(self, true_x, true_y):
         self.boat_true = Boat( true_x, true_y)
         self.boat_estimate = Boat(true_x, true_y, color='r')
-        
+
     def plot_boat(self):
         " plot boat true and boat estimate"
         self.boat_true.plot_boat("True boat")
         self.boat_estimate.plot_boat("Estimated boat")
+
 
 class Boat:
     """ Boat class """
@@ -88,15 +88,21 @@ class Boat:
 
 class Mark:
     """ Mark class, including landmarks and Seamarks """
-    def __init__(self,position_x, position_y, bearing = None, name = None):
+    number_of_marks = 0
+    def __init__(self,position_x, position_y, mark_type = 'lighthouse',  top_mark_type = None, bearing = None, name = None):
         self.position_x = position_x
         self.position_y = position_y
         self.bearing = bearing
+        self.mark_type = mark_type.lower()
+        if top_mark_type is not None:
+            self.top_mark_type = top_mark_type
         self.name = name
+        Mark.number_of_marks += 1
 
     def plot_position(self):
         """ Plot position"""
-        plt.plot(self.position_x, self.position_y,'*k', markersize = 10, label ="Mark")
+        #plt.plot(self.position_x, self.position_y,'*k', markersize = 10, label ="Mark")
+        marker.PlotMark( self.position_x, self.position_y, self.mark_type  )
 
     def plot_mark_bearing(self, boat):
         """ Plot LOP of a mark with dotted line"""
@@ -124,15 +130,15 @@ def compute_intersection(mark1, mark2):
     return intersection 
 
 
-def compute_position_3lop(boat,mark1,mark2,mark3):
-    """ Comput fix position with triangulation of 3LOP"""
+def compute_position_3lop(boat, mark1, mark2, mark3):
+    """ Comput fix position with triangulation of 3 Lines Of Position (LOP) """
     sigma = np.pi/90 # 2 degree
     mark1.compute_bearing(boat,sigma)
     mark2.compute_bearing(boat,sigma)
     mark3.compute_bearing(boat,sigma)
-    intersection1 = compute_intersection(mark1,mark2)
-    intersection2 = compute_intersection(mark2,mark3)
-    intersection3 = compute_intersection(mark1,mark3)
+    intersection1 = compute_intersection(mark1, mark2)
+    intersection2 = compute_intersection(mark2, mark3)
+    intersection3 = compute_intersection(mark1, mark3)
     #compute barycentre using Chasles formula
     barycentre = (intersection1 + intersection2 + intersection3)/3
     #circonscribed_circle does not work
@@ -142,8 +148,8 @@ def compute_position_3lop(boat,mark1,mark2,mark3):
 
 def compute_position_2lop(boat, mark1_up, mark2_up, show_lop):
     """ Compute estimated position with 2 LOP"""
-    mark1_down = Mark(mark1_up.position_x, mark1_up.position_y,0,"mark1_down")
-    mark2_down = Mark(mark2_up.position_x, mark2_up.position_x,0,"mark2_down")
+    mark1_down = Mark(mark1_up.position_x, mark1_up.position_y)
+    mark2_down = Mark(mark2_up.position_x, mark2_up.position_x)
 
     sigma = np.pi/90 # 2d egrees
     mark1_up.compute_bearing(boat,sigma)
@@ -206,12 +212,18 @@ def get_best_marks(mark_table):
 
     return(mark_table[mark_index[0]], mark_table[mark_index[1]], mark_table[mark_index[2]])
 
+def degree_minute_to_decimal(degree : int, minute : float):
+    """ Convert degree minute to degree with decimal """
+    return( degree + minute/60)
+
+
 # %%
 if __name__ == "__main__":
+    plt.close('all')
     plt.figure(1)
-    mark1 = Mark(100,300)
-    mark2 = Mark(500,500)
-    mark3 = Mark(500,100,0)
+    mark1 = Mark(100, 300, 'church')
+    mark2 = Mark(500, 500, 'major_lighthouse')
+    mark3 = Mark(500, 100, 'water_tower')
     boat_simu = BoatSimu(300,310)
     mark1.plot_position()
     mark2.plot_position()
@@ -227,8 +239,9 @@ if __name__ == "__main__":
     
         
     
-    legend_unique()
-
+    #legend_unique()
+    #plt.legend()
+    print(f"Number of marks = {Mark.number_of_marks}")
 
     plt.title("3 LOP position fix")
     plt.show()
