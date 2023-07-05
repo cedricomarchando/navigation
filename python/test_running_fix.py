@@ -41,11 +41,11 @@ mark4 = nav.Mark(500.0, 100.0, 'land_tower')
 mark5 = nav.Mark(200.0, 100.0, 'water_tower')
 mark6 = nav.Mark(50.0, 150.0, 'tower', 'east')
 
-amer_table=[mark1, mark2, mark3, mark4, mark5, mark6]
-for mark in amer_table:
+mark_table=[mark1, mark2, mark3, mark4, mark5, mark6]
+for mark in mark_table:
     mark.plot_position()
 
-boat_simu = nav.BoatSimu(200,300)
+boat_simu = nav.BoatSimu(10,300)
 boat_simu.boat_true.course=np.pi/2
 boat_simu.boat_true.speed=100
 boat_simu.boat_estimate.course=np.pi/2
@@ -54,19 +54,13 @@ boat_simu.boat_estimate.speed=100
 boat_simu.plot_boat()
 boat_simu.boat_true.plot_speed()
 
-# build cost table such that lowest cost is + or - pi/2 angle
-bearing_table = np.zeros((len(amer_table),1),dtype=float)
-for i, amer in enumerate(amer_table):
-    amer.compute_bearing(boat_simu.boat_true,sigma)
-    bearing_table[i]=amer.bearing
+for i in range(8):
+    best_mark = nav.get_best_mark90( boat_simu.boat_true, mark_table)
+    boat_simu.run_fix(best_mark,1,sigma)
+    boat_simu.plot_boat()
 
-bearing_table = boat_simu.boat_true.course - bearing_table
-print(bearing_table)
-# bearing_table = abs(bearing_table)
-# print(bearing_table)
-#bearing_table = bearing_table - np.pi/4
-#print(bearing_table)
 
+print(best_mark.mark_type)
 plt.show()
 
 
