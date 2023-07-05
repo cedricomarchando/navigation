@@ -11,7 +11,7 @@ class BoatSimu:
     """ BoatSimu class, 
     instantian Boat_true that represent the boat wit its true parameter
     and boat_estimate taht represent the boat with estimated parameters"""
-    def __init__(self, true_x, true_y):
+    def __init__(self, true_x:float, true_y:float):
         self.boat_true = Boat( true_x, true_y)
         self.boat_estimate = Boat(true_x, true_y, color='r')
 
@@ -165,6 +165,50 @@ class Mark:
         # bearing = bearing + random.normalvariate(mu=0.0,sigma = sigma)
         self.bearing = bearing + sigma
 
+class Waypoint:
+    """ create a waypoint object """
+    def __init__(self, position_x, position_y, course = None, waypoint_number = None):
+        self.position_x = position_x
+        self.position_y = position_y
+        self.couse = course
+        self.waypoint_number = waypoint_number
+        
+    def plot(self):
+        plt.plot(self.position_x, self.position_y, 'o')
+        
+    def __str__(self):
+        return f' id={self.waypoint_number}, x={self.position_x}, y={self.position_y} \n'
+        
+
+class Route:
+    def __init__(self):
+        self.route = []
+        self.number_of_waypoint = 0
+    
+    def append_waypoint(self, waypoint:Waypoint):
+        waypoint.waypoint_number = self.number_of_waypoint
+        self.route.append(waypoint)
+        self.number_of_waypoint += 1
+        
+    def plot_route(self):
+        x = []
+        y = []
+        for point in self.route:
+            x.append(point.position_x)
+            y.append(point.position_y)
+            plt.text(point.position_x, point.position_y, point.waypoint_number,
+                     horizontalalignment='center',
+                     verticalalignment='center',
+                     color='w')
+        plt.plot(x, y, '-o', markersize=15)
+        
+    def __str__(self):
+        route = ' '
+        for point in self.route:
+            route = route + point.__str__()
+        return route
+                
+
 def compute_intersection(mark1, mark2):
     """ Compute intersection between two LOP of mark1 and mark2"""
     # y = a1 x+ b1 (for LOP of mark1)
@@ -174,7 +218,7 @@ def compute_intersection(mark1, mark2):
             - (mark2.position_y -1/np.tan(mark2.bearing)*mark2.position_x)) / ((1/np.tan(mark2.bearing)) - ( 1/np.tan(mark1.bearing)))
     intersection_y = 1/np.tan(mark1.bearing) * intersection_x + mark1.position_y - 1/np.tan(mark1.bearing)*mark1.position_x
     intersection = np.array([intersection_x, intersection_y])
-    return intersection 
+    return intersection
 
 
 
@@ -217,13 +261,37 @@ def get_best_marks(mark_table):
 
     return(mark_table[mark_index[0]], mark_table[mark_index[1]], mark_table[mark_index[2]])
 
+
+def get_best_mark90(boat, mark_table):
+    """ return the mark that is the closet to an 90 degree angle to boat course """
+    bearing_table = np.zeros((len(mark_table),1),dtype=float)
+    for i, amer in enumerate(mark_table):
+        amer.compute_bearing(boat, 0)
+        bearing_table[i]=amer.bearing
+
+    bearing_table = boat.course - bearing_table
+
+    cost_table = bearing_table % (2*np.pi)
+    cost_table2 = - bearing_table % (2*np.pi)
+    cost_table = np.minimum(cost_table,cost_table2)
+    cost_table = cost_table - np.pi/2
+    cost_table = abs(cost_table)
+
+    index_min = np.array(cost_table).argmin()
+
+    best_mark = mark_table[index_min.item()]
+    return best_mark
+
+
+
+
+
 def degree_minute_to_decimal(degree : int, minute : float):
     """ Convert degree minute to degree with decimal """
-    return( degree + minute/60)
+    return degree + minute/60
 
 
-# %%
-if __name__ == "__main__":
+def main():
     plt.close('all')
     plt.figure(1)
     mark1 = Mark(100, 300, 'church')
@@ -241,11 +309,14 @@ if __name__ == "__main__":
     mark2.plot_mark_bearing(boat_simu.boat_true)
     mark3.plot_mark_bearing(boat_simu.boat_true)
     
-        
-    
     #legend_unique()
     #plt.legend()
     print(f"Number of marks = {Mark.number_of_marks}")
 
     plt.title("3 LOP position fix")
     plt.show()
+    
+
+if __name__ == "__main__":
+
+    main()
