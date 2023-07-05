@@ -1,2 +1,4 @@
 # ignore __pycache__ folder
 python/__pycache__
+old_test/
+map/
