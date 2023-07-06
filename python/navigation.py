@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import matplotlib.transforms as transforms
 from matplotlib.path import Path # For marker construction
 import nautical_marker as  marker
+import pandas as pd
 
 
 class BoatSimu:
@@ -134,17 +135,22 @@ class Boat:
         self.true_y = position[1]
 
 
+
+
 class Mark:
     """ Mark class, including landmarks and Seamarks """
-    number_of_marks = 0
-    def __init__(self,position_x, position_y, mark_type = 'lighthouse',  top_mark_type = None, bearing = None, name = None):
+    def __init__(self,position_x, position_y, mark_type = 'lighthouse',  top_mark_type = None,
+                 light_color = None, name = None, floating=False, show_top_mark=True, bearing = None, mark_number = None):
         self.position_x = position_x
         self.position_y = position_y
-        self.bearing = bearing
         self.mark_type = mark_type.lower()
         self.top_mark_type = top_mark_type
+        self.light_color = light_color
         self.name = name
-        Mark.number_of_marks += 1
+        self.floating = floating
+        self.show_top_mark = show_top_mark
+        self.bearing = bearing
+        self.mark_number = mark_number
 
     def plot_position(self):
         """ Plot position"""
@@ -164,6 +170,44 @@ class Mark:
         bearing = np.arctan2(vector_x, vector_y)
         # bearing = bearing + random.normalvariate(mu=0.0,sigma = sigma)
         self.bearing = bearing + sigma
+    
+    def __str__(self):
+        return f' x={self.position_x}, y={self.position_y}, mark_type={self.mark_type}, top_mark={self.top_mark_type}\n'
+
+
+class MarksMap:
+    """ Build map with all marks"""
+    def __init__(self):
+        self.marks_map = []
+        self.number_of_marks = 0
+    
+    def append_mark(self, mark:Mark):
+        mark.mark_number = self.number_of_marks
+        self.marks_map.append(mark)
+        self.number_of_marks += 1
+        
+    def plot_Map(self):
+        for mark in self.marks_map:
+            marker.PlotMark(mark.position_x, mark.position_y, mark.mark_type, mark.top_mark_type, mark.light_color,
+                            mark.name, mark.floating, mark.show_top_mark)
+
+    def marks_csv(self, csv_adress):
+        """ Construct route from csv file"""
+        marks_df = pd.read_csv(csv_adress)
+        for i in range(len(marks_df)):
+            mark_data = marks_df.loc[i]
+            mark = Mark(float(mark_data[0]),float(mark_data[1]), mark_data[2], mark_data[3],
+                    mark_data[4], mark_data[5], mark_data[6], mark_data[7])
+            self.append_mark(mark)
+        
+    def __str__(self):
+        map = ' '
+        for mark in self.marks_map:
+            map = map + mark.__str__()
+        return map
+
+
+
 
 class Waypoint:
     """ create a waypoint object """
@@ -181,6 +225,7 @@ class Waypoint:
         
 
 class Route:
+    """ append waypoints from a csv file to build a route"""
     def __init__(self):
         self.route = []
         self.number_of_waypoint = 0
@@ -201,6 +246,16 @@ class Route:
                      verticalalignment='center',
                      color='w')
         plt.plot(x, y, '-o', markersize=15)
+        
+
+    def route_csv(self, csv_adress):
+        """ Construct route from csv file"""
+        route_csv = pd.read_csv(csv_adress)
+        for i in range(len(route_csv)):
+            coordinate_x = route_csv.iloc[i,1]
+            coordinate_y = route_csv.iloc[i,0]
+            waypoint = Waypoint(coordinate_x, coordinate_y)
+            self.append_waypoint(waypoint)
         
     def __str__(self):
         route = ' '
@@ -311,7 +366,6 @@ def main():
     
     #legend_unique()
     #plt.legend()
-    print(f"Number of marks = {Mark.number_of_marks}")
 
     plt.title("3 LOP position fix")
     plt.show()
