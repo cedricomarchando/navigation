@@ -4,7 +4,7 @@ from matplotlib.path import Path
 import matplotlib.transforms as transforms
 
 
-LANDMARKS_SET : set[str] = {'lighthouse', 'major_lighthouse', 'land_tower', 'water_tower', 'church'}
+LANDMARKS_SET : set[str] = {'lighthouse', 'major_lighthouse', 'light_tower', 'land_tower', 'water_tower', 'church'}
 DANGERS_SET : set[str] = {'wreck', 'wreck_depth', 'danger','rock_covers','rock_depth'}
 SEAMARK_SET : set[str] = {'conical','can','spherical','spar','pillar','tower'}
 
@@ -119,6 +119,10 @@ class PlotMark:
                 marker = Path.unit_regular_star(5,0.3)
                 facecolor='k'
                 markersize = markersize/3
+            case 'light_tower':
+                marker = BuildPath.land_tower(10,3)
+                facecolor='none'
+                self.plot_white_circle(10)
             case 'land_tower':
                 marker = BuildPath.land_tower(10,3)
                 facecolor='none'
@@ -136,7 +140,14 @@ class PlotMark:
         plt.plot(self.position_x, self.position_y, marker=marker, linestyle='solid',
                 markerfacecolor=facecolor, markeredgecolor='k',
                 markersize=markersize, label=type)
-        if self.mark_type.lower() == 'major_lighthouse':
+        if self.mark_type == 'light_tower':
+                markersize = markersize/3
+                marker = Path.unit_regular_star(5,0.3)
+                plt.plot(self.position_x, self.position_y, marker=marker, linestyle='solid',
+                markerfacecolor='k', markeredgecolor='k',
+                markersize=markersize, label=type)
+        
+        if self.mark_type == 'major_lighthouse' or self.mark_type == 'light_tower':
             plt.plot(self.position_x, self.position_y, marker='o', linestyle='solid',
                 markerfacecolor=self.light_color, markeredgecolor=self.light_color,
                 markersize=markersize/6, label=type)
@@ -154,7 +165,7 @@ class PlotMark:
             symbol_marker2 = shape_marker2
             markersize = 2*markersize/3
         else:
-            topmark_marker = self.select_topmark_marker(topmark_size, shift_up=shape_height + 2)
+            topmark_marker = self.select_topmark_marker(topmark_size, shift_up=shape_height + topmark_size/2)
             symbol_marker = Path.make_compound_path(shape_marker, topmark_marker)
             symbol_marker2 = Path.make_compound_path(shape_marker2, topmark_marker)
 
@@ -379,6 +390,8 @@ class PlotMark:
                 topmark_marker = BuildPath.cross(shift_up + size, size)
             case _:
                 print(' Not a valid topmark')
+        line_path = Path([(0,shift_up-size/2), (0,shift_up)], [1,2])
+        topmark_marker = Path.make_compound_path(topmark_marker, line_path)
         return topmark_marker
 
 class BuildPath:
@@ -540,7 +553,7 @@ class BuildPath:
     def north_topmark(size: float, shift_up: float) -> Path:
         """ Plot north beacon """
         triangle_marker1 = BuildPath.triangle(2*size, 2*size, shift_up)
-        triangle_marker2 = BuildPath.triangle(2*size, 2*size, shift_up + 2*size + 2)
+        triangle_marker2 = BuildPath.triangle(2*size, 2*size, shift_up + 2*size + size/2)
         north_marker = Path.make_compound_path(triangle_marker1, triangle_marker2)
         return north_marker
     
@@ -548,7 +561,7 @@ class BuildPath:
     def south_topmark(size: float, shift_up: float) -> Path:
         """ Plot north beacon """
         triangle_marker1 = BuildPath.triangle_down(size, shift_up)
-        triangle_marker2 = BuildPath.triangle_down(size, shift_up + 2*size + 2)
+        triangle_marker2 = BuildPath.triangle_down(size, shift_up + 2*size + size/2)
         south_marker = Path.make_compound_path(triangle_marker1, triangle_marker2)
         return south_marker
     
@@ -556,7 +569,7 @@ class BuildPath:
     def east_topmark(size: float, shift_up: float) -> Path:
         """ Plot east beacon """
         triangle_marker1 = BuildPath.triangle_down(size, shift_up)
-        triangle_marker2 = BuildPath.triangle(2*size, 2*size, shift_up + 2*size + 2)
+        triangle_marker2 = BuildPath.triangle(2*size, 2*size, shift_up + 2*size + size/2)
         east_marker = Path.make_compound_path(triangle_marker1, triangle_marker2)
         return east_marker
         
@@ -564,7 +577,7 @@ class BuildPath:
     def west_topmark(size: float, shift_up: float) -> Path:
         """ Plot west beacon """
         triangle_marker1 = BuildPath.triangle(2*size, 2*size, shift_up)
-        triangle_marker2 = BuildPath.triangle_down(size, shift_up + 2*size + 2)
+        triangle_marker2 = BuildPath.triangle_down(size, shift_up + 2*size + size/2)
         west_marker = Path.make_compound_path(triangle_marker1, triangle_marker2)
         return west_marker
     
@@ -572,7 +585,8 @@ class BuildPath:
     def danger_topmark(size: float, shift_up: float) -> Path:
         """ Plot danger beacon """
         circle_marker1 = BuildPath.circle(size, shift_up + size)
-        return circle_marker1
+        circle_marker2 = BuildPath.circle(size, shift_up + 3*size)
+        return Path.make_compound_path(circle_marker1, circle_marker2)
 
     @staticmethod
     def marina() -> Path:
