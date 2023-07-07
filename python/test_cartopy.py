@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import nautical_marker as marker
 import pandas as pd
 import numpy as np
+import navigation as nav
 
 
 
@@ -25,22 +26,34 @@ ax.set_extent( [lat_min, lat_max, long_min, long_max], crs=ccrs.PlateCarree())
 plt.imshow(img, origin='upper', extent=img_extent, transform=ccrs.PlateCarree())
 #plt.figure(figsize=(10, 5))
 
+
+
+# %%
 marker.PlotMark.markersize=30
 
-# %%
+marks_map = nav.MarksMap()
+marks_map.marks_csv('marks.csv')
+marks_map.plot_map()
 
-marks_df = pd.read_csv('marks.csv')
-marks_df = marks_df.replace('None',None)
-marks_df = marks_df.replace(np.nan,None)
+route = nav.Route()
+route.route_csv('./route.csv')
+route.plot_route()
+
+print(route.route[0])
+
+sigma = np.pi/90 # 2 degree
+boat_simu = nav.BoatSimu(route.route[0].position_x, route.route[0].position_y)
+boat_simu.boat_true.course = route.route[0].course
+boat_simu.boat_true.speed = 0.1
+boat_simu.boat_estimate.course = route.route[0].course
+boat_simu.boat_estimate.speed = 0.1
 
 
-# %%
-
-for i in range(len(marks_df)):
-    mark_data = marks_df.loc[i]
-    marker.PlotMark(float(mark_data[0]),float(mark_data[1]), mark_data[2], mark_data[3],
-                    mark_data[4], mark_data[5], mark_data[6], mark_data[7])
-    
-
+boat_simu.run(0.01)
+boat_simu.update_3lop_fix(marks_map, sigma)
+boat_simu.run(0.01)
+boat_simu.update_3lop_fix(marks_map, sigma)
+boat_simu.run(0.01)
+boat_simu.update_3lop_fix(marks_map, sigma)
 plt.show()
 # %%
