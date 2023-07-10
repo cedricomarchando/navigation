@@ -245,17 +245,16 @@ class MarksMap:
 
 class Waypoint:
     """ create a waypoint object """
-    def __init__(self, position_x, position_y, course = None, waypoint_number = None):
-        self.position_x = position_x
-        self.position_y = position_y
+    def __init__(self, position :list[float, float], course = None, waypoint_number = None):
+        self.position = position
         self.course = course
         self.waypoint_number = waypoint_number
         
     def plot(self):
-        plt.plot(self.position_x, self.position_y, 'o')
+        plt.plot(self.position[0], self.position[1], 'o')
         
     def __str__(self):
-        return f' x={self.position_x}, y={self.position_y}, waypoint_id={self.waypoint_number}\n'
+        return f' x={self.position[0]}, y={self.position[1]}, waypoint_id={self.waypoint_number}\n'
         
 
 class Route:
@@ -274,9 +273,9 @@ class Route:
         x = []
         y = []
         for point in self.route:
-            x.append(point.position_x)
-            y.append(point.position_y)
-            plt.text(point.position_x, point.position_y, point.waypoint_number,
+            x.append(point.position[0])
+            y.append(point.position[1])
+            plt.text(point.position[0], point.position[1], point.waypoint_number,
                      horizontalalignment='center',
                      verticalalignment='center',
                      color='w')
@@ -289,15 +288,15 @@ class Route:
         for i in range(len(route_csv)):
             coordinate_x = route_csv.iloc[i,1]
             coordinate_y = route_csv.iloc[i,0]
-            waypoint = Waypoint(coordinate_x, coordinate_y)
+            waypoint = Waypoint([coordinate_x, coordinate_y])
             self.append_waypoint(waypoint)
         for i in range(len(route_csv) - 1 ):
             self.compute_course(i)
             
     def compute_course(self, waypoint_number: int ) -> None:
         """ compute Bearing angle of a mark from the point of vie of the Boat """
-        vector_x = self.route[waypoint_number+1].position_x - self.route[waypoint_number].position_x
-        vector_y = self.route[waypoint_number+1].position_y - self.route[waypoint_number].position_y
+        vector_x = self.route[waypoint_number+1].position[0] - self.route[waypoint_number].position[0]
+        vector_y = self.route[waypoint_number+1].position[1] - self.route[waypoint_number].position[1]
         course = np.arctan2(vector_x, vector_y)
         self.route[waypoint_number].course = course
         
