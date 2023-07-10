@@ -8,9 +8,9 @@ import navigation as nav
 
 # initialisation
 plt.figure(1)
-mark = nav.Mark(200,500,'church')
-mark.plot_position()
-boat_simu = nav.BoatSimu(50,50)
+mark = nav.Mark([200,500],'church')
+mark.plot_mark()
+boat_simu = nav.BoatSimu([50,50])
 boat_simu.boat_true.course=np.pi/2
 boat_simu.boat_true.speed=100
 boat_simu.boat_estimate.course=np.pi/2
@@ -34,18 +34,18 @@ plt.draw()
 plt.figure(2)
 sigma = 0 # 2 degree
 
-mark1 = nav.Mark(100.0, 500.0, 'church')
-mark2 = nav.Mark(250.0, 510.0, 'lighthouse')
-mark3 = nav.Mark(500.0, 500.0, 'major_lighthouse')
-mark4 = nav.Mark(500.0, 100.0, 'land_tower')
-mark5 = nav.Mark(200.0, 100.0, 'water_tower')
-mark6 = nav.Mark(50.0, 150.0, 'tower', 'east')
+mark1 = nav.Mark([100.0, 500.0], 'church')
+mark2 = nav.Mark([250.0, 510.0], 'lighthouse')
+mark3 = nav.Mark([500.0, 500.0], 'major_lighthouse')
+mark4 = nav.Mark([500.0, 100.0], 'land_tower')
+mark5 = nav.Mark([200.0, 100.0], 'water_tower')
+mark6 = nav.Mark([50.0, 150.0], 'tower', 'east')
 
 mark_table=[mark1, mark2, mark3, mark4, mark5, mark6]
 for mark in mark_table:
-    mark.plot_position()
+    mark.plot_mark()
 
-boat_simu = nav.BoatSimu(10,300)
+boat_simu = nav.BoatSimu([10,300])
 boat_simu.boat_true.course=np.pi/2
 boat_simu.boat_true.speed=100
 boat_simu.boat_estimate.course=np.pi/2
