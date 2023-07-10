@@ -114,9 +114,9 @@ class BoatSimu:
         markA, markB, markC = get_best_marks(nearest_marks)
         self.compute_position_3lop(markA, markB, markC)
         self.plot_boat()
-        markA.plot_mark_bearing(self.boat_true)
-        markB.plot_mark_bearing(self.boat_true)
-        markC.plot_mark_bearing(self.boat_true)
+        #markA.plot_mark_bearing(self.boat_true)
+        #markB.plot_mark_bearing(self.boat_true)
+        #markC.plot_mark_bearing(self.boat_true)
     
     def run(self,duration : float):
         self.boat_estimate.run(duration)
@@ -131,12 +131,12 @@ class BoatSimu:
         self.boat_true.compute_waypoint_distance(waypoint)
         
     def go_to_waypoint(self, waypoint:Waypoint, marks_map, sigma, fix_period):
-        while self.boat_estimate.waypoint_distance > self.boat_true.speed * fix_period:
+        self.compute_waypoint_distance(waypoint)
+        while self.boat_true.waypoint_distance > self.boat_true.speed * fix_period:
             self.set_course(waypoint.position)
             self.run(fix_period)
             self.update_3lop_fix(marks_map, sigma)
             self.compute_waypoint_distance(waypoint)
-
 
 
 class Boat:
@@ -185,7 +185,6 @@ class Boat:
         vector_x = position[0] - self.position[0]
         vector_y = position[1] - self.position[1]
         self.course = np.arctan2(vector_x, vector_y)
-        print(self.course)
 
     def compute_waypoint_distance(self, waypoint:Waypoint) -> float:
         self.waypoint_distance = math.dist(self.position, waypoint.position)
@@ -324,10 +323,10 @@ class Route:
                 
 
 def compute_intersection(mark1 : Mark, mark2 : Mark) -> list[float,float]:
-    """ Compute intersection between two LOP of mark1 and mark2"""
-    # y = a1 x+ b1 (for LOP of mark1)
-    # y = a2 x+ b2 (for LOP of mark2)
-    #  thus intersection at x = (b1-b2)/(a2-a1)
+    """ Compute intersection between two LOP of mark1 and mark2
+    y = a1 x+ b1 (for LOP of mark1)
+    y = a2 x+ b2 (for LOP of mark2)
+    thus intersection at x = (b1-b2)/(a2-a1) """
     intersection_x = ((mark1.position[1] - 1/np.tan(mark1.bearing)*mark1.position[0])
             - (mark2.position[1] -1/np.tan(mark2.bearing)*mark2.position[0])) / ((1/np.tan(mark2.bearing)) - ( 1/np.tan(mark1.bearing)))
     intersection_y = 1/np.tan(mark1.bearing) * intersection_x + mark1.position[1] - 1/np.tan(mark1.bearing)*mark1.position[0]
