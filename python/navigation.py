@@ -13,9 +13,9 @@ class BoatSimu:
     """ BoatSimu class, 
     instantian Boat_true that represent the boat wit its true parameter
     and boat_estimate taht represent the boat with estimated parameters"""
-    def __init__(self, true_x:float, true_y:float):
-        self.boat_true = Boat( true_x, true_y)
-        self.boat_estimate = Boat(true_x, true_y, color='r')
+    def __init__(self, true_position:list[float, float]):
+        self.boat_true = Boat( true_position)
+        self.boat_estimate = Boat( true_position, color='r')
 
     def plot_boat(self) ->None:
         " plot boat true and boat estimate"
@@ -41,8 +41,8 @@ class BoatSimu:
 
     def compute_position_2lop(self, mark1_up, mark2_up, show_lop):
         """ Compute estimated position with 2 LOP"""
-        mark1_down = Mark(mark1_up.position_x, mark1_up.position_y)
-        mark2_down = Mark(mark2_up.position_x, mark2_up.position_x)
+        mark1_down = Mark(mark1_up.position)
+        mark2_down = Mark(mark2_up.position)
 
         sigma = np.pi/90 # 2d egrees
         mark1_up.compute_bearing(self.boat_true,sigma)
@@ -80,11 +80,11 @@ class BoatSimu:
         # run mark in the direction of the boat
         duration = 1
         mark_tmp = Mark(
-            mark.position_x + self.boat_estimate.speed * duration * np.sin(self.boat_estimate.course),
-            mark.position_y + self.boat_estimate.speed * duration * np.cos(self.boat_estimate.course),
+            [mark.position[0] + self.boat_estimate.speed * duration * np.sin(self.boat_estimate.course),
+            mark.position[1] + self.boat_estimate.speed * duration * np.cos(self.boat_estimate.course)],
             bearing = save_bearing
             )
-        plt.plot(mark_tmp.position_x, mark_tmp.position_y,'+k', label ="mark shifted")
+        plt.plot(mark_tmp.position[0], mark_tmp.position[1],'+k', label ="mark shifted")
 
         mark_tmp.plot_mark_bearing(self.boat_true)
 
@@ -111,28 +111,27 @@ class BoatSimu:
 
 class Boat:
     """ Boat class """
-    def __init__(self,position_x, position_y,course = None,speed = None, color ='b'):
-        self.position_x = position_x
-        self.position_y = position_y
+    def __init__(self, position :list[float, float], course = None,speed = None, color ='b'):
+        self.position = position
         self.speed = speed
         self.course = course
         self.color = color
 
     def plot_speed(self):
         """ Show speed with direction of course"""
-        plt.arrow(self.position_x,self.position_y,
+        plt.arrow(self.position[0], self.position[1],
                   self.speed * np.sin(self.course),
                   self.speed * np.cos(self.course),
                   head_width = 10)
 
     def run(self,duration):
         """ Run with speed for a duration """
-        self.position_x += self.speed * duration * np.sin(self.course)
-        self.position_y += self.speed * duration * np.cos(self.course)
+        self.position[0] += self.speed * duration * np.sin(self.course)
+        self.position[1] += self.speed * duration * np.cos(self.course)
 
     def plot_position(self):
         """ Plot position """
-        plt.plot(self.position_x, self.position_y, '^b', markerfacecolor='none', label='Boat position')
+        plt.plot(self.position[0], self.position[1], '^b', markerfacecolor='none', label='Boat position')
 
     def plot_boat(self,label = None):
         """ plot with a boat marker in the direction of the course """
@@ -142,24 +141,22 @@ class Boat:
         if self.course is not None:
             angle = self.course - np.pi/2
             boat_marker = boat_marker.transformed(transforms.Affine2D().rotate(-angle))
-        plt.plot(self.position_x, self.position_y, marker=boat_marker,
+        plt.plot(self.position[0], self.position[1], marker=boat_marker,
             markersize=10, color=self.color,  markerfacecolor='none',
             linestyle = 'None', label=label)
 
     def set_position(self,position : list[float, float]) -> None:
         """ Set boat with new position """
-        self.position_x = position[0]
-        self.position_y = position[1]
+        self.position = position
 
 
 
 
 class Mark:
     """ Mark class, including landmarks and Seamarks """
-    def __init__(self,position_x : float, position_y : float, mark_type = 'lighthouse',  top_mark_type = None,
+    def __init__(self,position :list[float, float], mark_type = 'lighthouse',  top_mark_type = None,
                  light_color = None, name = None, floating:bool=False, show_top_mark=True, bearing = None, distance = None):
-        self.position_x = position_x
-        self.position_y = position_y
+        self.position = position
         self.mark_type = mark_type.lower()
         self.top_mark_type = top_mark_type
         self.light_color = light_color
@@ -171,29 +168,29 @@ class Mark:
 
     def plot_mark(self):
         """ Plot position"""
-        marker.PlotMark( self.position_x, self.position_y, self.mark_type, self.top_mark_type,
+        marker.PlotMark( self.position[0], self.position[1], self.mark_type, self.top_mark_type,
                         self.light_color, self.name, self.floating, self.show_top_mark  )
 
     def plot_mark_bearing(self, boat:Boat):
         """ Plot LOP of a mark with dotted line"""
-        x_line = np.linspace(self.position_x,boat.position_x,10)
-        y_line = x_line * 1/np.tan(self.bearing) + self.position_y - self.position_x *  1/np.tan(self.bearing)
+        x_line = np.linspace(self.position[0],boat.position[0],10)
+        y_line = x_line * 1/np.tan(self.bearing) + self.position[1] - self.position[0] *  1/np.tan(self.bearing)
         plt.plot(x_line, y_line, '--k', linewidth=0.5, label = "Line of Position (LoP)")
 
     def compute_bearing(self, boat:Boat, sigma):
         """ compute Bearing angle of a mark from the point of vie of the Boat """
-        vector_x = self.position_x - boat.position_x
-        vector_y = self.position_y - boat.position_y
+        vector_x = self.position[0] - boat.position[0]
+        vector_y = self.position[1] - boat.position[1]
         bearing = np.arctan2(vector_x, vector_y)
         # bearing = bearing + random.normalvariate(mu=0.0,sigma = sigma)
         self.bearing = bearing + sigma
     
     def compute_distance(self, boat:Boat):
-        distance = math.dist([self.position_x, self.position_y], [boat.position_x, boat.position_y])
+        distance = math.dist(self.position, boat.position)
         self.distance = distance
     
     def __str__(self):
-        return (f' x={self.position_x}, y={self.position_y}, mark_type={self.mark_type}, top_mark={self.top_mark_type},'
+        return (f' x={self.position[0]}, y={self.position[1]}, mark_type={self.mark_type}, top_mark={self.top_mark_type},'
                 f'name={self.name}, floating={self.floating}, distance={self.distance}\n')
 
 
@@ -221,7 +218,7 @@ class MarksMap:
         marks_df = marks_df.replace(np.nan,None)
         for i in range(len(marks_df)):
             mark_data = marks_df.loc[i]
-            mark = Mark(float(mark_data[0]),float(mark_data[1]), mark_data[2], mark_data[3],
+            mark = Mark([float(mark_data[0]),float(mark_data[1])], mark_data[2], mark_data[3],
                     mark_data[4], mark_data[5], mark_data[6], mark_data[7])
             self.append_mark(mark)
                 
@@ -316,9 +313,9 @@ def compute_intersection(mark1 : Mark, mark2 : Mark) -> list[float,float]:
     # y = a1 x+ b1 (for LOP of mark1)
     # y = a2 x+ b2 (for LOP of mark2)
     #  thus intersection at x = (b1-b2)/(a2-a1)
-    intersection_x = ((mark1.position_y - 1/np.tan(mark1.bearing)*mark1.position_x)
-            - (mark2.position_y -1/np.tan(mark2.bearing)*mark2.position_x)) / ((1/np.tan(mark2.bearing)) - ( 1/np.tan(mark1.bearing)))
-    intersection_y = 1/np.tan(mark1.bearing) * intersection_x + mark1.position_y - 1/np.tan(mark1.bearing)*mark1.position_x
+    intersection_x = ((mark1.position[1] - 1/np.tan(mark1.bearing)*mark1.position[0])
+            - (mark2.position[1] -1/np.tan(mark2.bearing)*mark2.position[0])) / ((1/np.tan(mark2.bearing)) - ( 1/np.tan(mark1.bearing)))
+    intersection_y = 1/np.tan(mark1.bearing) * intersection_x + mark1.position[1] - 1/np.tan(mark1.bearing)*mark1.position[0]
     intersection = np.array([intersection_x, intersection_y])
     return intersection
 
@@ -396,10 +393,10 @@ def degree_minute_to_decimal(degree : int, minute : float):
 def main():
     plt.close('all')
     plt.figure(1)
-    mark1 = Mark(100, 300, 'church')
-    mark2 = Mark(500, 500, 'major_lighthouse')
-    mark3 = Mark(500, 100, 'water_tower')
-    boat_simu = BoatSimu(300,310)
+    mark1 = Mark([100, 300], 'church')
+    mark2 = Mark([500, 500], 'major_lighthouse')
+    mark3 = Mark([500, 100], 'water_tower')
+    boat_simu = BoatSimu([300, 310])
     mark1.plot_mark()
     mark2.plot_mark()
     mark3.plot_mark()
