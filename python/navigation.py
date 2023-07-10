@@ -9,12 +9,25 @@ import pandas as pd
 import math
 
 
+class Waypoint:
+    """ create a waypoint object """
+    def __init__(self, position :list[float, float], waypoint_number = None):
+        self.position = position
+        self.waypoint_number = waypoint_number
+        
+    def plot(self):
+        plt.plot(self.position[0], self.position[1], 'o')
+        
+    def __str__(self):
+        return f' x={self.position[0]}, y={self.position[1]}, waypoint_id={self.waypoint_number}\n'
+
+
 class BoatSimu:
     """ BoatSimu class, 
     instantian Boat_true that represent the boat wit its true parameter
     and boat_estimate taht represent the boat with estimated parameters"""
     def __init__(self, true_position:list[float, float]):
-        self.boat_true = Boat( true_position)
+        self.boat_true = Boat( true_position, color='g')
         self.boat_estimate = Boat( true_position, color='r')
 
     def plot_boat(self) ->None:
@@ -108,14 +121,32 @@ class BoatSimu:
     def run(self,duration : float):
         self.boat_estimate.run(duration)
         self.boat_true.run(duration)
+        
+    def set_course(self, position:list[float, float]):
+        self.boat_estimate.set_course(position)
+        self.boat_true.set_course(position)
+        
+    def compute_waypoint_distance(self, waypoint:Waypoint) -> None:
+        self.boat_estimate.compute_waypoint_distance(waypoint)
+        self.boat_true.compute_waypoint_distance(waypoint)
+        
+    def go_to_waypoint(self, waypoint:Waypoint, marks_map, sigma, fix_period):
+        while self.boat_estimate.waypoint_distance > self.boat_true.speed * fix_period:
+            self.set_course(waypoint.position)
+            self.run(fix_period)
+            self.update_3lop_fix(marks_map, sigma)
+            self.compute_waypoint_distance(waypoint)
+
+
 
 class Boat:
     """ Boat class """
-    def __init__(self, position :list[float, float], course = None,speed = None, color ='b'):
+    def __init__(self, position :list[float, float], course = None, speed = None, waypoint_distance = None, color ='b'):
         self.position = position
         self.speed = speed
         self.course = course
         self.color = color
+        self.waypoint_distance = waypoint_distance
 
     def plot_speed(self):
         """ Show speed with direction of course"""
@@ -148,10 +179,18 @@ class Boat:
     def set_position(self,position : list[float, float]) -> None:
         """ Set boat with new position """
         self.position = position
+        
+    def set_course(self, position :list[float, float]) -> None:
+        """ give course to go to position """
+        vector_x = position[0] - self.position[0]
+        vector_y = position[1] - self.position[1]
+        self.course = np.arctan2(vector_x, vector_y)
+        print(self.course)
 
-
-
-
+    def compute_waypoint_distance(self, waypoint:Waypoint) -> float:
+        self.waypoint_distance = math.dist(self.position, waypoint.position)
+    
+    
 class Mark:
     """ Mark class, including landmarks and Seamarks """
     def __init__(self,position :list[float, float], mark_type = 'lighthouse',  top_mark_type = None,
@@ -243,20 +282,6 @@ class MarksMap:
 
 
 
-class Waypoint:
-    """ create a waypoint object """
-    def __init__(self, position :list[float, float], course = None, waypoint_number = None):
-        self.position = position
-        self.course = course
-        self.waypoint_number = waypoint_number
-        
-    def plot(self):
-        plt.plot(self.position[0], self.position[1], 'o')
-        
-    def __str__(self):
-        return f' x={self.position[0]}, y={self.position[1]}, waypoint_id={self.waypoint_number}\n'
-        
-
 class Route:
     """ append waypoints from a csv file to build a route"""
     # route obtained from openseamap, Fullscream chart, Tools, Trip planner, keep only latitude and longitude in decimal
@@ -290,15 +315,6 @@ class Route:
             coordinate_y = route_csv.iloc[i,0]
             waypoint = Waypoint([coordinate_x, coordinate_y])
             self.append_waypoint(waypoint)
-        for i in range(len(route_csv) - 1 ):
-            self.compute_course(i)
-            
-    def compute_course(self, waypoint_number: int ) -> None:
-        """ compute Bearing angle of a mark from the point of vie of the Boat """
-        vector_x = self.route[waypoint_number+1].position[0] - self.route[waypoint_number].position[0]
-        vector_y = self.route[waypoint_number+1].position[1] - self.route[waypoint_number].position[1]
-        course = np.arctan2(vector_x, vector_y)
-        self.route[waypoint_number].course = course
         
     def __str__(self):
         route = ' '
@@ -317,7 +333,6 @@ def compute_intersection(mark1 : Mark, mark2 : Mark) -> list[float,float]:
     intersection_y = 1/np.tan(mark1.bearing) * intersection_x + mark1.position[1] - 1/np.tan(mark1.bearing)*mark1.position[0]
     intersection = np.array([intersection_x, intersection_y])
     return intersection
-
 
 
 def legend_unique():
