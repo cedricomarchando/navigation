@@ -42,18 +42,25 @@ route.plot_route()
 print(route.route[0])
 
 sigma = np.pi/90 # 2 degree
-boat_simu = nav.BoatSimu(route.route[0].position_x, route.route[0].position_y)
-boat_simu.boat_true.course = route.route[0].course
-boat_simu.boat_true.speed = 0.1
-boat_simu.boat_estimate.course = route.route[0].course
-boat_simu.boat_estimate.speed = 0.1
 
 
-boat_simu.run(0.01)
+speed = 0.1
+fix_period = 0.01
+
+boat_simu = nav.BoatSimu(route.route[0].position)
+
+boat_simu.compute_waypoint_distance(route.route[1])
+print(f'distance_estimate:{boat_simu.boat_estimate.waypoint_distance} \t distance_true:{boat_simu.boat_true.waypoint_distance}')
+boat_simu.boat_true.speed = speed
+boat_simu.boat_estimate.speed = speed
+boat_simu.plot_boat()
 boat_simu.update_3lop_fix(marks_map, sigma)
-boat_simu.run(0.01)
-boat_simu.update_3lop_fix(marks_map, sigma)
-boat_simu.run(0.01)
-boat_simu.update_3lop_fix(marks_map, sigma)
+
+for i in range(1, len(route.route)):
+    boat_simu.go_to_waypoint(route.route[i], marks_map, sigma, fix_period)
+
+
+#boat_simu.run(0.01)
+#boat_simu.update_3lop_fix(marks_map, sigma)
 plt.show()
 # %%
