@@ -35,12 +35,16 @@ class BoatSimu:
         self.boat_true.plot_boat("True boat")
         self.boat_estimate.plot_boat("Estimated boat")
 
-    def compute_position_3lop(self, mark1, mark2, mark3):
+    def compute_position_3lop(self, mark1, mark2, mark3, show_lop):
         """ Comput fix position with triangulation of 3 Lines Of Position (LOP) """
         sigma = np.pi/90 # 2 degree
         mark1.compute_bearing(self.boat_true,sigma)
         mark2.compute_bearing(self.boat_true,sigma)
         mark3.compute_bearing(self.boat_true,sigma)
+        if show_lop:
+            mark1.plot_mark_bearing(self.boat_true)
+            mark2.plot_mark_bearing(self.boat_true)
+            mark3.plot_mark_bearing(self.boat_true)
         intersection1 = compute_intersection(mark1, mark2)
         intersection2 = compute_intersection(mark2, mark3)
         intersection3 = compute_intersection(mark1, mark3)
@@ -74,9 +78,7 @@ class BoatSimu:
         inter4 = compute_intersection(mark1_down,mark2_up)
 
         plt.plot( (inter1[0], inter2[0], inter3[0], inter4[0], inter1[0]),
-                (inter1[1], inter2[1], inter3[1], inter4[1],  inter1[1]),'k')
-        plt.fill( (inter1[0], inter2[0], inter3[0], inter4[0], inter1[0]),
-                (inter1[1], inter2[1], inter3[1], inter4[1],  inter1[1]),'g',label="position area")
+                (inter1[1], inter2[1], inter3[1], inter4[1],  inter1[1]),'g')
         
         barycentre = (inter1 + inter2 + inter3 + inter4)/4
         self.boat_estimate.set_position(barycentre)
@@ -111,20 +113,26 @@ class BoatSimu:
         nearest_marks = marks_map.select_near_fixed_marks(6)
         for mark in nearest_marks:
             mark.compute_bearing(self.boat_true, sigma)
-        markA, markB, markC = get_best_marks(nearest_marks)
-        self.compute_position_3lop(markA, markB, markC)
+        markA, markB, markC = get_3best_marks120(nearest_marks)
+        self.compute_position_3lop(markA, markB, markC, show_lop=False)
         self.plot_boat()
-        #markA.plot_mark_bearing(self.boat_true)
-        #markB.plot_mark_bearing(self.boat_true)
-        #markC.plot_mark_bearing(self.boat_true)
+        
+    def update_2lop_fix(self, marks_map, sigma) -> None:
+        marks_map.compute_fixed_mark_disance(self.boat_estimate)
+        nearest_marks = marks_map.select_near_fixed_marks(6)
+        for mark in nearest_marks:
+            mark.compute_bearing(self.boat_true, sigma)
+        markA, markB = get_2best_marks90(nearest_marks)
+        self.compute_position_2lop(markA, markB, show_lop=False)
+        self.plot_boat()
     
     def run(self,duration : float):
         self.boat_estimate.run(duration)
         self.boat_true.run(duration)
         
-    def set_course(self, position:list[float, float]):
-        self.boat_estimate.set_course(position)
-        self.boat_true.set_course(position)
+    def set_waypoint_course(self, position:list[float, float]):
+        self.boat_estimate.set_waypoint_course(position)
+        self.boat_true.set_waypoint_course(position)
         
     def compute_waypoint_distance(self, waypoint:Waypoint) -> None:
         self.boat_estimate.compute_waypoint_distance(waypoint)
@@ -132,10 +140,12 @@ class BoatSimu:
         
     def go_to_waypoint(self, waypoint:Waypoint, marks_map, sigma, fix_period):
         self.compute_waypoint_distance(waypoint)
-        while self.boat_true.waypoint_distance > self.boat_true.speed * fix_period:
-            self.set_course(waypoint.position)
+        while self.boat_estimate.waypoint_distance > self.boat_estimate.speed * fix_period:
+        #while self.boat_true.waypoint_distance > self.boat_true.speed * fix_period:
+            self.set_waypoint_course(waypoint.position)
             self.run(fix_period)
             self.update_3lop_fix(marks_map, sigma)
+            #self.update_2lop_fix(marks_map, sigma)
             self.compute_waypoint_distance(waypoint)
 
 
@@ -180,7 +190,7 @@ class Boat:
         """ Set boat with new position """
         self.position = position
         
-    def set_course(self, position :list[float, float]) -> None:
+    def set_waypoint_course(self, position :list[float, float]) -> None:
         """ give course to go to position """
         vector_x = position[0] - self.position[0]
         vector_y = position[1] - self.position[1]
@@ -188,8 +198,28 @@ class Boat:
 
     def compute_waypoint_distance(self, waypoint:Waypoint) -> float:
         self.waypoint_distance = math.dist(self.position, waypoint.position)
+        
+    def get_1best_mark90(self, mark_table):
+        """ return the mark that is the closet to an 90 degree angle to boat course """
+        bearing_table = np.zeros((len(mark_table),1),dtype=float)
+        for i, amer in enumerate(mark_table):
+            amer.compute_bearing(self, 0)
+            bearing_table[i]=amer.bearing
+
+        bearing_table = self.course - bearing_table
+
+        cost_table = bearing_table % (2*np.pi)
+        cost_table2 = - bearing_table % (2*np.pi)
+        cost_table = np.minimum(cost_table,cost_table2)
+        cost_table = cost_table - np.pi/2
+        cost_table = abs(cost_table)
+
+        index_min = np.array(cost_table).argmin()
+
+        best_mark = mark_table[index_min.item()]
+        return best_mark
     
-    
+
 class Mark:
     """ Mark class, including landmarks and Seamarks """
     def __init__(self,position :list[float, float], mark_type = 'lighthouse',  top_mark_type = None,
@@ -340,7 +370,7 @@ def legend_unique():
     by_label = dict(zip(labels, handles))
     plt.legend(by_label.values(), by_label.keys())
 
-def get_best_marks(mark_table) -> list[Mark, Mark, Mark]:
+def get_3best_marks120(mark_table) -> tuple():
     """ Get the three best mark from a set of mark"""
     mark_table_size = len(mark_table)
     bearing_table = np.zeros((mark_table_size ,mark_table_size ))
@@ -371,29 +401,35 @@ def get_best_marks(mark_table) -> list[Mark, Mark, Mark]:
 
     mark_index = comb[index_min]
 
-    return(mark_table[mark_index[0]], mark_table[mark_index[1]], mark_table[mark_index[2]])
+    return mark_table[mark_index[0]], mark_table[mark_index[1]], mark_table[mark_index[2]]
 
+def get_2best_marks90(mark_table) -> tuple():
+    """ Get the three best mark from a set of mark"""
+    mark_table_size = len(mark_table)
+    bearing_table = np.zeros((mark_table_size ,mark_table_size ))
+    cost_table= np.zeros((mark_table_size ,mark_table_size ))
+    cost_table2= np.zeros((mark_table_size ,mark_table_size ))
 
-def get_best_mark90(boat : Boat, mark_table):
-    """ return the mark that is the closet to an 90 degree angle to boat course """
-    bearing_table = np.zeros((len(mark_table),1),dtype=float)
-    for i, amer in enumerate(mark_table):
-        amer.compute_bearing(boat, 0)
-        bearing_table[i]=amer.bearing
-
-    bearing_table = boat.course - bearing_table
-
-    cost_table = bearing_table % (2*np.pi)
-    cost_table2 = - bearing_table % (2*np.pi)
+    for i , mark_i in enumerate(mark_table):
+        for j, mark_j in enumerate(mark_table):
+            bearing_table[i][j] = np.rad2deg(mark_j.bearing - mark_i.bearing)
+    cost_table = bearing_table % 360
+    cost_table2 = - bearing_table % 360
     cost_table = np.minimum(cost_table,cost_table2)
-    cost_table = cost_table - np.pi/2
+    cost_table = cost_table - 90
     cost_table = abs(cost_table)
+    comb = list(combinations(range(mark_table_size),2))
 
-    index_min = np.array(cost_table).argmin()
+    min_cost = 1000.0
+    index_min = 0
+    for i, comb_i in enumerate(comb):
+        cost = cost_table[comb_i[0]][comb_i[1]]
+        if cost < min_cost:
+            min_cost = cost
+            index_min = i
 
-    best_mark = mark_table[index_min.item()]
-    return best_mark
-
+    mark_index = comb[index_min]
+    return mark_table[mark_index[0]], mark_table[mark_index[1]]
 
 
 
@@ -414,7 +450,7 @@ def main():
     mark2.plot_mark()
     mark3.plot_mark()
 
-    boat_simu.compute_position_3lop(mark1,mark2,mark3)
+    boat_simu.compute_position_3lop(mark1, mark2, mark3, show_lop=True)
     boat_simu.plot_boat()
 
     mark1.plot_mark_bearing(boat_simu.boat_true)
