@@ -17,7 +17,7 @@ class FixType(Enum):
     
 class Waypoint:
     """ create a waypoint object """
-    def __init__(self, position :list[float, float], waypoint_number = None):
+    def __init__(self, position :list[float, float], waypoint_number: int = None):
         self.position = position
         self.waypoint_number = waypoint_number
         
@@ -29,7 +29,7 @@ class Waypoint:
 
 class Boat:
     """ Boat class """
-    def __init__(self, position :list[float, float], course = None, speed = None, waypoint_distance = None, color ='b'):
+    def __init__(self, position :list[float, float], course:float = None, speed:float = None, waypoint_distance:float = None, color ='b'):
         self.position = position
         self.speed = speed
         self.course = course
@@ -43,7 +43,7 @@ class Boat:
                   self.speed * np.cos(self.course),
                   head_width = 10)
 
-    def run(self,duration):
+    def run(self,duration:float):
         """ Run with speed for a duration """
         self.position[0] += self.speed * duration * np.sin(self.course)
         self.position[1] += self.speed * duration * np.cos(self.course)
@@ -52,7 +52,7 @@ class Boat:
         """ Plot position """
         plt.plot(self.position[0], self.position[1], '^b', markerfacecolor='none', label='Boat position')
 
-    def plot_boat(self,label = None):
+    def plot_boat(self):
         """ plot with a boat marker in the direction of the course """
         vertices = [(-2, 1), (1, 2), (3, 0), (1, -2), (-2, -1), (-2, 1)]
         codes = [1,3,2,3,1,79]
@@ -62,7 +62,7 @@ class Boat:
             boat_marker = boat_marker.transformed(transforms.Affine2D().rotate(-angle))
         plt.plot(self.position[0], self.position[1], marker=boat_marker,
             markersize=10, color=self.color,  markerfacecolor='none',
-            linestyle = 'None', label=label)
+            linestyle = 'None')
 
     def set_position(self,position : list[float, float]) -> None:
         """ Set boat with new position """
@@ -77,15 +77,13 @@ class Boat:
     def compute_waypoint_distance(self, waypoint:Waypoint) -> float:
         self.waypoint_distance = math.dist(self.position, waypoint.position)
         
-    def get_1best_mark90(self, mark_table):
+    def get_1best_mark90(self, mark_table:'MarksMap'):
         """ return the mark that is the closet to an 90 degree angle to boat course """
         bearing_table = np.zeros((len(mark_table),1),dtype=float)
         for i, amer in enumerate(mark_table):
             amer.compute_bearing(self, 0)
             bearing_table[i]=amer.bearing
-
         bearing_table = self.course - bearing_table
-
         cost_table = bearing_table % (2*np.pi)
         cost_table2 = - bearing_table % (2*np.pi)
         cost_table = np.minimum(cost_table,cost_table2)
@@ -108,7 +106,7 @@ class Boat:
 class Mark:
     """ Mark class, including landmarks and Seamarks """
     def __init__(self,position :list[float, float], mark_type = 'lighthouse',  top_mark_type = None,
-                 light_color = None, name = None, floating:bool=False, show_top_mark=True, bearing = None, distance = None):
+                 light_color = None, name = None, floating:bool=False, show_top_mark:bool=True, bearing = None, distance = None):
         self.position = position
         self.mark_type = mark_type.lower()
         self.top_mark_type = top_mark_type
@@ -130,7 +128,7 @@ class Mark:
         y_line = x_line * 1/np.tan(self.bearing) + self.position[1] - self.position[0] *  1/np.tan(self.bearing)
         plt.plot(x_line, y_line, '--k', linewidth=0.5, label = "Line of Position (LoP)")
 
-    def compute_bearing(self, boat:Boat, sigma):
+    def compute_bearing(self, boat:Boat, sigma: float):
         """ compute Bearing angle of a mark from the point of vie of the Boat """
         vector_x = self.position[0] - boat.position[0]
         vector_y = self.position[1] - boat.position[1]
@@ -164,7 +162,7 @@ class MarksMap:
         for mark in self.map_marks:
             mark.plot_mark()
 
-    def marks_csv(self, csv_adress):
+    def marks_csv(self, csv_adress: str):
         """ Construct route from csv file"""
         marks_df = pd.read_csv(csv_adress, comment='#')
         marks_df = marks_df.replace('None',None)
@@ -207,8 +205,8 @@ class BoatSimu:
 
     def plot_boat(self) ->None:
         " plot boat true and boat estimate"
-        self.boat_true.plot_boat("True boat")
-        self.boat_estimate.plot_boat("Estimated boat")
+        self.boat_true.plot_boat()
+        self.boat_estimate.plot_boat()
 
     def compute_position_3lop(self, mark1, mark2, mark3, show_lop):
         """ Comput fix position with triangulation of 3 Lines Of Position (LOP) """
@@ -231,7 +229,7 @@ class BoatSimu:
         self.boat_estimate.set_position(barycentre)
         return barycentre
 
-    def compute_position_2lop(self, mark1_up, mark2_up, show_lop):
+    def compute_position_2lop(self, mark1_up:Mark, mark2_up:Mark, show_lop:bool):
         """ Compute estimated position with 2 LOP"""
         mark1_down = Mark(mark1_up.position)
         mark2_down = Mark(mark2_up.position)
@@ -259,7 +257,7 @@ class BoatSimu:
         self.boat_estimate.set_position(barycentre)
         return barycentre
     
-    def run_fix(self, mark, fix_period, sigma):
+    def run_fix(self, mark:Mark, fix_period:float, sigma:float):
         """ Run fix: get position from 1 mark and speed """
         mark.compute_bearing(self.boat_true, sigma)
         save_bearing = mark.bearing
@@ -280,15 +278,15 @@ class BoatSimu:
         self.boat_estimate.set_position(estimate)
         return estimate
     
-    def update_3lop_fix(self, nearest_marks) -> None:
+    def update_3lop_fix(self, nearest_marks: Mark) -> None:
         markA, markB, markC = get_3best_marks120(nearest_marks)
         self.compute_position_3lop(markA, markB, markC, show_lop=False)
         
-    def update_2lop_fix(self, nearest_marks) -> None:
+    def update_2lop_fix(self, nearest_marks: Mark) -> None:
         markA, markB = get_2best_marks90(nearest_marks)
         self.compute_position_2lop(markA, markB, show_lop=False)
     
-    def update_run_fix(self, nearest_marks, fix_period, sigma) -> None:
+    def update_run_fix(self, nearest_marks: Mark, fix_period: float, sigma: float) -> None:
         best_mark = self.boat_true.get_1best_mark90(nearest_marks)
         self.run_fix(best_mark, fix_period, sigma)
     
@@ -296,7 +294,7 @@ class BoatSimu:
         self.boat_estimate.run(duration)
         self.boat_true.run(duration)
         
-    def set_waypoint_course(self, position:list[float, float]):
+    def set_waypoint_course(self, position: list[float, float]):
         self.boat_estimate.set_waypoint_course(position)
         self.boat_true.set_waypoint_course(position)
         
@@ -304,7 +302,7 @@ class BoatSimu:
         self.boat_estimate.compute_waypoint_distance(waypoint)
         self.boat_true.compute_waypoint_distance(waypoint)
         
-    def select_near_fixed_marks(self, marks_map, sigma, number_of_marks):
+    def select_near_fixed_marks(self, marks_map:MarksMap, sigma: float, number_of_marks: int):
         marks_map.compute_fixed_mark_disance(self.boat_estimate)
         nearest_marks = marks_map.select_near_fixed_marks(number_of_marks)
         for mark in nearest_marks:
@@ -392,7 +390,7 @@ def legend_unique():
     by_label = dict(zip(labels, handles))
     plt.legend(by_label.values(), by_label.keys())
 
-def get_3best_marks120(mark_table) -> tuple():
+def get_3best_marks120(mark_table:MarksMap) -> tuple():
     """ Get the three best mark from a set of mark"""
     mark_table_size = len(mark_table)
     bearing_table = np.zeros((mark_table_size ,mark_table_size ))
@@ -425,7 +423,7 @@ def get_3best_marks120(mark_table) -> tuple():
 
     return mark_table[mark_index[0]], mark_table[mark_index[1]], mark_table[mark_index[2]]
 
-def get_2best_marks90(mark_table) -> tuple():
+def get_2best_marks90(mark_table:MarksMap) -> tuple():
     """ Get the three best mark from a set of mark"""
     mark_table_size = len(mark_table)
     bearing_table = np.zeros((mark_table_size ,mark_table_size ))
