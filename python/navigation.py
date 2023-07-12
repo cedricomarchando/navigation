@@ -7,8 +7,14 @@ from matplotlib.path import Path # For marker construction
 import nautical_marker as  marker
 import pandas as pd
 import math
+from enum import Enum, auto
 
-
+class FixType(Enum):
+    FIX_3LOP = auto()
+    FIX_2LOP = auto()
+    FIX_RUNNING = auto()
+    
+    
 class Waypoint:
     """ create a waypoint object """
     def __init__(self, position :list[float, float], waypoint_number = None):
@@ -20,6 +26,175 @@ class Waypoint:
         
     def __str__(self):
         return f' x={self.position[0]}, y={self.position[1]}, waypoint_id={self.waypoint_number}\n'
+
+class Boat:
+    """ Boat class """
+    def __init__(self, position :list[float, float], course = None, speed = None, waypoint_distance = None, color ='b'):
+        self.position = position
+        self.speed = speed
+        self.course = course
+        self.color = color
+        self.waypoint_distance = waypoint_distance
+
+    def plot_speed(self):
+        """ Show speed with direction of course"""
+        plt.arrow(self.position[0], self.position[1],
+                  self.speed * np.sin(self.course),
+                  self.speed * np.cos(self.course),
+                  head_width = 10)
+
+    def run(self,duration):
+        """ Run with speed for a duration """
+        self.position[0] += self.speed * duration * np.sin(self.course)
+        self.position[1] += self.speed * duration * np.cos(self.course)
+
+    def plot_position(self):
+        """ Plot position """
+        plt.plot(self.position[0], self.position[1], '^b', markerfacecolor='none', label='Boat position')
+
+    def plot_boat(self,label = None):
+        """ plot with a boat marker in the direction of the course """
+        vertices = [(-2, 1), (1, 2), (3, 0), (1, -2), (-2, -1), (-2, 1)]
+        codes = [1,3,2,3,1,79]
+        boat_marker = Path(vertices,codes)
+        if self.course is not None:
+            angle = self.course - np.pi/2
+            boat_marker = boat_marker.transformed(transforms.Affine2D().rotate(-angle))
+        plt.plot(self.position[0], self.position[1], marker=boat_marker,
+            markersize=10, color=self.color,  markerfacecolor='none',
+            linestyle = 'None', label=label)
+
+    def set_position(self,position : list[float, float]) -> None:
+        """ Set boat with new position """
+        self.position = position
+        
+    def set_waypoint_course(self, position :list[float, float]) -> None:
+        """ give course to go to position """
+        vector_x = position[0] - self.position[0]
+        vector_y = position[1] - self.position[1]
+        self.course = np.arctan2(vector_x, vector_y)
+
+    def compute_waypoint_distance(self, waypoint:Waypoint) -> float:
+        self.waypoint_distance = math.dist(self.position, waypoint.position)
+        
+    def get_1best_mark90(self, mark_table):
+        """ return the mark that is the closet to an 90 degree angle to boat course """
+        bearing_table = np.zeros((len(mark_table),1),dtype=float)
+        for i, amer in enumerate(mark_table):
+            amer.compute_bearing(self, 0)
+            bearing_table[i]=amer.bearing
+
+        bearing_table = self.course - bearing_table
+
+        cost_table = bearing_table % (2*np.pi)
+        cost_table2 = - bearing_table % (2*np.pi)
+        cost_table = np.minimum(cost_table,cost_table2)
+        cost_table = cost_table - np.pi/2
+        cost_table = abs(cost_table)
+
+        index_min = np.array(cost_table).argmin()
+
+        best_mark = mark_table[index_min.item()]
+        return best_mark
+    
+    def __str__(self):
+        return (f' x={self.position[0]}, y={self.position[1]}, speed={self.speed},'
+                f' course={self.course}, waypoint_disatance={self.waypoint_distance} \n')
+
+
+
+
+
+class Mark:
+    """ Mark class, including landmarks and Seamarks """
+    def __init__(self,position :list[float, float], mark_type = 'lighthouse',  top_mark_type = None,
+                 light_color = None, name = None, floating:bool=False, show_top_mark=True, bearing = None, distance = None):
+        self.position = position
+        self.mark_type = mark_type.lower()
+        self.top_mark_type = top_mark_type
+        self.light_color = light_color
+        self.name = name
+        self.floating = floating
+        self.show_top_mark = show_top_mark
+        self.bearing = bearing
+        self.distance = distance
+
+    def plot_mark(self):
+        """ Plot position"""
+        marker.PlotMark( self.position[0], self.position[1], self.mark_type, self.top_mark_type,
+                        self.light_color, self.name, self.floating, self.show_top_mark  )
+
+    def plot_mark_bearing(self, boat:Boat):
+        """ Plot LOP of a mark with dotted line"""
+        x_line = np.linspace(self.position[0],boat.position[0],10)
+        y_line = x_line * 1/np.tan(self.bearing) + self.position[1] - self.position[0] *  1/np.tan(self.bearing)
+        plt.plot(x_line, y_line, '--k', linewidth=0.5, label = "Line of Position (LoP)")
+
+    def compute_bearing(self, boat:Boat, sigma):
+        """ compute Bearing angle of a mark from the point of vie of the Boat """
+        vector_x = self.position[0] - boat.position[0]
+        vector_y = self.position[1] - boat.position[1]
+        bearing = np.arctan2(vector_x, vector_y)
+        # bearing = bearing + random.normalvariate(mu=0.0,sigma = sigma)
+        self.bearing = bearing + sigma
+    
+    def compute_distance(self, boat:Boat):
+        distance = math.dist(self.position, boat.position)
+        self.distance = distance
+    
+    def __str__(self):
+        return (f' x={self.position[0]}, y={self.position[1]}, mark_type={self.mark_type}, top_mark={self.top_mark_type},'
+                f'name={self.name}, floating={self.floating}, bearing={self.bearing}, distance={self.distance}\n')
+
+
+class MarksMap:
+    """ Build map with all marks"""
+    def __init__(self):
+        self.map_marks = []
+        self.fixed_marks = []
+    
+    def append_mark(self, mark:Mark):
+        self.map_marks.append(mark)
+        if mark.mark_type in marker.LANDMARKS_SET:
+            self.fixed_marks.append(mark)
+        if (mark.mark_type in marker.SEAMARK_SET) and (mark.floating is None):
+            self.fixed_marks.append(mark)
+        
+    def plot_map(self):
+        for mark in self.map_marks:
+            mark.plot_mark()
+
+    def marks_csv(self, csv_adress):
+        """ Construct route from csv file"""
+        marks_df = pd.read_csv(csv_adress, comment='#')
+        marks_df = marks_df.replace('None',None)
+        marks_df = marks_df.replace(np.nan,None)
+        for i in range(len(marks_df)):
+            mark_data = marks_df.loc[i]
+            mark = Mark([float(mark_data[0]),float(mark_data[1])], mark_data[2], mark_data[3],
+                    mark_data[4], mark_data[5], mark_data[6], mark_data[7])
+            self.append_mark(mark)
+                
+    def compute_fixed_mark_disance(self, boat:Boat):
+        for mark in self.fixed_marks:
+            mark.compute_distance(boat)
+            
+    def sort_fixed_mark_distance(self):
+        self.fixed_marks.sort(key=lambda x: x.distance)
+        
+    def select_near_fixed_marks(self, number: int):
+        self.sort_fixed_mark_distance()
+        best_marks = self.fixed_marks[0:number]
+        return best_marks
+        
+    def __str__(self):
+        map = ' '
+        for mark in self.fixed_marks:
+            map = map + mark.__str__()
+        return map
+
+
+
 
 
 class BoatSimu:
@@ -136,184 +311,25 @@ class BoatSimu:
             mark.compute_bearing(self.boat_true, sigma)
         return nearest_marks
         
-    def go_to_waypoint(self, waypoint:Waypoint, marks_map, sigma, fix_period):
+    def go_to_waypoint(self, waypoint:Waypoint, marks_map:MarksMap, sigma:float, fix_period:float, fix_type:FixType):
         self.compute_waypoint_distance(waypoint)
         #while self.boat_estimate.waypoint_distance > self.boat_estimate.speed * fix_period:
         while self.boat_true.waypoint_distance > self.boat_true.speed * fix_period:
             self.set_waypoint_course(waypoint.position)
             
             nearest_marks = self.select_near_fixed_marks(marks_map, sigma, 6)
-            
-            self.run(fix_period)
-            self.update_3lop_fix(nearest_marks)
-            #self.update_2lop_fix(nearest_marks)
-            #self.update_run_fix(nearest_marks, fix_period, sigma)
+            match fix_type:
+                case FixType.FIX_2LOP:
+                    self.run(fix_period)
+                    self.update_2lop_fix(nearest_marks)
+                case FixType.FIX_3LOP:
+                    self.run(fix_period)
+                    self.update_3lop_fix(nearest_marks)
+                case FixType.FIX_RUNNING:
+                    self.update_run_fix(nearest_marks, fix_period, sigma)
+                    
             self.plot_boat()
             self.compute_waypoint_distance(waypoint)
-
-
-class Boat:
-    """ Boat class """
-    def __init__(self, position :list[float, float], course = None, speed = None, waypoint_distance = None, color ='b'):
-        self.position = position
-        self.speed = speed
-        self.course = course
-        self.color = color
-        self.waypoint_distance = waypoint_distance
-
-    def plot_speed(self):
-        """ Show speed with direction of course"""
-        plt.arrow(self.position[0], self.position[1],
-                  self.speed * np.sin(self.course),
-                  self.speed * np.cos(self.course),
-                  head_width = 10)
-
-    def run(self,duration):
-        """ Run with speed for a duration """
-        self.position[0] += self.speed * duration * np.sin(self.course)
-        self.position[1] += self.speed * duration * np.cos(self.course)
-
-    def plot_position(self):
-        """ Plot position """
-        plt.plot(self.position[0], self.position[1], '^b', markerfacecolor='none', label='Boat position')
-
-    def plot_boat(self,label = None):
-        """ plot with a boat marker in the direction of the course """
-        vertices = [(-2, 1), (1, 2), (3, 0), (1, -2), (-2, -1), (-2, 1)]
-        codes = [1,3,2,3,1,79]
-        boat_marker = Path(vertices,codes)
-        if self.course is not None:
-            angle = self.course - np.pi/2
-            boat_marker = boat_marker.transformed(transforms.Affine2D().rotate(-angle))
-        plt.plot(self.position[0], self.position[1], marker=boat_marker,
-            markersize=10, color=self.color,  markerfacecolor='none',
-            linestyle = 'None', label=label)
-
-    def set_position(self,position : list[float, float]) -> None:
-        """ Set boat with new position """
-        self.position = position
-        
-    def set_waypoint_course(self, position :list[float, float]) -> None:
-        """ give course to go to position """
-        vector_x = position[0] - self.position[0]
-        vector_y = position[1] - self.position[1]
-        self.course = np.arctan2(vector_x, vector_y)
-
-    def compute_waypoint_distance(self, waypoint:Waypoint) -> float:
-        self.waypoint_distance = math.dist(self.position, waypoint.position)
-        
-    def get_1best_mark90(self, mark_table):
-        """ return the mark that is the closet to an 90 degree angle to boat course """
-        bearing_table = np.zeros((len(mark_table),1),dtype=float)
-        for i, amer in enumerate(mark_table):
-            amer.compute_bearing(self, 0)
-            bearing_table[i]=amer.bearing
-
-        bearing_table = self.course - bearing_table
-
-        cost_table = bearing_table % (2*np.pi)
-        cost_table2 = - bearing_table % (2*np.pi)
-        cost_table = np.minimum(cost_table,cost_table2)
-        cost_table = cost_table - np.pi/2
-        cost_table = abs(cost_table)
-
-        index_min = np.array(cost_table).argmin()
-
-        best_mark = mark_table[index_min.item()]
-        return best_mark
-    
-    def __str__(self):
-        return (f' x={self.position[0]}, y={self.position[1]}, speed={self.speed},'
-                f' course={self.course}, waypoint_disatance={self.waypoint_distance} \n')
-
-class Mark:
-    """ Mark class, including landmarks and Seamarks """
-    def __init__(self,position :list[float, float], mark_type = 'lighthouse',  top_mark_type = None,
-                 light_color = None, name = None, floating:bool=False, show_top_mark=True, bearing = None, distance = None):
-        self.position = position
-        self.mark_type = mark_type.lower()
-        self.top_mark_type = top_mark_type
-        self.light_color = light_color
-        self.name = name
-        self.floating = floating
-        self.show_top_mark = show_top_mark
-        self.bearing = bearing
-        self.distance = distance
-
-    def plot_mark(self):
-        """ Plot position"""
-        marker.PlotMark( self.position[0], self.position[1], self.mark_type, self.top_mark_type,
-                        self.light_color, self.name, self.floating, self.show_top_mark  )
-
-    def plot_mark_bearing(self, boat:Boat):
-        """ Plot LOP of a mark with dotted line"""
-        x_line = np.linspace(self.position[0],boat.position[0],10)
-        y_line = x_line * 1/np.tan(self.bearing) + self.position[1] - self.position[0] *  1/np.tan(self.bearing)
-        plt.plot(x_line, y_line, '--k', linewidth=0.5, label = "Line of Position (LoP)")
-
-    def compute_bearing(self, boat:Boat, sigma):
-        """ compute Bearing angle of a mark from the point of vie of the Boat """
-        vector_x = self.position[0] - boat.position[0]
-        vector_y = self.position[1] - boat.position[1]
-        bearing = np.arctan2(vector_x, vector_y)
-        # bearing = bearing + random.normalvariate(mu=0.0,sigma = sigma)
-        self.bearing = bearing + sigma
-    
-    def compute_distance(self, boat:Boat):
-        distance = math.dist(self.position, boat.position)
-        self.distance = distance
-    
-    def __str__(self):
-        return (f' x={self.position[0]}, y={self.position[1]}, mark_type={self.mark_type}, top_mark={self.top_mark_type},'
-                f'name={self.name}, floating={self.floating}, bearing={self.bearing}, distance={self.distance}\n')
-
-
-class MarksMap:
-    """ Build map with all marks"""
-    def __init__(self):
-        self.map_marks = []
-        self.fixed_marks = []
-    
-    def append_mark(self, mark:Mark):
-        self.map_marks.append(mark)
-        if mark.mark_type in marker.LANDMARKS_SET:
-            self.fixed_marks.append(mark)
-        if (mark.mark_type in marker.SEAMARK_SET) and (mark.floating is None):
-            self.fixed_marks.append(mark)
-        
-    def plot_map(self):
-        for mark in self.map_marks:
-            mark.plot_mark()
-
-    def marks_csv(self, csv_adress):
-        """ Construct route from csv file"""
-        marks_df = pd.read_csv(csv_adress, comment='#')
-        marks_df = marks_df.replace('None',None)
-        marks_df = marks_df.replace(np.nan,None)
-        for i in range(len(marks_df)):
-            mark_data = marks_df.loc[i]
-            mark = Mark([float(mark_data[0]),float(mark_data[1])], mark_data[2], mark_data[3],
-                    mark_data[4], mark_data[5], mark_data[6], mark_data[7])
-            self.append_mark(mark)
-                
-    def compute_fixed_mark_disance(self, boat:Boat):
-        for mark in self.fixed_marks:
-            mark.compute_distance(boat)
-            
-    def sort_fixed_mark_distance(self):
-        self.fixed_marks.sort(key=lambda x: x.distance)
-        
-    def select_near_fixed_marks(self, number: int):
-        self.sort_fixed_mark_distance()
-        best_marks = self.fixed_marks[0:number]
-        return best_marks
-        
-    def __str__(self):
-        map = ' '
-        for mark in self.fixed_marks:
-            map = map + mark.__str__()
-        return map
-
 
 
 
