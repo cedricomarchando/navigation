@@ -84,47 +84,38 @@ class BoatSimu:
         self.boat_estimate.set_position(barycentre)
         return barycentre
     
-    def run_fix(self, mark, duration, sigma):
+    def run_fix(self, mark, fix_period, sigma):
         """ Run fix: get position from 1 mark and speed """
         mark.compute_bearing(self.boat_true, sigma)
         save_bearing = mark.bearing
         # compute updated bearing after running
-        self.boat_true.run(duration)
+        self.run(fix_period)
         mark.compute_bearing(self.boat_true, sigma)
         mark.plot_mark_bearing(self.boat_true)
         # run mark in the direction of the boat
-        duration = 1
         mark_tmp = Mark(
-            [mark.position[0] + self.boat_estimate.speed * duration * np.sin(self.boat_estimate.course),
-            mark.position[1] + self.boat_estimate.speed * duration * np.cos(self.boat_estimate.course)],
+            [mark.position[0] + self.boat_estimate.speed * fix_period * np.sin(self.boat_estimate.course),
+            mark.position[1] + self.boat_estimate.speed * fix_period * np.cos(self.boat_estimate.course)],
             bearing = save_bearing
             )
         plt.plot(mark_tmp.position[0], mark_tmp.position[1],'+k', label ="mark shifted")
-
         mark_tmp.plot_mark_bearing(self.boat_true)
-
         estimate = compute_intersection(mark,mark_tmp)
         del mark_tmp
         self.boat_estimate.set_position(estimate)
         return estimate
     
-    def update_3lop_fix(self, marks_map, sigma) -> None:
-        marks_map.compute_fixed_mark_disance(self.boat_estimate)
-        nearest_marks = marks_map.select_near_fixed_marks(6)
-        for mark in nearest_marks:
-            mark.compute_bearing(self.boat_true, sigma)
+    def update_3lop_fix(self, nearest_marks) -> None:
         markA, markB, markC = get_3best_marks120(nearest_marks)
         self.compute_position_3lop(markA, markB, markC, show_lop=False)
-        self.plot_boat()
         
-    def update_2lop_fix(self, marks_map, sigma) -> None:
-        marks_map.compute_fixed_mark_disance(self.boat_estimate)
-        nearest_marks = marks_map.select_near_fixed_marks(6)
-        for mark in nearest_marks:
-            mark.compute_bearing(self.boat_true, sigma)
+    def update_2lop_fix(self, nearest_marks) -> None:
         markA, markB = get_2best_marks90(nearest_marks)
         self.compute_position_2lop(markA, markB, show_lop=False)
-        self.plot_boat()
+    
+    def update_run_fix(self, nearest_marks, fix_period, sigma) -> None:
+        best_mark = self.boat_true.get_1best_mark90(nearest_marks)
+        self.run_fix(best_mark, fix_period, sigma)
     
     def run(self,duration : float):
         self.boat_estimate.run(duration)
@@ -138,14 +129,26 @@ class BoatSimu:
         self.boat_estimate.compute_waypoint_distance(waypoint)
         self.boat_true.compute_waypoint_distance(waypoint)
         
+    def select_near_fixed_marks(self, marks_map, sigma, number_of_marks):
+        marks_map.compute_fixed_mark_disance(self.boat_estimate)
+        nearest_marks = marks_map.select_near_fixed_marks(number_of_marks)
+        for mark in nearest_marks:
+            mark.compute_bearing(self.boat_true, sigma)
+        return nearest_marks
+        
     def go_to_waypoint(self, waypoint:Waypoint, marks_map, sigma, fix_period):
         self.compute_waypoint_distance(waypoint)
-        while self.boat_estimate.waypoint_distance > self.boat_estimate.speed * fix_period:
-        #while self.boat_true.waypoint_distance > self.boat_true.speed * fix_period:
+        #while self.boat_estimate.waypoint_distance > self.boat_estimate.speed * fix_period:
+        while self.boat_true.waypoint_distance > self.boat_true.speed * fix_period:
             self.set_waypoint_course(waypoint.position)
+            
+            nearest_marks = self.select_near_fixed_marks(marks_map, sigma, 6)
+            
             self.run(fix_period)
-            self.update_3lop_fix(marks_map, sigma)
-            #self.update_2lop_fix(marks_map, sigma)
+            self.update_3lop_fix(nearest_marks)
+            #self.update_2lop_fix(nearest_marks)
+            #self.update_run_fix(nearest_marks, fix_period, sigma)
+            self.plot_boat()
             self.compute_waypoint_distance(waypoint)
 
 
@@ -219,6 +222,9 @@ class Boat:
         best_mark = mark_table[index_min.item()]
         return best_mark
     
+    def __str__(self):
+        return (f' x={self.position[0]}, y={self.position[1]}, speed={self.speed},'
+                f' course={self.course}, waypoint_disatance={self.waypoint_distance} \n')
 
 class Mark:
     """ Mark class, including landmarks and Seamarks """
@@ -259,7 +265,7 @@ class Mark:
     
     def __str__(self):
         return (f' x={self.position[0]}, y={self.position[1]}, mark_type={self.mark_type}, top_mark={self.top_mark_type},'
-                f'name={self.name}, floating={self.floating}, distance={self.distance}\n')
+                f'name={self.name}, floating={self.floating}, bearing={self.bearing}, distance={self.distance}\n')
 
 
 class MarksMap:
