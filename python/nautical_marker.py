@@ -2,6 +2,7 @@
 import matplotlib.pyplot as plt
 from matplotlib.path import Path
 import matplotlib.transforms as transforms
+from enum import Enum, auto
 
 
 LANDMARKS_SET : set[str] = {'lighthouse', 'major_lighthouse', 'light_tower', 'land_tower', 'water_tower', 'church'}
@@ -13,6 +14,20 @@ TOPMARKS_SET : set[str] = {'green', 'green_bis', 'red', 'red_bis', 'north', 'sou
                 'danger', 'special', 'safe_water', 'emergency'}
 
 MARKS_LIST : set[str] = LANDMARKS_SET | DANGERS_SET | SEAMARK_SET | HARBOURS_SET
+
+class TopMark(Enum):
+    GREEN = auto()
+    GREEN_BIS = auto()
+    RED = auto()
+    RED_BIS = auto()
+    NORTH = auto()
+    SOUTH = auto()
+    EAST = auto()
+    WEST = auto()
+    DANGER = auto()
+    SPECIAL = auto()
+    SAFE_WATER = auto()
+    EMERGENCY = auto()
 
 class PlotMark:
     """ Plot mark """
@@ -655,11 +670,11 @@ def main():
     for j, shape in enumerate(SEAMARK_SET):
         plt.text(1,j*2,shape.capitalize(), horizontalalignment='center')
 
-    for i, topmark in enumerate(TOPMARKS_SET):
-        plt.text(i+2,len(SEAMARK_SET)*2, topmark.capitalize(),
+    for i, topmark in enumerate(TopMark):
+        plt.text(i+2,len(SEAMARK_SET)*2, topmark.name.capitalize(),
                  horizontalalignment='left', rotation = 30)
         for j, shape in enumerate(SEAMARK_SET):
-            sea_mark = PlotMark(i+2, j*2, shape, topmark, floating=False)
+            PlotMark(i+2, j*2, shape, topmark.name, floating=False)
     plt.title('Sea marks as a function of shape and topmark')
     
     
