@@ -279,7 +279,7 @@ class PlotMark:
                     case 'south':
                         shape_marker2 = BuildPath.tower(shape_height/3, width/2, 3*width/8, 0)
                     case 'west':
-                        shape_marker2 = BuildPath.tower(shape_height/3, width/2, width/4, shape_height/4)
+                        shape_marker2 = BuildPath.tower(shape_height/3, 7*width/16, width/4, shape_height/4)
                     case 'safe_water':
                         shape_marker2 = BuildPath.triangle(shape_height/2, shape_height, 0)
                     case 'emergency':
