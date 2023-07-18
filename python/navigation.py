@@ -1,19 +1,20 @@
 # %%
 from itertools import combinations
+from enum import Enum, auto
+import math
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.transforms as transforms
 from matplotlib.path import Path # For marker construction
 import nautical_marker as  marker
 import pandas as pd
-import math
-from enum import Enum, auto
+from shapely.geometry import Polygon
+
 
 class FixType(Enum):
     FIX_3LOP = auto()
     FIX_2LOP = auto()
     FIX_RUNNING = auto()
-    
     
 class Waypoint:
     """ create a waypoint object """
@@ -67,7 +68,7 @@ class Boat:
     def set_position(self,position : list[float, float]) -> None:
         """ Set boat with new position """
         self.position = position
-        
+ 
     def set_waypoint_course(self, position :list[float, float]) -> None:
         """ give course to go to position """
         vector_x = position[0] - self.position[0]
@@ -76,7 +77,7 @@ class Boat:
 
     def compute_waypoint_distance(self, waypoint:Waypoint) -> float:
         self.waypoint_distance = math.dist(self.position, waypoint.position)
-        
+
     def get_1best_mark90(self, mark_table:'MarksMap'):
         """ return the mark that is the closet to an 90 degree angle to boat course """
         bearing_table = np.zeros((len(mark_table),1),dtype=float)
@@ -94,7 +95,7 @@ class Boat:
 
         best_mark = mark_table[index_min.item()]
         return best_mark
-    
+
     def __str__(self):
         return (f' x={self.position[0]}, y={self.position[1]}, speed={self.speed},'
                 f' course={self.course}, waypoint_disatance={self.waypoint_distance} \n')
@@ -135,11 +136,11 @@ class Mark:
         bearing = np.arctan2(vector_x, vector_y)
         # bearing = bearing + random.normalvariate(mu=0.0,sigma = sigma)
         self.bearing = bearing + sigma
-    
+
     def compute_distance(self, boat:Boat):
         distance = math.dist(self.position, boat.position)
         self.distance = distance
-    
+
     def __str__(self):
         return (f' x={self.position[0]}, y={self.position[1]}, mark_type={self.mark_type}, top_mark={self.top_mark_type},'
                 f'name={self.name}, floating={self.floating}, bearing={self.bearing}, distance={self.distance}\n')
@@ -148,16 +149,16 @@ class Mark:
 class MarksMap:
     """ Build map with all marks"""
     def __init__(self):
-        self.map_marks = []
-        self.fixed_marks = []
-    
+        self.map_marks : list[Mark] = []
+        self.fixed_marks : list[Mark] = []
+
     def append_mark(self, mark:Mark):
         self.map_marks.append(mark)
         if mark.mark_type in marker.LANDMARKS_SET:
             self.fixed_marks.append(mark)
         if (mark.mark_type in marker.SEAMARK_SET) and (mark.floating is None):
             self.fixed_marks.append(mark)
-        
+
     def plot_map(self):
         for mark in self.map_marks:
             mark.plot_mark()
@@ -172,19 +173,19 @@ class MarksMap:
             mark = Mark([float(mark_data[0]),float(mark_data[1])], mark_data[2], mark_data[3],
                     mark_data[4], mark_data[5], mark_data[6], mark_data[7])
             self.append_mark(mark)
-                
+     
     def compute_fixed_mark_disance(self, boat:Boat):
         for mark in self.fixed_marks:
             mark.compute_distance(boat)
-            
+
     def sort_fixed_mark_distance(self):
         self.fixed_marks.sort(key=lambda x: x.distance)
-        
+
     def select_near_fixed_marks(self, number: int):
         self.sort_fixed_mark_distance()
         best_marks = self.fixed_marks[0:number]
         return best_marks
-        
+
     def __str__(self):
         map = ' '
         for mark in self.fixed_marks:
@@ -252,11 +253,11 @@ class BoatSimu:
 
         plt.plot( (inter1[0], inter2[0], inter3[0], inter4[0], inter1[0]),
                 (inter1[1], inter2[1], inter3[1], inter4[1],  inter1[1]),'g')
-        
+
         barycentre = (inter1 + inter2 + inter3 + inter4)/4
         self.boat_estimate.set_position(barycentre)
         return barycentre
-    
+
     def run_fix(self, mark:Mark, fix_period:float, sigma:float):
         """ Run fix: get position from 1 mark and speed """
         mark.compute_bearing(self.boat_true, sigma)
@@ -277,44 +278,43 @@ class BoatSimu:
         del mark_tmp
         self.boat_estimate.set_position(estimate)
         return estimate
-    
+
     def update_3lop_fix(self, nearest_marks: Mark) -> None:
         markA, markB, markC = get_3best_marks120(nearest_marks)
         self.compute_position_3lop(markA, markB, markC, show_lop=False)
-        
+
     def update_2lop_fix(self, nearest_marks: Mark) -> None:
         markA, markB = get_2best_marks90(nearest_marks)
         self.compute_position_2lop(markA, markB, show_lop=False)
-    
+
     def update_run_fix(self, nearest_marks: Mark, fix_period: float, sigma: float) -> None:
         best_mark = self.boat_true.get_1best_mark90(nearest_marks)
         self.run_fix(best_mark, fix_period, sigma)
-    
+
     def run(self,duration : float):
         self.boat_estimate.run(duration)
         self.boat_true.run(duration)
-        
+
     def set_waypoint_course(self, position: list[float, float]):
         self.boat_estimate.set_waypoint_course(position)
         self.boat_true.set_waypoint_course(position)
-        
+
     def compute_waypoint_distance(self, waypoint:Waypoint) -> None:
         self.boat_estimate.compute_waypoint_distance(waypoint)
         self.boat_true.compute_waypoint_distance(waypoint)
-        
+
     def select_near_fixed_marks(self, marks_map:MarksMap, sigma: float, number_of_marks: int):
         marks_map.compute_fixed_mark_disance(self.boat_estimate)
         nearest_marks = marks_map.select_near_fixed_marks(number_of_marks)
         for mark in nearest_marks:
             mark.compute_bearing(self.boat_true, sigma)
         return nearest_marks
-        
+
     def go_to_waypoint(self, waypoint:Waypoint, marks_map:MarksMap, sigma:float, fix_period:float, fix_type:FixType):
         self.compute_waypoint_distance(waypoint)
         #while self.boat_estimate.waypoint_distance > self.boat_estimate.speed * fix_period:
         while self.boat_true.waypoint_distance > self.boat_true.speed * fix_period:
-            self.set_waypoint_course(waypoint.position)
-            
+            self.set_waypoint_course(waypoint.position) 
             nearest_marks = self.select_near_fixed_marks(marks_map, sigma, 6)
             match fix_type:
                 case FixType.FIX_2LOP:
@@ -330,7 +330,6 @@ class BoatSimu:
             self.compute_waypoint_distance(waypoint)
 
 
-
 class Route:
     """ append waypoints from a csv file to build a route"""
     # route obtained from openseamap, Fullscream chart, Tools, Trip planner, keep only latitude and longitude in decimal
@@ -344,16 +343,16 @@ class Route:
         self.number_of_waypoint += 1
         
     def plot_route(self):
-        x = []
-        y = []
+        waypoints_x = []
+        waypoints_y = []
         for point in self.route:
-            x.append(point.position[0])
-            y.append(point.position[1])
+            waypoints_x.append(point.position[0])
+            waypoints_y.append(point.position[1])
             plt.text(point.position[0], point.position[1], point.waypoint_number,
                      horizontalalignment='center',
                      verticalalignment='center',
                      color='w')
-        plt.plot(x, y, '-o', markersize=15)
+        plt.plot(waypoints_x, waypoints_y, '-o', markersize=15)
         
 
     def route_csv(self, csv_adress : str):
@@ -422,6 +421,26 @@ def get_3best_marks120(mark_table:MarksMap) -> tuple():
     mark_index = comb[index_min]
 
     return mark_table[mark_index[0]], mark_table[mark_index[1]], mark_table[mark_index[2]]
+
+
+def get_3best_marks(mark_table:MarksMap) -> tuple():
+    """ Get the three best mark from a set of mark"""
+    for i, mark_i in enumerate(mark_table):
+        print(mark_i.position)
+
+    comb = list(combinations(range(len(mark_table)),3))
+    print(comb)
+
+    print(comb[0])
+    for i, waypoint_comb in enumerate(comb):
+        pos0 = mark_table[waypoint_comb[0]].position
+        pos1 = mark_table[waypoint_comb[1]].position
+        pos2 = mark_table[waypoint_comb[2]].position 
+        barycentre = (np.array(pos1) + np.array(pos2) + np.array(pos2))/3
+        print(barycentre)
+        std_deviation = math.dist(pos0, barycentre) + math.dist(pos1, barycentre) + math.dist(pos2, barycentre)
+        print(std_deviation)
+
 
 def get_2best_marks90(mark_table:MarksMap) -> tuple():
     """ Get the three best mark from a set of mark"""
