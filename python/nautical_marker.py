@@ -2,40 +2,27 @@
 import matplotlib.pyplot as plt
 from matplotlib.path import Path
 import matplotlib.transforms as transforms
-from enum import Enum, auto
 
-
-LANDMARKS_SET : set[str] = {'lighthouse', 'major_lighthouse', 'light_tower', 'land_tower', 'water_tower', 'church'}
+LANDMARKS_SET : set[str] = {'lighthouse', 'major_lighthouse', 'light_tower', 
+                            'land_tower', 'water_tower', 'church'}
 DANGERS_SET : set[str] = {'wreck', 'wreck_depth', 'danger','rock_covers','rock_depth'}
 SEAMARK_SET : set[str] = {'conical','can','spherical','spar','pillar','tower'}
 
-HARBOURS_SET : set[str] = {'marina','anchorage','no_anchorage', 'fish', 'no_fish', 'slipway', 'steps'}
+HARBOURS_SET : set[str] = {'marina','anchorage','no_anchorage', 'fish',
+                           'no_fish', 'slipway', 'steps'}
 TOPMARKS_SET : set[str] = {'green', 'green_bis', 'red', 'red_bis', 'north', 'south', 'east', 'west',
                 'danger', 'special', 'safe_water', 'emergency'}
 
 MARKS_LIST : set[str] = LANDMARKS_SET | DANGERS_SET | SEAMARK_SET | HARBOURS_SET
-
-class TopMark(Enum):
-    GREEN = auto()
-    GREEN_BIS = auto()
-    RED = auto()
-    RED_BIS = auto()
-    NORTH = auto()
-    SOUTH = auto()
-    EAST = auto()
-    WEST = auto()
-    DANGER = auto()
-    SPECIAL = auto()
-    SAFE_WATER = auto()
-    EMERGENCY = auto()
 
 class PlotMark:
     """ Plot mark """
     text_shift = 0.0002
     markersize = 30
 
-    def __init__(self, position_x :float, position_y : float, mark_type : str, top_mark_type : str = None,
-                 light_color:str=None, name:str=None, floating:bool = False, show_top_mark:bool = True):
+    def __init__(self, position_x :float, position_y : float, mark_type : str,
+                 top_mark_type : str = None, light_color:str=None, name:str=None,
+                 floating:bool = False, show_top_mark:bool = True):
         self.position_x = position_x
         self.position_y = position_y
         self.mark_type = mark_type.lower()
@@ -44,6 +31,7 @@ class PlotMark:
         self.light_color = light_color
         self.floating = floating
         self.show_top_mark = show_top_mark
+
 
         if self.top_mark_type is not None:
             self.top_mark_type = self.top_mark_type.lower()
@@ -57,18 +45,19 @@ class PlotMark:
         if light_color is not None:
             self.plot_light_mark(light_color)
         if self.name is not None:
-            plt.text(self.position_x + self.text_shift, self.position_y + self.text_shift, self.name)
+            plt.text(self.position_x + self.text_shift,
+                     self.position_y + self.text_shift, self.name)
 
 
-    def plot_light_mark(self, color : str, angle :float = None) -> None:
+    def plot_light_mark(self, color : str, angle : float=None) -> None:
         """ Plot light mark """
         if angle is None:
             angle = -0.45
         marker = BuildPath.light(angle)
-        plt.plot(self.position_x, self.position_y, marker=marker, linestyle= None, 
+        plt.plot(self.position_x, self.position_y, marker=marker, linestyle=None,
                  markeredgecolor=color,
                 markerfacecolor=color, markersize=self.markersize)
-        
+
     def plot_harbour_mark(self) -> None:
         """ Plot light mark """
         match self.mark_type:
@@ -88,13 +77,14 @@ class PlotMark:
                 marker = BuildPath.steps()
             case _:
                 print('not defined harbour')
-        plt.plot(self.position_x, self.position_y, marker = marker, markersize = PlotMark.markersize/2,
-            fillstyle='none', markeredgewidth=1, markeredgecolor='m')
+        plt.plot(self.position_x, self.position_y, marker=marker,
+                 markersize = PlotMark.markersize/2,
+                 fillstyle='none', markeredgewidth=1, markeredgecolor='m')
 
     def plot_danger_mark(self) -> None:
         """ plot danger marks """
         marker_size = self.markersize/2
-        
+
         if self.mark_type == 'danger':
             facecolor ='skyblue'
         else:
@@ -156,17 +146,17 @@ class PlotMark:
                 markerfacecolor=facecolor, markeredgecolor='k',
                 markersize=markersize, label=type)
         if self.mark_type == 'light_tower':
-                markersize = markersize/3
-                marker = Path.unit_regular_star(5,0.3)
-                plt.plot(self.position_x, self.position_y, marker=marker, linestyle='solid',
-                markerfacecolor='k', markeredgecolor='k',
-                markersize=markersize, label=type)
-        
-        if self.mark_type == 'major_lighthouse' or self.mark_type == 'light_tower':
+            markersize = markersize / 3
+            marker = Path.unit_regular_star(5, 0.3)
+            plt.plot(self.position_x, self.position_y, marker=marker,
+                     linestyle='solid', markerfacecolor='k', markeredgecolor='k',
+                     markersize=markersize, label=type)
+
+        if self.mark_type in ('major_lighthouse', 'light_tower'):
             plt.plot(self.position_x, self.position_y, marker='o', linestyle='solid',
                 markerfacecolor=self.light_color, markeredgecolor=self.light_color,
                 markersize=markersize/6, label=type)
-            
+
 
     def plot_sea_mark(self) -> None:
         """ plot nautical symbol """
@@ -180,7 +170,8 @@ class PlotMark:
             symbol_marker2 = shape_marker2
             markersize = 2*markersize/3
         else:
-            topmark_marker = self.select_topmark_marker(topmark_size, shift_up=shape_height + topmark_size/2)
+            topmark_marker = self.select_topmark_marker(topmark_size,
+                                                        shift_up=shape_height + topmark_size/2)
             symbol_marker = Path.make_compound_path(shape_marker, topmark_marker)
             symbol_marker2 = Path.make_compound_path(shape_marker2, topmark_marker)
 
@@ -192,7 +183,7 @@ class PlotMark:
             self.plot_ref_line(self.markersize/4)
         else:
             self.plot_ref_line(self.markersize/2)
-        
+
         plt.plot(self.position_x, self.position_y, marker=symbol_marker, linestyle='solid',
                 markerfacecolor=color,
                 markeredgecolor='k',markeredgewidth=0.5,
@@ -201,18 +192,18 @@ class PlotMark:
                 markerfacecolor=color2,
                 markeredgecolor='k',markeredgewidth=0.5,
                 markersize=markersize)
-        
+
         self.plot_white_circle(shape_height)
-        
-        
+
+
     def plot_ref_line(self,size) -> None:
         """ Build point path """
         marker = Path([(-1,0), (1,0)],[1,2])
-        plt.plot(self.position_x, self.position_y, marker=marker, 
+        plt.plot(self.position_x, self.position_y, marker=marker,
                 markeredgecolor='k',
                 markeredgewidth=0.5,
                 markersize=size)
-        
+
     def plot_white_circle(self, circle_size: float) -> None:
         """ plot white circle"""
         circle_path = BuildPath.circle(circle_size,0)
@@ -235,7 +226,7 @@ class PlotMark:
                     case 'north':
                         shape_marker2 = BuildPath.rectangle(shape_height/2, width/5, shape_height/2)
                     case 'south':
-                        shape_marker2 = BuildPath.rectangle(shape_height/2, width/5, 0)   
+                        shape_marker2 = BuildPath.rectangle(shape_height/2, width/5, 0)
                     case 'west':
                         shape_marker2 = BuildPath.rectangle(shape_height/3, width/5, shape_height/3)
                     case 'safe_water':
@@ -254,7 +245,7 @@ class PlotMark:
                     case 'north':
                         shape_marker2 = BuildPath.rectangle(shape_height/2, width, shape_height/2)
                     case 'south':
-                        shape_marker2 = BuildPath.rectangle(shape_height/2, width, 0)   
+                        shape_marker2 = BuildPath.rectangle(shape_height/2, width, 0)
                     case 'west':
                         shape_marker2 = BuildPath.rectangle(shape_height/3, width, shape_height/3)
                     case 'safe_water':
@@ -301,7 +292,7 @@ class PlotMark:
                         shape_marker2 = BuildPath.triangle(shape_height/2, shape_height, 0)
                     case _:
                         shape_marker2 = shape_marker
-                
+
             case 'pillar':
                 shape_marker = BuildPath.pillar(shape_height, width)
                 match top_mark_type:
@@ -418,7 +409,7 @@ class BuildPath:
         codes = [1, 2, 2, 79]
         triangle = Path(vertices,codes)
         return triangle
-    
+
     @staticmethod
     def triangle_down(size : float, shift_up : float) -> Path:
         """ Build a triangle path """
@@ -426,7 +417,7 @@ class BuildPath:
         codes = [1, 2, 2, 79]
         triangle_path = Path(vertices,codes)
         return triangle_path
-    
+
     @staticmethod
     def rectangle(height : float, width : float, shift_up: float) -> Path:
         """ Build a rectangle path """
@@ -443,7 +434,7 @@ class BuildPath:
         codes = [1,3,2,3,2,79]
         conical_path = Path(vertices,codes)
         return conical_path
-    
+
     @staticmethod
     def pillar(height, width) -> Path:
         """ Buils pillar path"""
@@ -455,10 +446,13 @@ class BuildPath:
     @staticmethod
     def diagonal_cross(height, width) -> Path:
         """ Build diagonal cross path """
-        vertices = [(width/3*0, width/3*1 + height), (width/3*2, width/3*3 + height), (width/3*3, width/3*2 + height),
-            (width/3*1, width/3*0 + height), (width/3*3, width/3*-2 + height), (width/3*2, width/3*-3 + height),
-            (width/3*0, width/3*-1 + height), (width/3*-2, width/3*-3 + height), (width/3*-3, width/3*-2 + height),
-            (width/3*-1, width/3*0 + height), (width/3*-3, width/3*2 + height), (width/3*-2, width/3*3 + height), (width/3*0, width/3*1 + height)]
+        vertices = [(width/3*0, width/3*1 + height), (width/3*2, width/3*3 + height),
+                    (width/3*3, width/3*2 + height), (width/3*1, width/3*0 + height),
+                    (width/3*3, width/3*-2 + height), (width/3*2, width/3*-3 + height),
+                    (width/3*0, width/3*-1 + height), (width/3*-2, width/3*-3 + height),
+                    (width/3*-3, width/3*-2 + height), (width/3*-1, width/3*0 + height),
+                    (width/3*-3, width/3*2 + height), (width/3*-2, width/3*3 + height),
+                    (width/3*0, width/3*1 + height)]
         codes = [1,2,2,2,2,2,2,2,2,2,2,2,79]
         cross_path = Path(vertices, codes)
         return cross_path
@@ -466,10 +460,11 @@ class BuildPath:
     @staticmethod
     def cross(height, width) -> Path:
         """ Build horizontal cross path """
-        vertices = [(width/4, width/4 + height), (width, width/4 + height), (width, -width/4 + height), (width/4, -width/4 + height),
-            (width/4, -width + height), (-width/4, -width + height), (-width/4, -width/4 + height),
-            (-width, -width/4 + height), (-width, width/4 + height), (-width/4, width/4 + height),
-            (-width/4, width/4 + height), (-width/4, width + height), (width/4, width + height), (width/4, width/4 + height)]
+        vertices = [(width/4, width/4 + height), (width, width/4 + height),
+                    (width, -width/4 + height), (width/4, -width/4 + height),
+                    (width/4, -width + height), (-width/4, -width + height), (-width/4, -width/4 + height),
+                    (-width, -width/4 + height), (-width, width/4 + height), (-width/4, width/4 + height),
+                    (-width/4, width/4 + height), (-width/4, width + height), (width/4, width + height), (width/4, width/4 + height)]
         codes = [1,2,2,2,2,2,2,2,2,2,2,2,2,79]
         cross_path = Path(vertices, codes)
         return cross_path
@@ -490,7 +485,7 @@ class BuildPath:
         codes=[1,3,2,2,3, 2,3,2,2,3, 2,3,2,2,3, 2,3,2,2,3, 79]
         church_path = Path(vertices, codes)
         return church_path
-    
+
     @staticmethod
     def land_tower(height, width) -> Path:
         """ build tower path """
@@ -498,7 +493,7 @@ class BuildPath:
         top_tower_path = BuildPath.rectangle(height/4,width,height*3/4)
         land_tower_path = Path.make_compound_path(botton_tower_path, top_tower_path)
         return land_tower_path
-    
+
     @staticmethod
     def water_tower(height, width) -> Path:
         """ build tower path """
@@ -506,7 +501,7 @@ class BuildPath:
         top_tower_path = BuildPath.rectangle(height/4, 2*width, height*3/4)
         land_tower_path = Path.make_compound_path(botton_tower_path, top_tower_path)
         return land_tower_path
-    
+
     @staticmethod
     def wreck() -> Path:
         """ build wreck path"""
@@ -517,7 +512,7 @@ class BuildPath:
         ref_line_path = Path([(-3,0), (3.5,0) ],[1,2])
         wreck_path = Path.make_compound_path(boat_path, mast_path, ref_line_path)
         return wreck_path
-    
+
     @staticmethod
     def wreck_depth() -> Path:
         """ build wreck path"""
@@ -551,27 +546,27 @@ class BuildPath:
         """ Build circle path """
         circle = Path.circle([0.0, shift_up], size)
         return circle
-    
+
     @staticmethod
     def green_topmark(size: float, shift_up: float) -> Path:
         """ plot green beacon """
         triangle_marker = BuildPath.triangle(2*size, 2*size, shift_up)
         return triangle_marker
-    
+
     @staticmethod
     def red_topmark(height: float, width: float, shift_up: float) -> Path:
         """ Plot red beacon """
         red_marker = BuildPath.rectangle(height, width, shift_up)
         return red_marker
     @staticmethod
-    
+
     def north_topmark(size: float, shift_up: float) -> Path:
         """ Plot north beacon """
         triangle_marker1 = BuildPath.triangle(2*size, 2*size, shift_up)
         triangle_marker2 = BuildPath.triangle(2*size, 2*size, shift_up + 2*size + size/2)
         north_marker = Path.make_compound_path(triangle_marker1, triangle_marker2)
         return north_marker
-    
+
     @staticmethod
     def south_topmark(size: float, shift_up: float) -> Path:
         """ Plot north beacon """
@@ -579,7 +574,7 @@ class BuildPath:
         triangle_marker2 = BuildPath.triangle_down(size, shift_up + 2*size + size/2)
         south_marker = Path.make_compound_path(triangle_marker1, triangle_marker2)
         return south_marker
-    
+
     @staticmethod
     def east_topmark(size: float, shift_up: float) -> Path:
         """ Plot east beacon """
@@ -587,7 +582,7 @@ class BuildPath:
         triangle_marker2 = BuildPath.triangle(2*size, 2*size, shift_up + 2*size + size/2)
         east_marker = Path.make_compound_path(triangle_marker1, triangle_marker2)
         return east_marker
-        
+
     @staticmethod
     def west_topmark(size: float, shift_up: float) -> Path:
         """ Plot west beacon """
@@ -595,7 +590,7 @@ class BuildPath:
         triangle_marker2 = BuildPath.triangle_down(size, shift_up + 2*size + size/2)
         west_marker = Path.make_compound_path(triangle_marker1, triangle_marker2)
         return west_marker
-    
+
     @staticmethod
     def danger_topmark(size: float, shift_up: float) -> Path:
         """ Plot danger beacon """
@@ -626,7 +621,7 @@ class BuildPath:
         tmp6 = Path([(0.86, -0.86), (0.86, -0.5), (0.5, -0.5)], [1, 2, 2])
         marker = Path.make_compound_path(tmp1, tmp2, tmp3, tmp4, tmp5, tmp6 )
         return marker
-    
+
     @staticmethod
     def no_anchorage() -> Path:
         """ Build anchorage mark """
@@ -634,7 +629,7 @@ class BuildPath:
         tmp2 = Path([(-1, -1),(1, 1)], [1, 2])
         tmp3 = Path([(-1, 1),(1, -1)], [1, 2])
         return Path.make_compound_path(tmp1, tmp2, tmp3)
-    
+
     @staticmethod
     def fish() -> Path:
         """ Build anchorage mark """
@@ -642,7 +637,7 @@ class BuildPath:
         tmp2 = Path([(0.5, 0.42), (0.5,-0.42)], [1,2])
         tmp3 = Path.circle([0.7, 0.15], 0.02)
         return Path.make_compound_path(tmp1, tmp2, tmp3)
-    
+
     @staticmethod
     def no_fish():
         """ Build anchorage mark """
@@ -658,8 +653,8 @@ class BuildPath:
 
     @staticmethod
     def steps():
-        return Path([(-3, 2), (-1, 2), (-1, 1), (0, 1), (0, 0), (1, 0), (1, -1), 
-                     (2, -1), (2, -2), (4, -2), (4, -3), (1, -3), (-3, 1), (-3, 2)], 
+        return Path([(-3, 2), (-1, 2), (-1, 1), (0, 1), (0, 0), (1, 0), (1, -1),
+                     (2, -1), (2, -2), (4, -2), (4, -3), (1, -3), (-3, 1), (-3, 2)],
                     [1,2,2,2,2,2,2,2,2,2,2,2,2,79])
 
 def main():
@@ -670,38 +665,38 @@ def main():
     for j, shape in enumerate(SEAMARK_SET):
         plt.text(1,j*2,shape.capitalize(), horizontalalignment='center')
 
-    for i, topmark in enumerate(TopMark):
-        plt.text(i+2,len(SEAMARK_SET)*2, topmark.name.capitalize(),
+    for i, topmark in enumerate(TOPMARKS_SET):
+        plt.text(i+2,len(SEAMARK_SET)*2, topmark.capitalize(),
                  horizontalalignment='left', rotation = 30)
         for j, shape in enumerate(SEAMARK_SET):
-            PlotMark(i+2, j*2, shape, topmark.name, floating=False)
+            PlotMark(i+2, j*2, shape, topmark, floating=False)
     plt.title('Sea marks as a function of shape and topmark')
-    
-    
+
+
     plt.plot(1,13,'*')
     plt.axis('off')
     #plt.show(block="True")
     plt.draw()
 
     plt.figure(2)
-    
+
 
     plt.text(1,15,'Land marks')
     for i, mark in enumerate(LANDMARKS_SET):
         plt.text(i*2 + 4,16,mark.capitalize(), horizontalalignment='left', rotation = 30)
         land_mark = PlotMark(i*2+4, 15, mark)
-    
+
     plt.text(1, 19,'Danger marks')
     for i, mark in enumerate(DANGERS_SET):
         plt.text(i*2 + 4,20,mark.capitalize(), horizontalalignment='left', rotation = 30)
         danger_mark = PlotMark(i*2+4,19,mark)
-    
+
     #plt.text(1, 23, 'Light')
-        
+
     PlotMark(3, 23,'Spar','East',light_color='yellow', floating=True)
-        
+
     plt.plot(1, 25, '*')
-    
+
     PlotMark(5, 23, 'marina')
     PlotMark(7, 23, 'anchorage')
     PlotMark(9, 23, 'fish')
@@ -711,8 +706,8 @@ def main():
     plt.axis('off')
     plt.title('Nautical symbols')
     plt.show()
-    
+
 
 if __name__ == "__main__":
-    
+
     main()
