@@ -9,12 +9,14 @@ from matplotlib.path import Path # For marker construction
 import nautical_marker as  marker
 import pandas as pd
 from shapely.geometry import Polygon
+import shapely
 
 
 class FixType(Enum):
     FIX_3LOP = auto()
     FIX_2LOP = auto()
     FIX_RUNNING = auto()
+    
     
 class Waypoint:
     """ create a waypoint object """
@@ -125,9 +127,32 @@ class Mark:
 
     def plot_mark_bearing(self, boat:Boat):
         """ Plot LOP of a mark with dotted line"""
-        x_line = np.linspace(self.position[0],boat.position[0],10)
-        y_line = x_line * 1/np.tan(self.bearing) + self.position[1] - self.position[0] *  1/np.tan(self.bearing)
-        plt.plot(x_line, y_line, '--k', linewidth=0.5, label = "Line of Position (LoP)")
+        x_line = (self.position[0] + np.sin(self.bearing - np.pi) *
+                  math.dist(self.position,boat.position))
+        y_line = (self.position[1] + np.cos(self.bearing - np.pi) *
+                  math.dist(self.position,boat.position))
+        plt.plot([self.position[0], x_line],
+                 [self.position[1], y_line],
+                 '--k', linewidth=0.5)
+
+    def polygone_estimate(self, boat:Boat, sigma):
+        """ build triangle of possible boat estimated position"""
+        point_a = tuple(self.position)
+        point_b_x = (self.position[0] +
+                     np.sin(self.bearing - np.pi + sigma) *
+                     math.dist(self.position, boat.position) * 2)
+        point_b_y = (self.position[1] +
+                     np.cos(self.bearing - np.pi + sigma) *
+                     math.dist(self.position, boat.position) * 2)
+        point_b = (point_b_x, point_b_y)
+        point_c_x = (self.position[0]
+                     + np.sin(self.bearing - np.pi - sigma) *
+                     math.dist(self.position, boat.position) * 2)
+        point_c_y = (self.position[1]
+                     + np.cos(self.bearing - np.pi - sigma) *
+                     math.dist(self.position, boat.position) * 2)
+        point_c = (point_c_x, point_c_y)
+        return point_a, point_b, point_c
 
     def compute_bearing(self, boat:Boat, sigma: float):
         """ compute Bearing angle of a mark from the point of vie of the Boat """
@@ -144,7 +169,6 @@ class Mark:
     def __str__(self):
         return (f' x={self.position[0]}, y={self.position[1]}, mark_type={self.mark_type}, top_mark={self.top_mark_type},'
                 f'name={self.name}, floating={self.floating}, bearing={self.bearing}, distance={self.distance}\n')
-
 
 class MarksMap:
     """ Build map with all marks"""
@@ -232,29 +256,33 @@ class BoatSimu:
 
     def compute_position_2lop(self, mark1_up:Mark, mark2_up:Mark, show_lop:bool):
         """ Compute estimated position with 2 LOP"""
-        mark1_down = Mark(mark1_up.position)
-        mark2_down = Mark(mark2_up.position)
-
         sigma = np.pi/90 # 2d egrees
-        mark1_up.compute_bearing(self.boat_true,sigma)
-        mark2_up.compute_bearing(self.boat_true,sigma)
-        mark1_down.compute_bearing(self.boat_true,-sigma)
-        mark2_down.compute_bearing(self.boat_true,-sigma)
+        mark1_up.compute_bearing(self.boat_true,0)
+        mark2_up.compute_bearing(self.boat_true,0)
+        print(mark1_up.bearing)
+        print(mark2_up.bearing)
+        
         if show_lop:
             mark1_up.plot_mark_bearing(self.boat_true)
             mark2_up.plot_mark_bearing(self.boat_true)
-            mark1_down.plot_mark_bearing(self.boat_true)
-            mark2_down.plot_mark_bearing(self.boat_true)
-
-        inter1 = compute_intersection(mark1_up,mark2_up)
-        inter2 = compute_intersection(mark1_up,mark2_down)
-        inter3 = compute_intersection(mark1_down,mark2_down)
-        inter4 = compute_intersection(mark1_down,mark2_up)
-
-        plt.plot( (inter1[0], inter2[0], inter3[0], inter4[0], inter1[0]),
-                (inter1[1], inter2[1], inter3[1], inter4[1],  inter1[1]),'g')
-
-        barycentre = (inter1 + inter2 + inter3 + inter4)/4
+        poly_mark1 = mark1_up.polygone_estimate(self.boat_true, sigma)
+        polygone1 = Polygon(poly_mark1)
+        #x, y = polygone1.exterior.xy
+        #plt.plot(x,y, c='g')
+        poly_mark2 = mark2_up.polygone_estimate(self.boat_true, sigma)
+        polygone2 = Polygon(poly_mark2)
+        #x, y = polygone2.exterior.xy
+        #plt.plot(x,y, c='b')
+        poly_intersection = polygone1.intersection(polygone2)
+        if poly_intersection.is_empty:
+            print(f'empty intersection!betweenn{mark1_up} and {mark2_up}')
+            barycentre = [0.0, 0.0]
+        else:
+            x, y = poly_intersection.exterior.xy
+            plt.plot(x,y, c='g')
+            barycentre = shapely.get_coordinates(poly_intersection.centroid).tolist()[0]
+            print(f'barycentre is{barycentre}')
+            
         self.boat_estimate.set_position(barycentre)
         return barycentre
 
