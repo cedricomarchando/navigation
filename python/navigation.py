@@ -283,6 +283,23 @@ class BoatSimu:
         poly_intersection = polygone1.intersection(polygone2)
         return poly_intersection
         
+    def get_2best_marks(self, mark_table:MarksMap) -> tuple():
+        """ Get the two best mark from a set of mark, considering area of intersection"""
+        sigma = np.pi/90 # 2d egrees
+        for i, mark in enumerate(mark_table):
+            mark.compute_bearing(self.boat_true, 0)
+        comb = list(combinations(range(len(mark_table)), 2))
+        min_cost = 100000
+        for i, comb_i in enumerate(comb):
+            poly_intersection = self.compute_intersection_2lop(
+                mark_table[comb_i[0]], mark_table[comb_i[1]], sigma)
+            cost = poly_intersection.area
+            if cost < min_cost:
+                min_cost = cost
+                index_min = i
+        mark_index = comb[index_min]
+        print(mark_index)
+        return mark_table[mark_index[0]], mark_table[mark_index[1]]
 
     def run_fix(self, mark:Mark, fix_period:float, sigma:float):
         """ Run fix: get position from 1 mark and speed """
