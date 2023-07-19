@@ -22,19 +22,22 @@ mark4.plot_mark()
 mark5.plot_mark()
 mark_table=[mark1, mark2, mark3, mark4, mark5]
 
-""" for i in range(50,600,100):
+for i in range(50,600,100):
     for j in range(50,600,100):
-        boat_simu = nav.BoatSimu([i, j])
-
+        boat_simu = nav.BoatSimu([i, j], [i, j])
         for mark in mark_table:
             mark.compute_bearing(boat_simu.boat_true,sigma)
-        mark_a, mark_b, mark_c = nav.get_3best_marks120(mark_table)
+        #mark_a, mark_b, mark_c = nav.get_3best_marks120(mark_table)
+        mark_a, mark_b, mark_c = boat_simu.get_3best_marks(mark_table)
         boat_simu.compute_position_3lop(mark_a, mark_b, mark_c, show_lop=True)
         boat_simu.plot_boat()
-        del boat_simu """
+        del boat_simu
 
-nav.get_3best_marks(mark_table)
-
+# #nav.get_3best_marks(mark_table)
+# boat_simu = nav.BoatSimu([200, 200])
+# mark_a, mark_b, mark_c = boat_simu.get_3best_marks(mark_table)
+# boat_simu.compute_position_3lop(mark_a, mark_b, mark_c, show_lop=True)
+# boat_simu.plot_boat()
 
 nav.legend_unique()
 plt.show()

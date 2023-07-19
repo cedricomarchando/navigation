@@ -10,12 +10,12 @@ plt.figure(1)
 mark1 = nav.Mark([100,300], 'church')
 mark2 = nav.Mark([500,500], 'lighthouse')
 mark3 = nav.Mark([500,100], 'land_tower')
-boat_simu = nav.BoatSimu([300,310])
+boat_simu = nav.BoatSimu([300,310], [300,310])
 mark1.plot_mark()
 mark2.plot_mark()
 mark3.plot_mark()
 
-boat_simu.compute_position_3lop(mark1, mark2, mark3)
+boat_simu.compute_position_3lop(mark1, mark2, mark3, True)
 
 mark1.plot_mark_bearing(boat_simu.boat_true)
 mark2.plot_mark_bearing(boat_simu.boat_true)
@@ -36,8 +36,8 @@ mark2.plot_mark()
 mark3.plot_mark()
 for i in range(40,600,50):
     for j in range(150,590,100):
-        boat_simu = nav.BoatSimu([i,j])
-        boat_simu.compute_position_3lop(mark1, mark2, mark3)
+        boat_simu = nav.BoatSimu([i,j], [i,j])
+        boat_simu.compute_position_3lop(mark1, mark2, mark3, False)
         boat_simu.plot_boat()
         del boat_simu
 nav.legend_unique()
@@ -52,7 +52,7 @@ mark2 = nav.Mark([500, 500], 'water_tower')
 mark1.plot_mark()
 mark2.plot_mark()
 
-boat_simu = nav.BoatSimu([400,310])
+boat_simu = nav.BoatSimu([400,310], [400,310])
 boat_simu.compute_position_2lop(mark1, mark2, show_lop=True)
 boat_simu.plot_boat()
 
@@ -63,15 +63,15 @@ plt.draw()
 # %%
 plt.figure(5)
 mark1 = nav.Mark([100, 100], 'church')
-mark2 = nav.Mark([500, 500], 'tower')
+mark2 = nav.Mark([500, 500], 'land_tower')
 mark1.plot_mark()
 mark2.plot_mark()
-boat_simu = nav.BoatSimu([400,310])
+boat_simu = nav.BoatSimu([400,310], [400,310])
 boat_simu.plot_boat()
 
 for i in range(100,600,50):
-    for j in range(-100,i,50):
-        boat_simu = nav.BoatSimu([i,j])
+    for j in range(-100,600,50):
+        boat_simu = nav.BoatSimu([i,j], [i,j])
         boat_simu.compute_position_2lop(mark1, mark2,show_lop=False)
         boat_simu.plot_boat()
         del boat_simu
@@ -97,11 +97,11 @@ mark_table=[mark1, mark2, mark3, mark4, mark5]
 
 for i in range(150,500,100):
     for j in range(150,500,100):
-        boat_simu = nav.BoatSimu([i, j])
+        boat_simu = nav.BoatSimu([i, j], [i,j])
         for mark in mark_table:
             mark.compute_bearing(boat_simu.boat_true,sigma)
-        markA, markB, markC = nav.get_best_marks(mark_table)
-        boat_simu.compute_position_3lop(markA,markB,markC)
+        markA, markB, markC = boat_simu.get_3best_marks(mark_table)
+        boat_simu.compute_position_3lop(markA, markB, markC, True)
         boat_simu.plot_boat()
         markA.plot_mark_bearing(boat_simu.boat_true)
         markB.plot_mark_bearing(boat_simu.boat_true)
@@ -109,6 +109,7 @@ for i in range(150,500,100):
         del boat_simu
 
 nav.legend_unique()
+plt.title("3 LOP position fix, with selection of three best marks based on estimate area")
 plt.show()
 
 # %%

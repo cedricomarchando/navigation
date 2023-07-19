@@ -24,8 +24,7 @@ mark_table=[mark1, mark2, mark3, mark4, mark5]
 
 for i in range(0,700,100):
     for j in range(50,600,100):
-        boat_simu = nav.BoatSimu([i, j])
-
+        boat_simu = nav.BoatSimu([i, j], [i, j])
         for mark in mark_table:
             mark.compute_bearing(boat_simu.boat_true,sigma)
         markA, markB = boat_simu.get_2best_marks(mark_table)
