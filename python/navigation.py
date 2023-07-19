@@ -298,7 +298,6 @@ class BoatSimu:
                 min_cost = cost
                 index_min = i
         mark_index = comb[index_min]
-        print(mark_index)
         return mark_table[mark_index[0]], mark_table[mark_index[1]]
 
     def run_fix(self, mark:Mark, fix_period:float, sigma:float):
@@ -327,7 +326,7 @@ class BoatSimu:
         self.compute_position_3lop(markA, markB, markC, show_lop=False)
 
     def update_2lop_fix(self, nearest_marks: Mark) -> None:
-        markA, markB = get_2best_marks90(nearest_marks)
+        markA, markB = self.get_2best_marks(nearest_marks)
         self.compute_position_2lop(markA, markB, show_lop=False)
 
     def update_run_fix(self, nearest_marks: Mark, fix_period: float, sigma: float) -> None:
@@ -483,37 +482,6 @@ def get_3best_marks(mark_table:MarksMap) -> tuple():
         print(barycentre)
         std_deviation = math.dist(pos0, barycentre) + math.dist(pos1, barycentre) + math.dist(pos2, barycentre)
         print(std_deviation)
-
-
-def get_2best_marks90(mark_table:MarksMap) -> tuple():
-    """ Get the three best mark from a set of mark, only consider angles"""
-    mark_table_size = len(mark_table)
-    bearing_table = np.zeros((mark_table_size ,mark_table_size ))
-    cost_table= np.zeros((mark_table_size ,mark_table_size ))
-    cost_table2= np.zeros((mark_table_size ,mark_table_size ))
-
-    for i , mark_i in enumerate(mark_table):
-        for j, mark_j in enumerate(mark_table):
-            bearing_table[i][j] = np.rad2deg(mark_j.bearing - mark_i.bearing)
-    cost_table = bearing_table % 360
-    cost_table2 = - bearing_table % 360
-    cost_table = np.minimum(cost_table,cost_table2)
-    cost_table = cost_table - 90
-    cost_table = abs(cost_table)
-    comb = list(combinations(range(mark_table_size),2))
-
-    min_cost = 1000.0
-    index_min = 0
-    for i, comb_i in enumerate(comb):
-        cost = cost_table[comb_i[0]][comb_i[1]]
-        if cost < min_cost:
-            min_cost = cost
-            index_min = i
-
-    mark_index = comb[index_min]
-    return mark_table[mark_index[0]], mark_table[mark_index[1]]
-
-
 
 
 def degree_minute_to_decimal(degree : int, minute : float):
