@@ -254,37 +254,35 @@ class BoatSimu:
         self.boat_estimate.set_position(barycentre)
         return barycentre
 
-    def compute_position_2lop(self, mark1_up:Mark, mark2_up:Mark, show_lop:bool):
+    def compute_position_2lop(self, mark1:Mark, mark2:Mark, show_lop:bool):
         """ Compute estimated position with 2 LOP"""
         sigma = np.pi/90 # 2d egrees
-        mark1_up.compute_bearing(self.boat_true,0)
-        mark2_up.compute_bearing(self.boat_true,0)
-        print(mark1_up.bearing)
-        print(mark2_up.bearing)
-        
+        mark1.compute_bearing(self.boat_true,0)
+        mark2.compute_bearing(self.boat_true,0)
         if show_lop:
-            mark1_up.plot_mark_bearing(self.boat_true)
-            mark2_up.plot_mark_bearing(self.boat_true)
-        poly_mark1 = mark1_up.polygone_estimate(self.boat_true, sigma)
-        polygone1 = Polygon(poly_mark1)
-        #x, y = polygone1.exterior.xy
-        #plt.plot(x,y, c='g')
-        poly_mark2 = mark2_up.polygone_estimate(self.boat_true, sigma)
-        polygone2 = Polygon(poly_mark2)
-        #x, y = polygone2.exterior.xy
-        #plt.plot(x,y, c='b')
-        poly_intersection = polygone1.intersection(polygone2)
+            mark1.plot_mark_bearing(self.boat_true)
+            mark2.plot_mark_bearing(self.boat_true)
+            
+        poly_intersection = self.compute_intersection_2lop(mark1, mark2, sigma)
         if poly_intersection.is_empty:
-            print(f'empty intersection!betweenn{mark1_up} and {mark2_up}')
+            print(f'empty intersection for boat at position \n{self.boat_true.position}')
             barycentre = [0.0, 0.0]
         else:
             x, y = poly_intersection.exterior.xy
             plt.plot(x,y, c='g')
             barycentre = shapely.get_coordinates(poly_intersection.centroid).tolist()[0]
-            print(f'barycentre is{barycentre}')
-            
         self.boat_estimate.set_position(barycentre)
         return barycentre
+    
+    def compute_intersection_2lop(self, mark1:Mark, mark2:Mark, sigma:float):
+        """ compute intersection of two polygones"""
+        poly_mark1 = mark1.polygone_estimate(self.boat_true, sigma)
+        polygone1 = Polygon(poly_mark1)
+        poly_mark2 = mark2.polygone_estimate(self.boat_true, sigma)
+        polygone2 = Polygon(poly_mark2)
+        poly_intersection = polygone1.intersection(polygone2)
+        return poly_intersection
+        
 
     def run_fix(self, mark:Mark, fix_period:float, sigma:float):
         """ Run fix: get position from 1 mark and speed """
@@ -471,7 +469,7 @@ def get_3best_marks(mark_table:MarksMap) -> tuple():
 
 
 def get_2best_marks90(mark_table:MarksMap) -> tuple():
-    """ Get the three best mark from a set of mark"""
+    """ Get the three best mark from a set of mark, only consider angles"""
     mark_table_size = len(mark_table)
     bearing_table = np.zeros((mark_table_size ,mark_table_size ))
     cost_table= np.zeros((mark_table_size ,mark_table_size ))
