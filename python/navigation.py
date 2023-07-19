@@ -81,24 +81,6 @@ class Boat:
     def compute_waypoint_distance(self, waypoint:Waypoint) -> float:
         self.waypoint_distance = math.dist(self.position, waypoint.position)
 
-    def get_1best_mark90(self, mark_table:'MarksMap'):
-        """ return the mark that is the closet to an 90 degree angle to boat course """
-        bearing_table = np.zeros((len(mark_table),1),dtype=float)
-        for i, amer in enumerate(mark_table):
-            amer.compute_bearing(self, 0)
-            bearing_table[i]=amer.bearing
-        bearing_table = self.course - bearing_table
-        cost_table = bearing_table % (2*np.pi)
-        cost_table2 = - bearing_table % (2*np.pi)
-        cost_table = np.minimum(cost_table,cost_table2)
-        cost_table = cost_table - np.pi/2
-        cost_table = abs(cost_table)
-
-        index_min = np.array(cost_table).argmin()
-
-        best_mark = mark_table[index_min.item()]
-        return best_mark
-
     def __str__(self):
         return (f' x={self.position[0]}, y={self.position[1]}, speed={self.speed},'
                 f' course={self.course}, waypoint_disatance={self.waypoint_distance} \n')
@@ -327,37 +309,51 @@ class BoatSimu:
         mark_index = comb[index_min]
         return mark_table[mark_index[0]], mark_table[mark_index[1]], mark_table[mark_index[2]]
 
+    def get_1best_mark(self, mark_table:'MarksMap', fix_period:float):
+        """ return the mark that is the closet to an 90 degree angle to boat course """
+        sigma = np.pi / 90 # 2d egrees
+        area_min = 10000
+        index_min = 0
+        for i, mark in enumerate(mark_table):
+            mark.compute_bearing(self.boat_true, 0)
+            _, area = self.run_fix(mark, fix_period, sigma, False)
+            self.run(-fix_period)
+            if area < area_min:
+                area_min = area
+                index_min = i
+        best_mark = mark_table[index_min]
+        return best_mark
+
     
-    def run_fix(self, mark:Mark, fix_period:float, sigma:float):
+    def run_fix(self, mark:Mark, fix_period:float, sigma:float, show_lop:bool):
         """ Run fix: get position from 1 mark and speed """
-        mark.compute_bearing(self.boat_true, sigma)
+        mark.compute_bearing(self.boat_true, 0)
         save_bearing = mark.bearing
-        print(self.boat_estimate.position)
-        print(self.boat_true.position)
         # compute updated bearing after running
         self.run(fix_period)
-        
-        print(self.boat_estimate.position)
-        print(self.boat_true.position)
-        
-        mark.compute_bearing(self.boat_true, sigma)
-        mark.plot_mark_bearing(self.boat_true)
+        mark.compute_bearing(self.boat_true, 0)
         # run mark in the direction of the boat
         mark_shifted = Mark(
             [mark.position[0] + self.boat_estimate.speed * fix_period * np.sin(self.boat_estimate.course),
             mark.position[1] + self.boat_estimate.speed * fix_period * np.cos(self.boat_estimate.course)],
             bearing = save_bearing
             )
-        plt.plot(mark_shifted.position[0], mark_shifted.position[1],'+k')
-        mark_shifted.plot_mark_bearing(self.boat_true)
-        estimate = compute_intersection(mark,mark_shifted)
+        poly_intersection = self.compute_intersection_2lop(mark, mark_shifted, sigma)
+        if poly_intersection.is_empty:
+            print(f'empty intersection for boat at position \n{self.boat_true.position}')
+            barycentre = [0.0, 0.0]
+        else:
+            x, y = poly_intersection.exterior.xy
+            if show_lop:
+                plt.plot(mark_shifted.position[0], mark_shifted.position[1],'+k')
+                mark.plot_mark_bearing(self.boat_true)
+                mark_shifted.plot_mark_bearing(self.boat_true)
+                plt.plot(x,y, c='g')
+            barycentre = shapely.get_coordinates(poly_intersection.centroid).tolist()[0]
         del mark_shifted
-        self.boat_estimate.set_position(estimate)
-        
-        print(self.boat_estimate.position)
-        print(self.boat_true.position)
-        
-        return estimate
+        self.boat_estimate.set_position(barycentre)
+        area = poly_intersection.area
+        return barycentre, area
 
     def update_3lop_fix(self, nearest_marks: Mark) -> None:
         markA, markB, markC = self.get_3best_marks(nearest_marks)
@@ -368,8 +364,8 @@ class BoatSimu:
         self.compute_position_2lop(markA, markB, show_lop=False)
 
     def update_run_fix(self, nearest_marks: Mark, fix_period: float, sigma: float) -> None:
-        best_mark = self.boat_true.get_1best_mark90(nearest_marks)
-        self.run_fix(best_mark, fix_period, sigma)
+        best_mark = self.get_1best_mark(nearest_marks, fix_period)
+        self.run_fix(best_mark, fix_period, sigma, show_lop=True)
 
     def run(self,duration : float):
         self.boat_estimate.run(duration)
