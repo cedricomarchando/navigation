@@ -41,7 +41,8 @@ class Boat:
 
     def plot_speed(self):
         """ Show speed with direction of course"""
-        plt.arrow(self.position[0], self.position[1],
+        plt.arrow(self.position[0],
+                  self.position[1],
                   self.speed * np.sin(self.course),
                   self.speed * np.cos(self.course),
                   head_width = 10)
@@ -127,16 +128,17 @@ class Mark:
 
     def plot_mark_bearing(self, boat:Boat):
         """ Plot LOP of a mark with dotted line"""
-        x_line = (self.position[0] + np.sin(self.bearing - np.pi) *
+        lop = self.bearing - np.pi
+        x_line = (self.position[0] + np.sin(lop) *
                   math.dist(self.position,boat.position))
-        y_line = (self.position[1] + np.cos(self.bearing - np.pi) *
+        y_line = (self.position[1] + np.cos(lop) *
                   math.dist(self.position,boat.position))
         plt.plot([self.position[0], x_line],
                  [self.position[1], y_line],
                  '--k', linewidth=0.5)
 
     def polygone_estimate(self, boat:Boat, sigma):
-        """ build triangle of possible boat estimated position"""
+        """ build triangle of possible boat estimated position """
         point_a = tuple(self.position)
         point_b_x = (self.position[0] +
                      np.sin(self.bearing - np.pi + sigma) *
@@ -224,9 +226,9 @@ class BoatSimu:
     """ BoatSimu class, 
     instantian Boat_true that represent the boat wit its true parameter
     and boat_estimate taht represent the boat with estimated parameters"""
-    def __init__(self, true_position:list[float, float]):
+    def __init__(self, true_position:list[float, float],estimate_position: list[float, float]):
         self.boat_true = Boat( true_position, color='g')
-        self.boat_estimate = Boat( true_position, color='r')
+        self.boat_estimate = Boat( estimate_position, color='r')
 
     def plot_boat(self) ->None:
         " plot boat true and boat estimate"
@@ -236,22 +238,22 @@ class BoatSimu:
     def compute_position_3lop(self, mark1, mark2, mark3, show_lop):
         """ Comput fix position with triangulation of 3 Lines Of Position (LOP) """
         sigma = np.pi/90 # 2 degree
-        mark1.compute_bearing(self.boat_true,sigma)
-        mark2.compute_bearing(self.boat_true,sigma)
-        mark3.compute_bearing(self.boat_true,sigma)
+        mark1.compute_bearing(self.boat_true,0)
+        mark2.compute_bearing(self.boat_true,0)
+        mark3.compute_bearing(self.boat_true,0)
         if show_lop:
             mark1.plot_mark_bearing(self.boat_true)
             mark2.plot_mark_bearing(self.boat_true)
             mark3.plot_mark_bearing(self.boat_true)
-        intersection1 = compute_intersection(mark1, mark2)
-        intersection2 = compute_intersection(mark2, mark3)
-        intersection3 = compute_intersection(mark1, mark3)
-        #compute barycentre using Chasles formula
-        barycentre = (intersection1 + intersection2 + intersection3)/3
-        #circonscribed_circle does not work
-        plt.plot( (intersection1[0], intersection2[0], intersection3[0], intersection1[0]),
-                (intersection1[1], intersection2[1], intersection3[1], intersection1[1]),'g')
-        self.boat_estimate.set_position(barycentre)
+        poly_intersection = self.compute_intersection_3lop(mark1, mark2, mark3, sigma)
+        if poly_intersection.is_empty:
+            print(f'empty intersection for boat at position \n{self.boat_true.position}')
+            barycentre = [0.0, 0.0]
+        else:
+            x, y = poly_intersection.exterior.xy
+            plt.plot(x,y, c='g')
+            barycentre = shapely.get_coordinates(poly_intersection.centroid).tolist()[0]
+        self.boat_estimate.set_position(barycentre)   
         return barycentre
 
     def compute_position_2lop(self, mark1:Mark, mark2:Mark, show_lop:bool):
@@ -262,7 +264,6 @@ class BoatSimu:
         if show_lop:
             mark1.plot_mark_bearing(self.boat_true)
             mark2.plot_mark_bearing(self.boat_true)
-            
         poly_intersection = self.compute_intersection_2lop(mark1, mark2, sigma)
         if poly_intersection.is_empty:
             print(f'empty intersection for boat at position \n{self.boat_true.position}')
@@ -276,12 +277,21 @@ class BoatSimu:
     
     def compute_intersection_2lop(self, mark1:Mark, mark2:Mark, sigma:float):
         """ compute intersection of two polygones"""
-        poly_mark1 = mark1.polygone_estimate(self.boat_true, sigma)
-        polygone1 = Polygon(poly_mark1)
-        poly_mark2 = mark2.polygone_estimate(self.boat_true, sigma)
-        polygone2 = Polygon(poly_mark2)
+        poly_tuple1 = mark1.polygone_estimate(self.boat_true, sigma)
+        polygone1 = Polygon(poly_tuple1)
+        poly_tuple2 = mark2.polygone_estimate(self.boat_true, sigma)
+        polygone2 = Polygon(poly_tuple2)
         poly_intersection = polygone1.intersection(polygone2)
         return poly_intersection
+    
+    def compute_intersection_3lop(self, mark1:Mark, mark2:Mark, mark3:Mark, sigma:float):
+        """ compute intersection of two polygones"""
+        polygone_2lop = self.compute_intersection_2lop(mark1, mark2, sigma)
+        poly_tuple3 = mark3.polygone_estimate(self.boat_true, sigma)
+        polygone3 = Polygon(poly_tuple3)        
+        polygone_3lop = polygone_2lop.intersection(polygone3)
+        return polygone_3lop
+    
         
     def get_2best_marks(self, mark_table:MarksMap) -> tuple():
         """ Get the two best mark from a set of mark, considering area of intersection"""
@@ -299,30 +309,58 @@ class BoatSimu:
                 index_min = i
         mark_index = comb[index_min]
         return mark_table[mark_index[0]], mark_table[mark_index[1]]
+    
+    def get_3best_marks(self, mark_table:MarksMap) -> tuple():
+        """ Get the three best mark from a set of mark, considering area of intersection """
+        sigma = np.pi/90 # 2d egrees
+        for i, mark in enumerate(mark_table):
+            mark.compute_bearing(self.boat_true, 0)
+        comb = list(combinations(range(len(mark_table)), 3))
+        min_cost = 100000
+        for i, comb_i in enumerate(comb):
+            poly_intersection = self.compute_intersection_3lop(
+                mark_table[comb_i[0]], mark_table[comb_i[1]],  mark_table[comb_i[2]], sigma)
+            cost = poly_intersection.area
+            if cost < min_cost:
+                min_cost = cost
+                index_min = i
+        mark_index = comb[index_min]
+        return mark_table[mark_index[0]], mark_table[mark_index[1]], mark_table[mark_index[2]]
 
+    
     def run_fix(self, mark:Mark, fix_period:float, sigma:float):
         """ Run fix: get position from 1 mark and speed """
         mark.compute_bearing(self.boat_true, sigma)
         save_bearing = mark.bearing
+        print(self.boat_estimate.position)
+        print(self.boat_true.position)
         # compute updated bearing after running
         self.run(fix_period)
+        
+        print(self.boat_estimate.position)
+        print(self.boat_true.position)
+        
         mark.compute_bearing(self.boat_true, sigma)
         mark.plot_mark_bearing(self.boat_true)
         # run mark in the direction of the boat
-        mark_tmp = Mark(
+        mark_shifted = Mark(
             [mark.position[0] + self.boat_estimate.speed * fix_period * np.sin(self.boat_estimate.course),
             mark.position[1] + self.boat_estimate.speed * fix_period * np.cos(self.boat_estimate.course)],
             bearing = save_bearing
             )
-        plt.plot(mark_tmp.position[0], mark_tmp.position[1],'+k', label ="mark shifted")
-        mark_tmp.plot_mark_bearing(self.boat_true)
-        estimate = compute_intersection(mark,mark_tmp)
-        del mark_tmp
+        plt.plot(mark_shifted.position[0], mark_shifted.position[1],'+k')
+        mark_shifted.plot_mark_bearing(self.boat_true)
+        estimate = compute_intersection(mark,mark_shifted)
+        del mark_shifted
         self.boat_estimate.set_position(estimate)
+        
+        print(self.boat_estimate.position)
+        print(self.boat_true.position)
+        
         return estimate
 
     def update_3lop_fix(self, nearest_marks: Mark) -> None:
-        markA, markB, markC = get_3best_marks120(nearest_marks)
+        markA, markB, markC = self.get_3best_marks(nearest_marks)
         self.compute_position_3lop(markA, markB, markC, show_lop=False)
 
     def update_2lop_fix(self, nearest_marks: Mark) -> None:
@@ -366,8 +404,7 @@ class BoatSimu:
                     self.run(fix_period)
                     self.update_3lop_fix(nearest_marks)
                 case FixType.FIX_RUNNING:
-                    self.update_run_fix(nearest_marks, fix_period, sigma)
-                    
+                    self.update_run_fix(nearest_marks, fix_period, sigma)     
             self.plot_boat()
             self.compute_waypoint_distance(waypoint)
 
@@ -378,12 +415,12 @@ class Route:
     def __init__(self):
         self.route = []
         self.number_of_waypoint = 0
-    
+
     def append_waypoint(self, waypoint:Waypoint):
         waypoint.waypoint_number = self.number_of_waypoint
         self.route.append(waypoint)
         self.number_of_waypoint += 1
-        
+ 
     def plot_route(self):
         waypoints_x = []
         waypoints_y = []
@@ -395,7 +432,6 @@ class Route:
                      verticalalignment='center',
                      color='w')
         plt.plot(waypoints_x, waypoints_y, '-o', markersize=15)
-        
 
     def route_csv(self, csv_adress : str):
         """ Construct route from csv file"""
@@ -405,13 +441,12 @@ class Route:
             coordinate_y = route_csv.iloc[i,0]
             waypoint = Waypoint([coordinate_x, coordinate_y])
             self.append_waypoint(waypoint)
-        
+
     def __str__(self):
         route = ' '
         for point in self.route:
             route = route + point.__str__()
-        return route
-                
+        return route 
 
 def compute_intersection(mark1 : Mark, mark2 : Mark) -> list[float,float]:
     """ Compute intersection between two LOP of mark1 and mark2
@@ -431,58 +466,6 @@ def legend_unique():
     by_label = dict(zip(labels, handles))
     plt.legend(by_label.values(), by_label.keys())
 
-def get_3best_marks120(mark_table:MarksMap) -> tuple():
-    """ Get the three best mark from a set of mark"""
-    mark_table_size = len(mark_table)
-    bearing_table = np.zeros((mark_table_size ,mark_table_size ))
-    cost_table= np.zeros((mark_table_size ,mark_table_size ))
-    cost_table2= np.zeros((mark_table_size ,mark_table_size ))
-
-    for i , mark_i in enumerate(mark_table):
-        for j, mark_j in enumerate(mark_table):
-            bearing_table[i][j] = mark_j.bearing - mark_i.bearing
-
-    cost_table = bearing_table % (2*np.pi)
-    cost_table2 = - bearing_table % (2*np.pi)
-    cost_table = np.minimum(cost_table,cost_table2)
-    cost_table = cost_table - (2*np.pi/3)
-    cost_table = abs(cost_table)
-
-    comb = list(combinations(range(mark_table_size),3))
-
-    min_cost = 1000.0
-    index_min = 0
-    for i, comb_i in enumerate(comb):
-        cost=0
-        for j in range(3):
-            cost += cost_table[comb_i[j]][comb_i[(j+1)%3]]
-        if cost < min_cost:
-            min_cost = cost
-            index_min = i
-
-    mark_index = comb[index_min]
-
-    return mark_table[mark_index[0]], mark_table[mark_index[1]], mark_table[mark_index[2]]
-
-
-def get_3best_marks(mark_table:MarksMap) -> tuple():
-    """ Get the three best mark from a set of mark"""
-    for i, mark_i in enumerate(mark_table):
-        print(mark_i.position)
-
-    comb = list(combinations(range(len(mark_table)),3))
-    print(comb)
-
-    print(comb[0])
-    for i, waypoint_comb in enumerate(comb):
-        pos0 = mark_table[waypoint_comb[0]].position
-        pos1 = mark_table[waypoint_comb[1]].position
-        pos2 = mark_table[waypoint_comb[2]].position 
-        barycentre = (np.array(pos1) + np.array(pos2) + np.array(pos2))/3
-        print(barycentre)
-        std_deviation = math.dist(pos0, barycentre) + math.dist(pos1, barycentre) + math.dist(pos2, barycentre)
-        print(std_deviation)
-
 
 def degree_minute_to_decimal(degree : int, minute : float):
     """ Convert degree minute to degree with decimal """
@@ -495,7 +478,7 @@ def main():
     mark1 = Mark([100, 300], 'church')
     mark2 = Mark([500, 500], 'major_lighthouse')
     mark3 = Mark([500, 100], 'water_tower')
-    boat_simu = BoatSimu([300, 310])
+    boat_simu = BoatSimu([300, 310],[300, 310])
     mark1.plot_mark()
     mark2.plot_mark()
     mark3.plot_mark()
