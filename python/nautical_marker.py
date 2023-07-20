@@ -13,6 +13,8 @@ HARBOURS_SET : set[str] = {'marina','anchorage','no_anchorage', 'fish',
 TOPMARKS_SET : set[str] = {'green', 'green_bis', 'red', 'red_bis', 'north', 'south', 'east', 'west',
                 'danger', 'special', 'safe_water', 'emergency'}
 
+NAVIGATION_SET : set[str] = {'waypoint', 'water_track', 'ground_track', 'tide_track', 'dead_reckoning'}
+
 MARKS_LIST : set[str] = LANDMARKS_SET | DANGERS_SET | SEAMARK_SET | HARBOURS_SET
 
 class PlotMark:
@@ -32,7 +34,6 @@ class PlotMark:
         self.floating = floating
         self.show_top_mark = show_top_mark
 
-
         if self.top_mark_type is not None:
             self.top_mark_type = self.top_mark_type.lower()
             self.plot_sea_mark()
@@ -47,7 +48,6 @@ class PlotMark:
         if self.name is not None:
             plt.text(self.position_x + self.text_shift,
                      self.position_y + self.text_shift, self.name)
-
 
     def plot_light_mark(self, color : str, angle : float=None) -> None:
         """ Plot light mark """
@@ -656,6 +656,37 @@ class BuildPath:
         return Path([(-3, 2), (-1, 2), (-1, 1), (0, 1), (0, 0), (1, 0), (1, -1),
                      (2, -1), (2, -2), (4, -2), (4, -3), (1, -3), (-3, 1), (-3, 2)],
                     [1,2,2,2,2,2,2,2,2,2,2,2,2,79])
+        
+def plot_nav(position_x :float, position_y :float, nav_type : str, angle :float = None, markersize = 20):
+    """ Plot Nav """
+    match nav_type:
+        case 'waypoint':
+            cross_h = Path([(-1, 0), (1, 0)], [1, 2])
+            cross_v = Path([(0, 1), (0, -1)], [1, 2])
+            square = Path([(-1, -1), (1, -1), (1, 1), (-1, 1), (-1, -1)], [1, 2, 2, 2, 79])
+            marker = Path.make_compound_path(cross_h, cross_v, square)
+        case 'ground_track':
+            arrow1 = Path([(-1, 1), (0, 0), (-1, -1)], [1, 2, 2])
+            arrow2 = Path([(-0.5, 1), (0.5, 0), (-0.5, -1)], [1, 2, 2])
+            marker = Path.make_compound_path(arrow1, arrow2)
+        case 'water_track':
+            marker = Path([(-1, 1), (0, 0), (-1, -1)], [1, 2, 2])
+        case 'tide_track':
+            arrow1 = Path([(-1, 1), (0, 0), (-1, -1)], [1, 2, 2])
+            arrow2 = Path([(-0.5, 1), (0.5, 0), (-0.5, -1)], [1, 2, 2])
+            arrow3 = Path([(-1.5, 1), (-0.5, 0), (-1.5, -1)], [1, 2, 2])
+            marker = Path.make_compound_path(arrow1, arrow2, arrow3)
+        case 'dead_reckoning':
+            marker = Path.arc(0,180)
+        case _:
+            print('not defined in NAVIGATION_SET!')
+            
+    if angle is not None:
+        marker = marker.transformed(transforms.Affine2D().rotate(angle))
+    
+    plt.plot(position_x, position_y, marker=marker,
+                markersize = markersize,
+                fillstyle='none', markeredgewidth=1, markeredgecolor='k')
 
 def main():
 
@@ -691,18 +722,31 @@ def main():
         plt.text(i*2 + 4,20,mark.capitalize(), horizontalalignment='left', rotation = 30)
         danger_mark = PlotMark(i*2+4,19,mark)
 
+    plt.text(1, 23,'Harbour marks')
+    for i, mark in enumerate(HARBOURS_SET):
+        plt.text(i*2 + 4,24,mark.capitalize(), horizontalalignment='left', rotation = 30)
+        danger_mark = PlotMark(i*2+4,23,mark)
+    
+    plt.text(1, 27,'Navigation marks')
+    for i, nav in enumerate(NAVIGATION_SET):
+        plt.text(i*2 + 4,28,nav.capitalize(), horizontalalignment='left', rotation = 30)
+        plot_nav(i*2+4,27,nav)
+    
+    
     #plt.text(1, 23, 'Light')
 
-    PlotMark(3, 23,'Spar','East',light_color='yellow', floating=True)
+    # PlotMark(3, 23,'Spar','East',light_color='yellow', floating=True)
 
-    plt.plot(1, 25, '*')
+    plt.plot(1, 29, '*')
 
-    PlotMark(5, 23, 'marina')
-    PlotMark(7, 23, 'anchorage')
-    PlotMark(9, 23, 'fish')
-    PlotMark(9, 23, 'no_fish')
-    PlotMark(11, 23, 'slipway')
-    PlotMark(13, 23, 'steps')
+    # PlotMark(5, 23, 'marina')
+    # PlotMark(7, 23, 'anchorage')
+    # PlotMark(9, 23, 'fish')
+    # PlotMark(9, 23, 'no_fish')
+    # PlotMark(11, 23, 'slipway')
+    # PlotMark(13, 23, 'steps')
+    
+    
     plt.axis('off')
     plt.title('Nautical symbols')
     plt.show()
