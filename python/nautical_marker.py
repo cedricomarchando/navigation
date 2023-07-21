@@ -1,4 +1,5 @@
 # %%
+from math import pi
 import matplotlib.pyplot as plt
 from matplotlib.path import Path
 import matplotlib.transforms as transforms
@@ -13,7 +14,7 @@ HARBOURS_SET : set[str] = {'marina','anchorage','no_anchorage', 'fish',
 TOPMARKS_SET : set[str] = {'green', 'green_bis', 'red', 'red_bis', 'north', 'south', 'east', 'west',
                 'danger', 'special', 'safe_water', 'emergency'}
 
-NAVIGATION_SET : set[str] = {'waypoint', 'water_track', 'ground_track', 'tide_track', 'dead_reckoning'}
+TRACK_SET : set[str] = {'waypoint', 'water_track', 'ground_track', 'tide_track', 'dead_reckoning'}
 
 MARKS_LIST : set[str] = LANDMARKS_SET | DANGERS_SET | SEAMARK_SET | HARBOURS_SET
 
@@ -657,9 +658,9 @@ class BuildPath:
                      (2, -1), (2, -2), (4, -2), (4, -3), (1, -3), (-3, 1), (-3, 2)],
                     [1,2,2,2,2,2,2,2,2,2,2,2,2,79])
         
-def plot_nav(position_x :float, position_y :float, nav_type : str, angle :float = None, markersize = 20):
+def plot_track(position_x :float, position_y :float, track_type : str, angle :float, markersize = 20):
     """ Plot Nav """
-    match nav_type:
+    match track_type:
         case 'waypoint':
             cross_h = Path([(-1, 0), (1, 0)], [1, 2])
             cross_v = Path([(0, 1), (0, -1)], [1, 2])
@@ -679,18 +680,15 @@ def plot_nav(position_x :float, position_y :float, nav_type : str, angle :float 
         case 'dead_reckoning':
             marker = Path.arc(0,180)
         case _:
-            print('not defined in NAVIGATION_SET!')
-            
-    if angle is not None:
-        marker = marker.transformed(transforms.Affine2D().rotate(angle))
-    
+            print(f'the string {track_type} not defined in TRACK_SET! {TRACK_SET}')
+    marker = marker.transformed(transforms.Affine2D().rotate(-angle + pi/2))
     plt.plot(position_x, position_y, marker=marker,
                 markersize = markersize,
                 fillstyle='none', markeredgewidth=1, markeredgecolor='k')
 
 def main():
 
-    PlotMark.markersize = 100
+    PlotMark.markersize = 50
 
     plt.figure(1,figsize=(10,5) )
     for j, shape in enumerate(SEAMARK_SET):
@@ -728,9 +726,9 @@ def main():
         danger_mark = PlotMark(i*2+4,23,mark)
     
     plt.text(1, 27,'Navigation marks')
-    for i, nav in enumerate(NAVIGATION_SET):
-        plt.text(i*2 + 4,28,nav.capitalize(), horizontalalignment='left', rotation = 30)
-        plot_nav(i*2+4,27,nav)
+    for i, track_type in enumerate(TRACK_SET):
+        plt.text(i*2 + 4, 28, track_type.capitalize(), horizontalalignment='left', rotation = 30)
+        plot_track(i*2+4, 27, track_type, 0.0)
     
     
     #plt.text(1, 23, 'Light')
