@@ -31,37 +31,50 @@ class Waypoint:
         return f' x={self.position[0]}, y={self.position[1]}, waypoint_id={self.waypoint_number}\n'
              
 
+class Track:
+    """ track class """
+    def __init__(self, start_position:list[float,float], speed:float = 0, course:float = 0, markersize:int = 30,  track_type:str = 'ground_track'):
+        self.start_position = start_position
+        self.speed = speed
+        self.course = course
+        self.markersize = markersize
+        self.track_type = track_type
+        
+    def plot_track(self):
+        """ Show speed with direction of course"""
+        plt.plot([self.start_position[0], self.start_position[0] + self.speed * np.sin(self.course)],
+                 [self.start_position[1], self.start_position[1] + self.speed * np.cos(self.course)],'-k')
+        marker.plot_track(self.start_position[0] + self.speed /2 * np.sin(self.course),
+                        self.start_position[1] + self.speed /2 * np.cos(self.course),
+                        track_type=self.track_type,
+                        angle=self.course,
+                        markersize=self.markersize)
+    
+    def __str__(self):
+        return (f' x={self.start_position[0]}, y={self.start_position[1]}, speed={self.speed},'
+                f' course={self.course}, track_type={self.track_type} \n')
 
 class Boat:
     """ Boat class """
+    markersize = 30
     def __init__(self, position :list[float, float],
-        ground_course:float=0, ground_speed:float=0,
-        water_course:float=0, water_speed:float=0,
-        tide_course:float=0, tide_speed:float=0,
+        ground_track:Track = Track([0,0],track_type='ground_track'),
+        water_track:Track = Track([0,0],track_type='water_track'),
+        tide_track:Track = Track([0,0],track_type='tide_track'),
         waypoint_distance:float = None, color ='b'):
+        
         self.position = position
-        self.ground_course = ground_course
-        self.ground_speed = ground_speed
-        self.water_course = water_course
-        self.water_speed = water_speed
-        self.tide_course = tide_course
-        self.tide_speed = tide_speed
+        self.ground_track = ground_track
+        self.water_track = water_track
+        self.tide_track = tide_track
         self.color = color
         self.waypoint_distance = waypoint_distance
-
-    def plot_track(self):
-        """ Show speed with direction of course"""
-        plt.plot([self.position[0], self.position[0] + self.ground_speed * np.sin(self.ground_course)],
-                 [self.position[1], self.position[1] + self.ground_speed * np.cos(self.ground_course)],'-k')
-        marker.plot_nav(self.position[0] + self.ground_speed /2 * np.sin(self.ground_course),
-                        self.position[1] + self.ground_speed /2 * np.cos(self.ground_course),
-                        'tide_track')
-        
+        self.ground_track.start_position = position
         
     def run(self,duration:float):
         """ Run with speed for a duration """
-        self.position[0] += self.ground_speed * duration * np.sin(self.ground_course)
-        self.position[1] += self.ground_speed * duration * np.cos(self.ground_course)
+        self.position[0] += self.ground_track.speed * duration * np.sin(self.ground_track.course)
+        self.position[1] += self.ground_track.speed * duration * np.cos(self.ground_track.course)
 
     def plot_position(self):
         """ Plot position """
@@ -72,11 +85,11 @@ class Boat:
         vertices = [(-2, 1), (1, 2), (3, 0), (1, -2), (-2, -1), (-2, 1)]
         codes = [1,3,2,3,1,79]
         boat_marker = Path(vertices,codes)
-        if self.ground_course is not None:
-            angle = self.ground_course - np.pi/2
+        if self.ground_track.course is not None:
+            angle = self.ground_track.course - np.pi/2
             boat_marker = boat_marker.transformed(transforms.Affine2D().rotate(-angle))
         plt.plot(self.position[0], self.position[1], marker=boat_marker,
-            markersize=10, color=self.color,  markerfacecolor='none',
+            markersize=self.markersize/3, color=self.color,  markerfacecolor='none',
             linestyle = 'None')
 
     def set_position(self,position : list[float, float]) -> None:
@@ -87,14 +100,14 @@ class Boat:
         """ give course to go to position """
         vector_x = position[0] - self.position[0]
         vector_y = position[1] - self.position[1]
-        self.ground_course = np.arctan2(vector_x, vector_y)
+        self.ground_track.course = np.arctan2(vector_x, vector_y)
 
     def compute_waypoint_distance(self, waypoint:Waypoint) -> float:
         self.waypoint_distance = math.dist(self.position, waypoint.position)
 
     def __str__(self):
-        return (f' x={self.position[0]}, y={self.position[1]}, speed={self.ground_speed},'
-                f' course={self.ground_course}, waypoint_disatance={self.waypoint_distance} \n')
+        return (f' x={self.position[0]}, y={self.position[1]}, speed={self.ground_track.speed},'
+                f' course={self.ground_track.course}, waypoint_disatance={self.waypoint_distance} \n')
 
 
 
@@ -345,8 +358,8 @@ class BoatSimu:
         mark.compute_bearing(self.boat_true, 0)
         # run mark in the direction of the boat
         mark_shifted = Mark(
-            [mark.position[0] + self.boat_estimate.ground_speed * fix_period * np.sin(self.boat_estimate.ground_course),
-            mark.position[1] + self.boat_estimate.ground_speed * fix_period * np.cos(self.boat_estimate.ground_course)],
+            [mark.position[0] + self.boat_estimate.ground_track.speed * fix_period * np.sin(self.boat_estimate.ground_track.course),
+            mark.position[1] + self.boat_estimate.ground_track.speed * fix_period * np.cos(self.boat_estimate.ground_track.course)],
             bearing = save_bearing
             )
         poly_intersection = self.compute_intersection_2lop(mark, mark_shifted, sigma)
@@ -400,7 +413,7 @@ class BoatSimu:
     def go_to_waypoint(self, waypoint:Waypoint, marks_map:MarksMap, sigma:float, fix_period:float, fix_type:FixType):
         self.compute_waypoint_distance(waypoint)
         #while self.boat_estimate.waypoint_distance > self.boat_estimate.speed * fix_period:
-        while self.boat_true.waypoint_distance > self.boat_true.ground_speed * fix_period:
+        while self.boat_true.waypoint_distance > self.boat_true.ground_track.speed * fix_period:
             self.set_waypoint_course(waypoint.position) 
             nearest_marks = self.select_near_fixed_marks(marks_map, sigma, 6)
             match fix_type:
