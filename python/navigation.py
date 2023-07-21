@@ -49,6 +49,12 @@ class Track:
                         track_type=self.track_type,
                         angle=self.course,
                         markersize=self.markersize)
+        
+    def run_track(self):
+        """ run track """
+        position = [self.start_position[0] + self.speed * np.sin(self.course),
+                    self.start_position[1] + self.speed * np.cos(self.course)]
+        return position
     
     def __str__(self):
         return (f' x={self.start_position[0]}, y={self.start_position[1]}, speed={self.speed},'
@@ -70,6 +76,26 @@ class Boat:
         self.color = color
         self.waypoint_distance = waypoint_distance
         self.ground_track.start_position = position
+        self.tide_track.start_position = position
+        
+    def update_course_to_steer(self):
+        """ let us define min_distance_tide_ground vector from end of tide verctor to ground track,
+        orthogonal to ground track
+        then using trigonometrie one can find the course to steer """
+        min_distance_tide_ground = (math.sin(self.tide_track.course - self.ground_track.course) *
+                                    self.tide_track.speed)
+        angle_ortho_water = math.acos(min_distance_tide_ground / self.water_track.speed)
+        course_to_steer = self.ground_track.course - math.pi/2 +  angle_ortho_water
+        return course_to_steer
+    
+    def update_ground_speed(self):
+        """ update ground speed with tide speed + water speed """
+        position_after_tide = self.tide_track.run_track()
+        self.water_track.start_position = position_after_tide
+        position_after_water = self.water_track.run_track()
+        self.ground_track.speed = math.dist(self.tide_track.start_position, position_after_water)
+
+
         
     def run(self,duration:float):
         """ Run with speed for a duration """
@@ -85,11 +111,11 @@ class Boat:
         vertices = [(-2, 1), (1, 2), (3, 0), (1, -2), (-2, -1), (-2, 1)]
         codes = [1,3,2,3,1,79]
         boat_marker = Path(vertices,codes)
-        if self.ground_track.course is not None:
-            angle = self.ground_track.course - np.pi/2
+        if self.water_track.course is not None:
+            angle = self.water_track.course - np.pi/2
             boat_marker = boat_marker.transformed(transforms.Affine2D().rotate(-angle))
         plt.plot(self.position[0], self.position[1], marker=boat_marker,
-            markersize=self.markersize/3, color=self.color,  markerfacecolor='none',
+            markersize=self.markersize, color=self.color,  markerfacecolor='none',
             linestyle = 'None')
 
     def set_position(self,position : list[float, float]) -> None:
