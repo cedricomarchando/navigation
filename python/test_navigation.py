@@ -14,17 +14,31 @@ boat_simu = nav.BoatSimu([300,310], [300,310])
 mark1.plot_mark()
 mark2.plot_mark()
 mark3.plot_mark()
-
-boat_simu.compute_position_3lop(mark1, mark2, mark3, True)
-
+boat_simu.compute_position_3lop_hat(mark1, mark2, mark3, True)
 mark1.plot_mark_bearing(boat_simu.boat_true)
 mark2.plot_mark_bearing(boat_simu.boat_true)
 mark3.plot_mark_bearing(boat_simu.boat_true)
-# circle1 = plt.Circle((position_x,position_y),radius, fill=False)
-# plt.gca().add_patch(circle1)
 boat_simu.plot_boat()
-nav.legend_unique()
+plt.title(" 3LOP with hat")
 plt.draw()
+
+# %%
+plt.figure(11)
+mark1 = nav.Mark([100,300], 'church')
+mark2 = nav.Mark([500,500], 'lighthouse')
+mark3 = nav.Mark([500,100], 'land_tower')
+boat_simu = nav.BoatSimu([300,310], [300,310])
+mark1.plot_mark()
+mark2.plot_mark()
+mark3.plot_mark()
+boat_simu.compute_position_3lop(mark1, mark2, mark3, True)
+mark1.plot_mark_bearing(boat_simu.boat_true)
+mark2.plot_mark_bearing(boat_simu.boat_true)
+mark3.plot_mark_bearing(boat_simu.boat_true)
+boat_simu.plot_boat()
+plt.title(" 3LOP with estimated error position")
+plt.draw()
+
 
 # %%
 plt.figure(2)
@@ -40,7 +54,6 @@ for i in range(40,600,50):
         boat_simu.compute_position_3lop(mark1, mark2, mark3, False)
         boat_simu.plot_boat()
         del boat_simu
-nav.legend_unique()
 plt.title("3 LOP position fix")
 plt.draw()
 
@@ -56,7 +69,6 @@ boat_simu = nav.BoatSimu([400,310], [400,310])
 boat_simu.compute_position_2lop(mark1, mark2, show_lop=True)
 boat_simu.plot_boat()
 
-nav.legend_unique()
 plt.title("2 LOP fix")
 plt.draw()
 
@@ -75,7 +87,6 @@ for i in range(100,600,50):
         boat_simu.compute_position_2lop(mark1, mark2,show_lop=False)
         boat_simu.plot_boat()
         del boat_simu
-nav.legend_unique()
 plt.title("2 LOP position fix")
 plt.draw()
 
@@ -108,7 +119,6 @@ for i in range(150,500,100):
         markC.plot_mark_bearing(boat_simu.boat_true)
         del boat_simu
 
-nav.legend_unique()
 plt.title("3 LOP position fix, with selection of three best marks based on estimate area")
 plt.show()
 
