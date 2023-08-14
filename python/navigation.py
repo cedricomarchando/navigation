@@ -2,6 +2,7 @@
 from itertools import combinations
 from enum import Enum, auto
 import math
+import logging
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.transforms as transforms
@@ -272,22 +273,28 @@ class BoatSimu:
         """ Comput fix position with triangulation of 3 Lines Of Position (LOP) 
         using interction of boat estimated error position"""
         sigma = np.pi/90 # 2 degree
-        mark1.compute_bearing(self.boat_true,0)
-        mark2.compute_bearing(self.boat_true,0)
-        mark3.compute_bearing(self.boat_true,0)
+        mark1.compute_bearing(self.boat_true, sigma)
+        mark2.compute_bearing(self.boat_true, sigma)
+        mark3.compute_bearing(self.boat_true, sigma)
         if show_lop:
             mark1.plot_mark_bearing(self.boat_true)
             mark2.plot_mark_bearing(self.boat_true)
             mark3.plot_mark_bearing(self.boat_true)
         poly_intersection = self.compute_intersection_3lop(mark1, mark2, mark3, sigma)
         if poly_intersection.is_empty:
-            print(f'empty intersection for boat at position \n{self.boat_true.position}')
-            barycentre = [0.0, 0.0]
+            logging.info('Empty intersection at position %s, use of the hat method as default',self.boat_true.position)
+            inter1 = compute_intersection(mark1, mark2)
+            inter2 = compute_intersection(mark1, mark3)
+            inter3 = compute_intersection(mark2, mark3)
+            plt.plot( [inter1[0], inter2[0], inter3[0], inter1[0]], [inter1[1], inter2[1], inter3[1], inter1[1]], c='g')
+            barycentre_x = (inter1[0] + inter2[0] + inter3[0])/3
+            barycentre_y = (inter1[1] + inter2[1] + inter3[1])/3
+            barycentre = [ barycentre_x, barycentre_y]
         else:
             x, y = poly_intersection.exterior.xy
             plt.plot(x,y, c='g')
             barycentre = shapely.get_coordinates(poly_intersection.centroid).tolist()[0]
-        self.boat_estimate.set_position(barycentre)   
+        self.boat_estimate.set_position(barycentre) 
         return barycentre
     
     def compute_position_3lop_hat(self, mark1, mark2, mark3, show_lop):
@@ -309,9 +316,7 @@ class BoatSimu:
         barycentre_x = (inter1[0] + inter2[0] + inter3[0])/3
         barycentre_y = (inter1[1] + inter2[1] + inter3[1])/3
         barycentre = [ barycentre_x, barycentre_y]
-        
-
-        self.boat_estimate.set_position(barycentre)   
+        self.boat_estimate.set_position(barycentre)
         return barycentre
 
     def compute_position_2lop(self, mark1:Mark, mark2:Mark, show_lop:bool):
@@ -555,7 +560,7 @@ def main():
     mark2.plot_mark()
     mark3.plot_mark()
 
-    boat_simu.compute_position_3lop(mark1, mark2, mark3, show_lop=True)
+    boat_simu.compute_position_3lop_hat(mark1, mark2, mark3, show_lop=True)
     boat_simu.plot_boat()
 
     mark1.plot_mark_bearing(boat_simu.boat_true)
