@@ -273,14 +273,18 @@ class BoatSimu:
         """ Comput fix position with triangulation of 3 Lines Of Position (LOP) 
         using interction of boat estimated error position"""
         sigma = np.pi/90 # 2 degree
-        mark1.compute_bearing(self.boat_true, sigma)
-        mark2.compute_bearing(self.boat_true, sigma)
-        mark3.compute_bearing(self.boat_true, sigma)
+        mark1.compute_bearing(self.boat_true, 0)
+        mark2.compute_bearing(self.boat_true, 0)
+        mark3.compute_bearing(self.boat_true, 0)
         if show_lop:
             mark1.plot_mark_bearing(self.boat_true)
             mark2.plot_mark_bearing(self.boat_true)
             mark3.plot_mark_bearing(self.boat_true)
         poly_intersection = self.compute_intersection_3lop(mark1, mark2, mark3, sigma)
+        #print(poly_intersection)
+        #print(type(poly_intersection))
+        #print(poly_intersection.length)
+        #print(f'number of points in polygon{len(poly_intersection[0])}')
         if poly_intersection.is_empty:
             logging.info('Empty intersection at position %s, use of the hat method as default',self.boat_true.position)
             inter1 = compute_intersection(mark1, mark2)
@@ -291,10 +295,14 @@ class BoatSimu:
             barycentre_y = (inter1[1] + inter2[1] + inter3[1])/3
             barycentre = [ barycentre_x, barycentre_y]
         else:
+            #if poly_intersection.is_point:
+            ##    logging.info('intersection is a point for boat at position %s',self.boat_true.position)
+            #    barycentre = poly_intersection
+            #else:
             x, y = poly_intersection.exterior.xy
             plt.plot(x,y, c='g')
             barycentre = shapely.get_coordinates(poly_intersection.centroid).tolist()[0]
-        self.boat_estimate.set_position(barycentre) 
+        self.boat_estimate.set_position(barycentre)
         return barycentre
     
     def compute_position_3lop_hat(self, mark1, mark2, mark3, show_lop):
@@ -329,8 +337,8 @@ class BoatSimu:
             mark2.plot_mark_bearing(self.boat_true)
         poly_intersection = self.compute_intersection_2lop(mark1, mark2, sigma)
         if poly_intersection.is_empty:
-            print(f'empty intersection for boat at position \n{self.boat_true.position}')
-            barycentre = [0.0, 0.0]
+            logging.warning('empty intersection for 2LOP for boat at position %s, using tradition intersection of 2LOP as default', self.boat_true.position)
+            barycentre = compute_intersection(mark1, mark2)
         else:
             x, y = poly_intersection.exterior.xy
             plt.plot(x,y, c='g')
@@ -527,12 +535,26 @@ class Route:
 
 def compute_intersection(mark1 : Mark, mark2 : Mark) -> list[float,float]:
     """ Compute intersection between two LOP of mark1 and mark2
-    y = a1 x+ b1 (for LOP of mark1)
-    y = a2 x+ b2 (for LOP of mark2)
-    thus intersection at x = (b1-b2)/(a2-a1) """
-    intersection_x = ((mark1.position[1] - 1/np.tan(mark1.bearing)*mark1.position[0])
-            - (mark2.position[1] -1/np.tan(mark2.bearing)*mark2.position[0])) / ((1/np.tan(mark2.bearing)) - ( 1/np.tan(mark1.bearing)))
-    intersection_y = 1/np.tan(mark1.bearing) * intersection_x + mark1.position[1] - 1/np.tan(mark1.bearing)*mark1.position[0]
+    y = slop1 * x + b1 (for LOP of mark1)
+    y = slop2 * x + b2 (for LOP of mark2)
+    thus intersection at x = (b1-b2)/(slop2-slop1) """
+
+    if mark1.bearing == 0:
+        logging.warning("division by 0 avoided by giving high value to slop")
+        slop1 = 10000
+    else:
+        slop1 = 1/np.tan(mark1.bearing)
+    if mark2.bearing == 0:
+        logging.warning("division by 0 avoided by giving high value to slop")
+        slop2 = 10000
+    else:
+        slop2 = 1/np.tan(mark2.bearing)
+        
+    b1 = mark1.position[1] - slop1*mark1.position[0]
+    b2 = mark2.position[1] - slop2*mark2.position[0]
+    
+    intersection_x = (b1 - b2) / ( slop2 - slop1)
+    intersection_y = slop1 * intersection_x + mark1.position[1] - slop1 * mark1.position[0]
     intersection = np.array([intersection_x, intersection_y])
     return intersection
 
@@ -556,11 +578,12 @@ def main():
     mark2 = Mark([500, 500], 'major_lighthouse')
     mark3 = Mark([500, 100], 'water_tower')
     boat_simu = BoatSimu([300, 310],[300, 310])
+    #boat_simu = BoatSimu([100, 300],[100, 300])
     mark1.plot_mark()
     mark2.plot_mark()
     mark3.plot_mark()
 
-    boat_simu.compute_position_3lop_hat(mark1, mark2, mark3, show_lop=True)
+    boat_simu.compute_position_3lop(mark1, mark2, mark3, show_lop=True)
     boat_simu.plot_boat()
 
     mark1.plot_mark_bearing(boat_simu.boat_true)
