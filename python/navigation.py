@@ -129,6 +129,7 @@ class Boat:
         vector_x = position[0] - self.position[0]
         vector_y = position[1] - self.position[1]
         self.ground_track.course = np.arctan2(vector_x, vector_y)
+        self.water_track.course = self.ground_track.course
 
     def compute_waypoint_distance(self, waypoint:Waypoint) -> float:
         self.waypoint_distance = math.dist(self.position, waypoint.position)
@@ -269,7 +270,7 @@ class BoatSimu:
         self.boat_true.plot_boat()
         self.boat_estimate.plot_boat()
 
-    def compute_position_3lop(self, mark1, mark2, mark3, show_lop):
+    def compute_position_3lop(self, mark1:Mark, mark2:Mark, mark3:Mark, show_lop:bool):
         """ Comput fix position with triangulation of 3 Lines Of Position (LOP) 
         using intersection of boat estimated polygone error position"""
         sigma = np.pi/90 # 2 degree
@@ -300,7 +301,7 @@ class BoatSimu:
         self.boat_estimate.set_position(barycentre)
         return barycentre
     
-    def compute_position_3lop_hat(self, mark1, mark2, mark3, show_lop):
+    def compute_position_3lop_hat(self, mark1:Mark, mark2:Mark, mark3:Mark, show_lop:bool):
         """ Comput fix position with triangulation of 3 Lines Of Position (LOP)
         using the hat algorithm """
         sigma = np.pi/90 # 2 degree
@@ -479,21 +480,31 @@ class BoatSimu:
 
     def go_to_waypoint(self, waypoint:Waypoint, marks_map:MarksMap, sigma:float, fix_period:float, fix_type:FixType):
         self.compute_waypoint_distance(waypoint)
-        #while self.boat_estimate.waypoint_distance > self.boat_estimate.speed * fix_period:
         while self.boat_true.waypoint_distance > self.boat_true.ground_track.speed * fix_period:
-            self.set_waypoint_course(waypoint.position) 
-            nearest_marks = self.select_near_fixed_marks(marks_map, sigma, 6)
-            match fix_type:
-                case FixType.FIX_2LOP:
-                    self.run(fix_period)
-                    self.update_2lop_fix(nearest_marks)
-                case FixType.FIX_3LOP:
-                    self.run(fix_period)
-                    self.update_3lop_fix(nearest_marks)
-                case FixType.FIX_RUNNING:
-                    self.update_run_fix(nearest_marks, fix_period, sigma)     
+            self.set_waypoint_course(waypoint.position)
             self.plot_boat()
+            nearest_marks = self.select_near_fixed_marks(marks_map, sigma, 6)
+            self.run_and_fix(nearest_marks, fix_period, fix_type, sigma)
             self.compute_waypoint_distance(waypoint)
+        # finish to go
+        finish_period = self.boat_true.waypoint_distance / self.boat_true.ground_track.speed
+        self.set_waypoint_course(waypoint.position)
+        self.plot_boat()
+        nearest_marks = self.select_near_fixed_marks(marks_map, sigma, 6)
+        self.run_and_fix(nearest_marks, finish_period, fix_type, sigma)
+
+    def run_and_fix(self, nearest_marks, fix_period:float, fix_type:FixType, sigma:float):
+        match fix_type:
+            case FixType.FIX_2LOP:
+                self.run(fix_period)
+                self.update_2lop_fix(nearest_marks)
+            case FixType.FIX_3LOP:
+                self.run(fix_period)
+                self.update_3lop_fix(nearest_marks)
+            case FixType.FIX_RUNNING:
+                self.update_run_fix(nearest_marks, fix_period, sigma)
+        
+        
 
 
 class Route:
