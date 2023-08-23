@@ -273,9 +273,9 @@ class BoatSimu:
         """ Comput fix position with triangulation of 3 Lines Of Position (LOP) 
         using interction of boat estimated error position"""
         sigma = np.pi/90 # 2 degree
-        mark1.compute_bearing(self.boat_true, 0)
-        mark2.compute_bearing(self.boat_true, 0)
-        mark3.compute_bearing(self.boat_true, 0)
+        mark1.compute_bearing(self.boat_true, sigma)
+        mark2.compute_bearing(self.boat_true, sigma)
+        mark3.compute_bearing(self.boat_true, sigma)
         if show_lop:
             mark1.plot_mark_bearing(self.boat_true)
             mark2.plot_mark_bearing(self.boat_true)
@@ -294,6 +294,9 @@ class BoatSimu:
             barycentre_x = (inter1[0] + inter2[0] + inter3[0])/3
             barycentre_y = (inter1[1] + inter2[1] + inter3[1])/3
             barycentre = [ barycentre_x, barycentre_y]
+        elif poly_intersection.area == 0.0:
+            logging.info('Intersection at position %s, is a point that is used as barycentre',self.boat_true.position)
+            barycentre = shapely.get_coordinates(poly_intersection.centroid).tolist()[0]
         else:
             #if poly_intersection.is_point:
             ##    logging.info('intersection is a point for boat at position %s',self.boat_true.position)
