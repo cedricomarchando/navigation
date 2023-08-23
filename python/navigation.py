@@ -271,22 +271,18 @@ class BoatSimu:
 
     def compute_position_3lop(self, mark1, mark2, mark3, show_lop):
         """ Comput fix position with triangulation of 3 Lines Of Position (LOP) 
-        using interction of boat estimated error position"""
+        using intersection of boat estimated polygone error position"""
         sigma = np.pi/90 # 2 degree
-        mark1.compute_bearing(self.boat_true, sigma)
-        mark2.compute_bearing(self.boat_true, sigma)
-        mark3.compute_bearing(self.boat_true, sigma)
+        mark1.compute_bearing(self.boat_true, 0)
+        mark2.compute_bearing(self.boat_true, 0)
+        mark3.compute_bearing(self.boat_true, 0)
         if show_lop:
             mark1.plot_mark_bearing(self.boat_true)
             mark2.plot_mark_bearing(self.boat_true)
             mark3.plot_mark_bearing(self.boat_true)
         poly_intersection = self.compute_intersection_3lop(mark1, mark2, mark3, sigma)
-        #print(poly_intersection)
-        #print(type(poly_intersection))
-        #print(poly_intersection.length)
-        #print(f'number of points in polygon{len(poly_intersection[0])}')
         if poly_intersection.is_empty:
-            logging.info('Empty intersection at position %s, use of the hat method as default',self.boat_true.position)
+            logging.warning('Empty intersection at position %s, use of the hat method as default',self.boat_true.position)
             inter1 = compute_intersection(mark1, mark2)
             inter2 = compute_intersection(mark1, mark3)
             inter3 = compute_intersection(mark2, mark3)
@@ -295,13 +291,9 @@ class BoatSimu:
             barycentre_y = (inter1[1] + inter2[1] + inter3[1])/3
             barycentre = [ barycentre_x, barycentre_y]
         elif poly_intersection.area == 0.0:
-            logging.info('Intersection at position %s, is a point that is used as barycentre',self.boat_true.position)
+            logging.warning('Intersection at position %s, is a point that is used as barycentre',self.boat_true.position)
             barycentre = shapely.get_coordinates(poly_intersection.centroid).tolist()[0]
         else:
-            #if poly_intersection.is_point:
-            ##    logging.info('intersection is a point for boat at position %s',self.boat_true.position)
-            #    barycentre = poly_intersection
-            #else:
             x, y = poly_intersection.exterior.xy
             plt.plot(x,y, c='g')
             barycentre = shapely.get_coordinates(poly_intersection.centroid).tolist()[0]
@@ -394,7 +386,14 @@ class BoatSimu:
         for i, comb_i in enumerate(comb):
             poly_intersection = self.compute_intersection_3lop(
                 mark_table[comb_i[0]], mark_table[comb_i[1]],  mark_table[comb_i[2]], sigma)
-            cost = poly_intersection.area
+            if poly_intersection.is_empty:
+                logging.warning('Empty intersection at position %s, the mark combinaison %s is discarded',self.boat_true.position, comb_i)
+                cost = 100000
+            elif poly_intersection.area == 0.0:
+                logging.warning('Intersection with no area at position %s',self.boat_true.position)
+                cost = 100000
+            else:
+                cost = poly_intersection.area
             if cost < min_cost:
                 min_cost = cost
                 index_min = i
