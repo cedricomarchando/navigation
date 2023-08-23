@@ -54,9 +54,21 @@ for i in range(40,600,50):
         boat_simu.compute_position_3lop(mark1, mark2, mark3, False)
         boat_simu.plot_boat()
         del boat_simu
-plt.title("3 LOP position fix")
+plt.title("3 LOP position fix with estimated error position")
 plt.draw()
 
+plt.figure(21)
+mark1.plot_mark()
+mark2.plot_mark()
+mark3.plot_mark()
+for i in range(40,600,50):
+    for j in range(150,590,100):
+        boat_simu = nav.BoatSimu([i,j], [i,j])
+        boat_simu.compute_position_3lop_hat(mark1, mark2, mark3, False)
+        boat_simu.plot_boat()
+        del boat_simu
+plt.title("3 LOP position fix with hat")
+plt.draw()
 
 # %% 2 LOP intersection
 plt.figure(4)
