@@ -34,7 +34,7 @@ class Waypoint:
 
 class Track:
     """ track class """
-    markersize = 30
+    markersize = 20
     def __init__(self, start_position:list[float,float], speed:float = 0, course:float = 0, track_type:str = 'ground_track'):
         self.start_position = start_position
         self.speed = speed
@@ -81,14 +81,23 @@ class Boat:
         self.tide_track.start_position = position
         
     def update_course_to_steer(self):
-        """ let us define min_distance_tide_ground vector from end of tide verctor to ground track,
-        orthogonal to ground track
-        then using trigonometrie one can find the course to steer """
+        """ 
+        A course to steer is a method of calculation what heading the boat needs 
+        to be pointing at in order to get successfullyt to its waypoint considering 
+        the effects of tide and leeway. 
+        Let us define  a vector min_distance_tide_ground from end of tide_track vector 
+        to the closest point of ground_track vector 
+        ( built vector is orthogonal to ground track).
+        Then using trigonometrie one can find the course to steer """
         min_distance_tide_ground = (math.sin(self.tide_track.course - self.ground_track.course) *
                                     self.tide_track.speed)
-        angle_ortho_water = math.acos(min_distance_tide_ground / self.water_track.speed)
+        if self.water_track.speed == 0:
+            angle_ortho_water = 0
+        else:
+            angle_ortho_water = math.acos(min_distance_tide_ground / self.water_track.speed)
+            
         course_to_steer = self.ground_track.course - math.pi/2 +  angle_ortho_water
-        return course_to_steer
+        self.water_track.course = course_to_steer
     
     def update_ground_speed(self):
         """ update ground speed with tide speed + water speed """
@@ -129,7 +138,9 @@ class Boat:
         vector_x = position[0] - self.position[0]
         vector_y = position[1] - self.position[1]
         self.ground_track.course = np.arctan2(vector_x, vector_y)
-        self.water_track.course = self.ground_track.course
+        self.update_course_to_steer()
+        self.update_ground_speed()
+        #self.water_track.course = self.ground_track.course
 
     def compute_waypoint_distance(self, waypoint:Waypoint) -> float:
         self.waypoint_distance = math.dist(self.position, waypoint.position)
@@ -466,6 +477,13 @@ class BoatSimu:
     def set_waypoint_course(self, position: list[float, float]):
         self.boat_estimate.set_waypoint_course(position)
         self.boat_true.set_waypoint_course(position)
+        
+    def set_tide_track(self, course:float=0, speed:float=0):
+        self.boat_estimate.tide_track.course = course
+        self.boat_estimate.tide_track.speed = speed
+        self.boat_true.tide_track.course = course
+        self.boat_true.tide_track.speed = speed
+        
 
     def compute_waypoint_distance(self, waypoint:Waypoint) -> None:
         self.boat_estimate.compute_waypoint_distance(waypoint)
