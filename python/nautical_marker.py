@@ -681,10 +681,12 @@ def plot_track(position_x :float, position_y :float, track_type : str, angle :fl
             marker = Path.arc(0,180)
         case _:
             print(f'the string {track_type} not defined in TRACK_SET! {TRACK_SET}')
+    line = Path([(-2,0), (1,0)], [1,2])
+    marker = Path.make_compound_path(marker, line)
     marker = marker.transformed(transforms.Affine2D().rotate(-angle + pi/2))
     plt.plot(position_x, position_y, marker=marker,
                 markersize = markersize,
-                fillstyle='none', markeredgewidth=1, markeredgecolor='k')
+                fillstyle='none', markeredgewidth=1, markeredgecolor='k', linestyle='None', label=track_type)
 
 def main():
 
