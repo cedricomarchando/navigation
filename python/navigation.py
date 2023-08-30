@@ -63,12 +63,12 @@ class Track:
 
 class Boat:
     """ Boat class """
-    markersize = 10
     def __init__(self, position :list[float, float],
         ground_track:Track = Track([0,0],track_type='ground_track'),
         water_track:Track = Track([0,0],track_type='water_track'),
         tide_track:Track = Track([0,0],track_type='tide_track'),
-        waypoint_distance:float = None, color ='b'
+        waypoint_distance:float = None, color ='b',
+        boat_size=10
         ):
         
         self.position = position
@@ -79,11 +79,12 @@ class Boat:
         self.waypoint_distance = waypoint_distance
         self.ground_track.start_position = position
         self.tide_track.start_position = position
+        self.boat_size = boat_size
         
     def update_course_to_steer(self):
         """ 
-        A course to steer is a method of calculation what heading the boat needs 
-        to be pointing at in order to get successfullyt to its waypoint considering 
+        A course to steer is a method of calculating what heading the boat needs 
+        to be pointing at in order to get successfully to its waypoint considering 
         the effects of tide and leeway. 
         Let us define  a vector min_distance_tide_ground from end of tide_track vector 
         to the closest point of ground_track vector 
@@ -126,7 +127,7 @@ class Boat:
             angle = self.water_track.course - np.pi/2
             boat_marker = boat_marker.transformed(transforms.Affine2D().rotate(-angle))
         plt.plot(self.position[0], self.position[1], marker=boat_marker,
-            markersize=self.markersize, color=self.color,  markerfacecolor='none',
+            markersize=self.boat_size, color=self.color,  markerfacecolor='none',
             linestyle = 'None')
 
     def set_position(self,position : list[float, float]) -> None:
@@ -270,11 +271,11 @@ class MarksMap:
 
 class BoatSimu:
     """ BoatSimu class, 
-    instantian Boat_true that represent the boat wit its true parameter
+    instantian Boat_true that represent the boat with its true parameter
     and boat_estimate taht represent the boat with estimated parameters"""
-    def __init__(self, true_position:list[float, float],estimate_position: list[float, float]):
-        self.boat_true = Boat( true_position, color='g')
-        self.boat_estimate = Boat( estimate_position, color='r')
+    def __init__(self, true_position:list[float, float], estimate_position: list[float, float], boat_size=10):
+        self.boat_true = Boat( true_position, color='g', boat_size=boat_size)
+        self.boat_estimate = Boat( estimate_position, color='r', boat_size=boat_size)
 
     def plot_boat(self) ->None:
         " plot boat true and boat estimate"
