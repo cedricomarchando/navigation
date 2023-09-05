@@ -1,7 +1,4 @@
 
-#to do
-logging 
-add traditionnal 3LOP
 
 # introduction
 
@@ -9,11 +6,14 @@ Alternative to GNSS  (global navigation satellite systems) such as GPS(USA), Gal
 
 navigation celestre
 navigation visuel assisté (adométrie)
-navigatiino par sugnaux d'opportunité
 navigation magnétique
+...
+# usage
+Try test_2lop_fix.py for 2 lop fix, test_3lop_fix.py for 3 lop fix and so on.
+Try test_cartopy for a navigation using waypoint, 3lop fix and course of stear in "rade de lorient"
 
-# navigation visuel assité
-python module for backend (traditional) sailing navigation  
+# navigation visuel assisté
+python module for backend (traditional) marine navigation  
 one can choose the "fix method"  
 
 > 2 Line of Position(LOP)
