@@ -548,7 +548,7 @@ class Route:
                      horizontalalignment='center',
                      verticalalignment='center',
                      color='w')
-        plt.plot(waypoints_x, waypoints_y, '-o', markersize=15)
+        plt.plot(waypoints_x, waypoints_y, '-o', color='b', markersize=15)
 
     def route_csv(self, csv_adress : str):
         """ Construct route from csv file"""
