@@ -19,10 +19,11 @@ coordinate_x,coordinate_y,mark_type,top_mark_type,light_color,name,floating,show
 -3.36705,47.72751,lighthouse,None,red
 -3.36774,47.72757,lighthouse,None,green
 -3.37408,47.71497,lighthouse,None,red
--3.36032,47.72448,land_tower
--3.36032,47.72448,major_lighthouse,None,green
--3.35917,47.72712,land_tower
--3.35917,47.72712,major_lighthouse,None,green
+-3.367834,47.72351,lighthouse,None,red
+# -3.36032,47.72448,land_tower
+-3.36032,47.72448,light_tower,None,green
+# -3.35917,47.72712,land_tower
+-3.35917,47.72712,light_tower,None,green
 -3.35995,47.72535,land_tower,None,None,Tourelle_Aimé
 -3.35197,47.72534,spar,green,green,None,None,False
 -3.35808,47.71756,conical,green,None,M1,True
@@ -38,11 +39,12 @@ coordinate_x,coordinate_y,mark_type,top_mark_type,light_color,name,floating,show
 -3.35369,47.73134,tower,green,green,Pengarne,None,False
 -3.35258,47.73248,conical,green,green,No9,True
 -3.35750,47.71276,spar,green,green
+-3.36834,47.7234,spar,green
 -3.35152,47.72559,spar,red,red,None,None,False
 -3.36533,47.7162,spar,red,red,N°2,True
 -3.35763,47.71972,can,red,None,M2,True
 -3.35496,47.72264,can,red,None,M4,True,False
--3.36723,47.72172,can,red,None,N°6,True,False
+# -3.36723,47.72172,can,red,None,N°6,True,False
 -3.35353,47.72723,can,red,None,M6,True,False
 -3.36601,47.71843,can,red,None,N°4,True,False
 -3.36722,47.71793,spar,red
@@ -51,7 +53,7 @@ coordinate_x,coordinate_y,mark_type,top_mark_type,light_color,name,floating,show
 -3.36785,47.71330,spar,red
 -3.35898,47.71376,can,red,None,None,True
 -3.36650,47.71862,spar,south,yellow
--3.36297,47.7187,spar,south,None,None,True
+-3.36297,47.7187,spar,south,None,T,True
 -3.37030,47.72651,spar,east,None,None,None,False
 -3.35252,47.73136,spar,east
 -3.36108,47.71447,spar,west,None,None,True
