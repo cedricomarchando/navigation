@@ -35,6 +35,7 @@ marks_map = nav.MarksMap()
 marks_map.marks_csv('marks.csv')
 marks_map.plot_map()
 
+# %%
 routes = nav.Route()
 routes.route_csv('./route.csv')
 routes.plot_route()
@@ -44,12 +45,13 @@ print(routes.route[0])
 sigma = np.pi/90 # 2 degree
 
 
-SPEED = 0.1
+SPEED = 0.2
 FIX_PERIOD = 0.01
+BOAT_SIZE =15
 
-boat_simu = nav.BoatSimu(routes.route[0].position, routes.route[0].position)
+boat_simu = nav.BoatSimu(routes.route[0].position, routes.route[0].position, boat_size=BOAT_SIZE)
 
-boat_simu.set_tide_track(course=np.pi, speed=SPEED/3)
+boat_simu.set_tide_track(course=np.pi, speed=SPEED/2)
 
 boat_simu.compute_waypoint_distance(routes.route[1])
 print(f'distance_estimate:{boat_simu.boat_estimate.waypoint_distance} \t distance_true:{boat_simu.boat_true.waypoint_distance}')
