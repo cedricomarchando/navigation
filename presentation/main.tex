@@ -93,14 +93,14 @@
         Why Python?
         \begin{itemize}
             \item Python is used in many projects ( machine learning, image recognition)
-            \item lots of libraries (NumPy, Matplotlib, Cartopy, ...)
+            \item Lots of libraries (NumPy, Matplotlib, Cartopy, ...)
             \item No navigation tools (to my knowledge) available in Python
         \end{itemize}
     
     \column{0.5\textwidth}
-        New modules
+        New modules:
         \begin{itemize}
-            \item to extend the set of markers used in Matplotlib with the nautical symbol
+            \item A set of nautical marks used as markers in Matplotlib
             \item Navigation tools
         \end{itemize}
     \end{columns}
@@ -111,6 +111,9 @@
         \includegraphics[height=1.5cm]{./pictures/numpy.png}
         \includegraphics[height=1.5cm]{./pictures/matplotlib.png}
         \includegraphics[height=1.5cm]{./pictures/cartopy.jpeg}
+        \includegraphics[height=1.5cm]{./pictures/TensorFlow.png}
+        \includegraphics[height=1.5cm]{./pictures/PyTorch.png}
+        \includegraphics[height=1.5cm]{./pictures/OpenCV.png}
         \end{figure}
 
 
@@ -137,14 +140,15 @@
 
 
 \begin{frame}
-    \frametitle{Marker on a map [1]}
+    \frametitle{Markers[1] on a map [2]}
     \begin{figure}[h]
     \centering
     \includegraphics[width=12cm]{./pictures/map_marker.png}
+    %\caption{Rade de Lorient}
     \end{figure}
     %{ \tiny Markers are added using a CSV file:
     %"-3.36396, 47.72219, pillar, green, green, Banc du Turc, True" produces a floating green pillar named "Banc du turc" with green light %at position -3.36396E, 47.72219N}
-    [1] \href{https://www.openseamap.org/}{openseamap} 
+    [1] From a CSV file;  [2] "Rade de Lorient" from \href{https://www.openseamap.org/}{openseamap}
 \end{frame}
 
 \section{Line of Position (LOP) Fix}
@@ -214,7 +218,7 @@
 \begin{frame}
     \frametitle{Course of steer}
 
-    A course to steer is a method of calculating what heading the boat needs to be pointing at in order to get successfully to its way-point considering the effects of tide and leeway. 
+    A course to steer is a method of calculating what heading the boat needs to be pointing at to get successfully to its way-point considering the effects of tide and leeway. 
     \begin{columns}
     \column{0.5\textwidth}
 
@@ -240,7 +244,7 @@
 
         \begin{figure}[h]
         \centering
-        \includegraphics[width=12cm]{waypoints.png}
+        \includegraphics[width=12cm]{./pictures/waypoints.png}
         \end{figure}
         
 \end{frame}
@@ -267,7 +271,8 @@ Python modules for
         \end{itemize}
         \item Python modules available on GitHub
         \begin{itemize}
-            \item https://github.com/cedricomarchando/navigation
+            %\item https://github.com/cedricomarchando/navigation
+            \item https://github.com/Lab-STICC-UBS/navigation
         \end{itemize}
         
     \end{itemize}
@@ -284,11 +289,13 @@ Python modules for
         \item Wrapper to add existing mark positions, coastline, depth
         \item Nautical navigation front end (bearing, mark detection, etc.)
         \item Improve position estimate
-        \item Promotion, valorization, publication, license
         \item Add collision avoidance
-        \item Fusion with IMU
+        \item Add LOP with distance
+        \item Add IMU, Kalman filter
+        \item Fusion of position results
         \item Comparison with state-of-the-art
-        \item Back end for celestial navigation
+        \item Promotion, valorization, publication, license
+        \item Add celestial navigation
         \item ...
     \end{itemize}s
 \end{frame}
